@@ -1,0 +1,63 @@
+{
+  "pdf": "output/pdf/FOLLOW-Showcase.pdf",
+  "pages": 7,
+  "textOnly": true,
+  "browserImport": "passed",
+  "localRetrieval": [
+    {
+      "utterance": "Explain the four-stage workflow: build the knowledge base, transcribe speech, retrieve source material and refine the explanation.",
+      "matchedTopics": [
+        "Four\u2011stage FOLLOW workflow"
+      ],
+      "renderable": true
+    },
+    {
+      "utterance": "Compare fixed slides with FOLLOW and the speech-directed canvas.",
+      "matchedTopics": [
+        "Fixed slides versus FOLLOW dynamic canvas"
+      ],
+      "renderable": true
+    },
+    {
+      "utterance": "Explain source evidence, exact quotations and source checking.",
+      "matchedTopics": [
+        "All visuals must be backed by source quotations"
+      ],
+      "renderable": true
+    },
+    {
+      "utterance": "The active board shows up to 3 visual elements, and history retains 24 introduced concepts.",
+      "matchedTopics": [
+        "Canvas retains up to 24 concepts for overview"
+      ],
+      "renderable": true
+    }
+  ],
+  "realGroq": {
+    "provider": "real Groq using the final PDF extracted by PDF.js",
+    "preparation": {
+      "topics": 5,
+      "pages": 7
+    },
+    "turns": [
+      {
+        "intent": "process",
+        "http": 502,
+        "ms": 10216,
+        "error": "PROVIDER_RATE_LIMIT"
+      },
+      {
+        "intent": "comparison",
+        "http": 502,
+        "ms": 11610,
+        "error": "PROVIDER_RATE_LIMIT"
+      },
+      {
+        "intent": "metric",
+        "http": 502,
+        "ms": 10167,
+        "error": "PROVIDER_RATE_LIMIT"
+      }
+    ]
+  }
+}
