@@ -1,0 +1,16 @@
+[
+  {
+    "source": "fictional-rooftop-farm.pdf",
+    "provider": "real Groq",
+    "knowledgePages": 1,
+    "indexTopics": 4,
+    "quotesVerified": 13,
+    "liveVisualTypes": [
+      "process"
+    ],
+    "liveTitles": [
+      "Water Recirculation Steps"
+    ],
+    "liveMs": 1568
+  }
+]

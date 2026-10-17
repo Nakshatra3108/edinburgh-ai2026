@@ -1,0 +1,23 @@
+{
+  "provider": "real Groq",
+  "model": "openai/gpt-oss-120b",
+  "source": "demo/source/follow-demo.pdf",
+  "knowledgePages": 4,
+  "visualTypes": [
+    "process"
+  ],
+  "quotesVerified": 4,
+  "usage": {
+    "promptTokens": 2039,
+    "completionTokens": 775,
+    "reasoningTokens": 253,
+    "totalTokens": 2814
+  },
+  "attempts": [
+    {
+      "kind": "initial",
+      "outcome": "ok",
+      "ms": 2164
+    }
+  ]
+}

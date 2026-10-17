@@ -61,3 +61,22 @@
   .source-text { max-height: 50dvh; padding: 20px; }
   .source-panel { border-left: 0; border-top: 1px solid var(--line); }
 }
+
+.source-panel-intro { padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+.source-panel-intro h1 { font-size: 24px; line-height: 1.3; }
+.source-panel-intro p { margin-top: 12px; color: var(--text-secondary); font-size: 13px; line-height: 1.7; }
+.source-page.is-active { box-shadow: inset 0 0 0 1px var(--brand); }
+.source-preview { align-items: stretch; }
+.source-text, .source-edit { width: 100%; margin: 0 auto; }
+.source-preview-topline { width: 100%; max-width: 760px; margin: 0 auto; }
+.source-panel .prepare-button { width: 100%; }
+.source-panel .prepare-button:disabled { background: var(--surface-raised); color: var(--text-secondary); border-color: var(--line); }
+@media (max-width: 600px) {
+  .source-screen .project-title, .source-screen .header-separator { display: none; }
+  .source-screen .app-header { gap: 8px; padding: 0 12px; flex-wrap: wrap; height: auto; min-height: 68px; }
+  .source-screen .app-header .badge { white-space: normal; font-size: 10px; max-width: 130px; }
+  .source-body { display: flex; flex-direction: column; }
+  .source-panel { order: -1; padding: 20px; }
+}
+
+.source-page.is-active small { color: var(--brand); }

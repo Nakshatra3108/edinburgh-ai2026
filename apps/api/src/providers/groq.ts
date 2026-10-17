@@ -37,6 +37,8 @@ export class ProviderHttpError extends PrepError {
 function mapStatus(status: number, providerCode: string | undefined, message: string): PrepError {
   const text = `${providerCode ?? ''} ${message}`.toLowerCase();
   if (status === 401 || status === 403) return new PrepError('PROVIDER_AUTH');
+  // Rate-limit messages can contain billing/quota help links; HTTP 429 is retryable.
+  if (status === 429 && !/insufficient_quota/.test(providerCode ?? '')) return new PrepError('PROVIDER_RATE_LIMIT');
   if (status === 402 || /insufficient_quota|quota|billing/.test(text)) return new PrepError('PROVIDER_QUOTA');
   if (status === 413 || /context_length|too large|maximum context/.test(text)) return new PrepError('SOURCE_TOO_LARGE', 'The selected text is too long for the model. Select fewer pages.');
   if (status === 429) return new PrepError('PROVIDER_RATE_LIMIT');
@@ -57,6 +59,7 @@ export function createGroqProvider(opts: { apiKey: string; model: string; fetchI
         headers: { Authorization: `Bearer ${opts.apiKey}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: opts.model,
+          ...(opts.model.startsWith('openai/gpt-oss-') ? { reasoning_effort: 'low' } : {}),
           messages,
           response_format: { type: 'json_schema', json_schema: { name: schemaName, strict: true, schema } },
           max_completion_tokens: maxCompletionTokens,

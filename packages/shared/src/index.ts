@@ -10,7 +10,7 @@ export const conceptSchema = z
     aliases: z.array(z.string()),
     speechExamples: z.array(z.string()),
     enabled: z.boolean(),
-    review: z.enum(["reviewed", "needs-review"]),
+    review: z.enum(["reviewed", "needs-review", "source-checked"]),
     details: z.array(
       z
         .object({ id: z.string().min(1), text: z.string().min(1) })
@@ -29,7 +29,7 @@ export const manifestSchema = z
     id: z.string().min(1),
     revision: z.number().int().positive(),
     title: z.string(),
-    concepts: z.array(conceptSchema).min(1),
+    concepts: z.array(conceptSchema),
     relationships: z.array(
       z
         .object({
@@ -45,6 +45,7 @@ export const manifestSchema = z
   })
   .passthrough()
   .superRefine((p, ctx) => {
+    if (!p.concepts.length && !p.knowledgeBase) ctx.addIssue({code: 'custom', message: 'An empty project requires a knowledge base'});
     const ids = new Set(p.concepts.map((c) => c.id));
     if (ids.size !== p.concepts.length)
       ctx.addIssue({ code: "custom", message: "Duplicate concept IDs" });

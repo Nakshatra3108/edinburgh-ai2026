@@ -4,13 +4,14 @@
 // method, URL, status and timing only; source text is never logged.
 
 import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify';
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import type { Config } from './config.ts';
 import { PrepError, envelope } from './errors.ts';
 import { JobStore } from './jobs.ts';
 import { normalizeText } from './generation/sourceText.ts';
 import { PLAN_LIMITS, PLAN_SCHEMA_VERSION } from './generation/planSchema.ts';
+import { runPreparation } from './generation/prepare.ts';
 import { PROMPT_VERSION } from './generation/prompt.ts';
 import { createGroqProvider, type CompletionProvider } from './providers/groq.ts';
 
@@ -34,9 +35,12 @@ export type ServerDeps = { config: Config; provider?: CompletionProvider; logger
 export function buildServer({ config, provider, logger = true }: ServerDeps): FastifyInstance {
   const app = Fastify({ logger, bodyLimit: BODY_LIMIT, genReqId: () => randomUUID() });
   const configured = Boolean(provider ?? config.groqApiKey);
+  const completion = provider ?? (config.groqApiKey ? createGroqProvider({ apiKey: config.groqApiKey, model: config.groqModel }) : null);
+  let liveBusy = false;
+  const liveCache = new Map<string, unknown>();
   const jobs = configured
     ? new JobStore({
-        provider: provider ?? createGroqProvider({ apiKey: config.groqApiKey!, model: config.groqModel }),
+        provider: completion!,
         model: config.groqModel,
         timeoutMs: config.prepTimeoutMs,
         maxJobsPerSession: config.maxPrepJobsPerSession,
@@ -100,6 +104,38 @@ export function buildServer({ config, provider, logger = true }: ServerDeps): Fa
     const view = jobs.submit({ source: { name: source.name, sha256: source.sha256, pageCount: source.pageCount }, pages: pages.filter((p) => p.text), density }, { sessionId, regenerate });
     req.log.info({ jobId: view.jobId, pages: pages.length, chars, cached: view.cached }, 'prepare submitted');
     return reply.code(202).send(view);
+  });
+
+  // The document is a knowledge base, not a fixed visual sequence. Every turn
+  // composes a fresh, source-checked scene for the current explanation.
+  app.post('/api/live/compose', async (req, reply) => {
+    if (!completion) throw new PrepError('NOT_CONFIGURED');
+    const schema = z.object({ source: prepareBody.shape.source, utterance: z.string().trim().min(8).max(2000) }).strict();
+    const parsed = schema.safeParse(req.body);
+    if (!parsed.success) throw new PrepError('INVALID_SOURCE', 'Supply document pages and a spoken explanation of 8–2000 characters.');
+    const { source, utterance } = parsed.data;
+    const pages = source.pages.map(p => ({ page: p.page, text: normalizeText(p.text) }));
+    if (pages.length > MAX_SELECTED_PAGES || pages.reduce((n, p) => n + p.text.length, 0) > config.maxSourceChars) throw new PrepError('SOURCE_TOO_LARGE');
+    if (new Set(pages.map(p => p.page)).size !== pages.length || pages.some(p => p.page > source.pageCount) || !pages.some(p => p.text)) throw new PrepError('INVALID_SOURCE');
+    const key = createHash('sha256').update(JSON.stringify([source, utterance.toLowerCase()])).digest('hex');
+    if (liveCache.has(key)) return liveCache.get(key);
+    if (liveBusy) throw new PrepError('PREP_BUSY', 'A live visual is being composed. Keep speaking; the latest explanation will follow.');
+    liveBusy = true;
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(new PrepError('PREP_TIMEOUT')), Math.min(config.prepTimeoutMs, 45000));
+    const disconnected = () => { if (!reply.raw.writableEnded) ctl.abort(new PrepError('CANCELLED')); };
+    reply.raw.on('close', disconnected);
+    try {
+      const result = await runPreparation({ source, pages, density: 'concise', utterance }, { provider: completion, model: config.groqModel, signal: ctl.signal });
+      const response = { project: result.project, warnings: result.warnings, usage: result.usage, supported: result.project.concepts.length > 0 };
+      liveCache.set(key, response);
+      if (liveCache.size > 32) liveCache.delete(liveCache.keys().next().value!);
+      return response;
+    } finally {
+      clearTimeout(timer);
+      reply.raw.off('close', disconnected);
+      liveBusy = false;
+    }
   });
 
   app.get<{ Params: { jobId: string } }>('/api/prepare/:jobId', async (req) => {

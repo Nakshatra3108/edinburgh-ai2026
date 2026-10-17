@@ -13,7 +13,7 @@ export type Detail = { id: string; text: string; sources: SourceRef[]; origin: '
 export type Concept = {
   id: string; title: string; summary: string; aliases: string[]; speechExamples: string[];
   visual: VisualPayload; details: Detail[]; sources: SourceRef[]; assetIds: string[]; enabled: boolean;
-  review: 'needs-review' | 'reviewed'; position: { x: number; y: number };
+  review: 'needs-review' | 'reviewed' | 'source-checked'; position: { x: number; y: number };
 };
 export type Relationship = {
   id: string; from: string; to: string; label: string;
@@ -23,6 +23,7 @@ export type CanvasProject = {
   schemaVersion: 1; id: string; revision: number; title: string;
   source: { name: string; sha256: string; pages: number };
   preparation: { mode: 'groq' | 'curated'; model: string | null; promptVersion: string; preparedAt: string };
+  knowledgeBase?: { version: 1; pages: { page: number; text: string }[] };
   concepts: Concept[]; relationships: Relationship[]; assets: never[]; approvedRevision: number | null;
 };
 

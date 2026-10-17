@@ -1,3 +1,5 @@
+> Current product direction: see [knowledge-base and live canvas amendment](KNOWLEDGE-CANVAS.md) and the canonical [FOLLOW-PRD](../FOLLOW-PRD.md). Older fixed-concept/manual-review requirements below are superseded for the main studio.
+
 # FOLLOW
 ## Product requirements, visual design, and engineering specification
 

@@ -1,3 +1,5 @@
+> Historical audit: the current knowledge-base and live-composition implementation is documented in [KNOWLEDGE-CANVAS.md](KNOWLEDGE-CANVAS.md). Speech capture, the preparation API and live composition have since been connected in the main studio.
+
 # FOLLOW application status — 17 October 2026
 
 Audit baseline: main commit `e7b1370` (curated demo manifest), plus the Groq provider alignment in this branch. Only code available in the pulled repository was assessed; teammates may have unpublished work. There were no other open PRs at the start of this audit.

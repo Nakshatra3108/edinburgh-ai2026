@@ -19,7 +19,9 @@ export type Config = {
 const LOOPBACK = new Set(['127.0.0.1', '::1', 'localhost']);
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env, envFile = resolve(dirname(fileURLToPath(import.meta.url)), '../.env')): Config {
-  if (env === process.env && existsSync(envFile)) process.loadEnvFile(envFile);
+  // Match the smoke script: prefer apps/api/.env, then the repository .env.
+  const selectedEnvFile = existsSync(envFile) ? envFile : resolve(dirname(fileURLToPath(import.meta.url)), '../../../.env');
+  if (env === process.env && existsSync(selectedEnvFile)) process.loadEnvFile(selectedEnvFile);
   const int = (name: string, fallback: number, min: number, max: number) => {
     const raw = env[name];
     const value = raw === undefined || raw === '' ? fallback : Number(raw);

@@ -12,7 +12,7 @@
     "typecheck": "tsc -p .",
     "verify:phrases": "node scripts/verify-phrases.ts",
     "start": "node src/main.ts",
-    "test": "node --test test/generation.test.ts test/prepare.test.ts test/server.test.ts"
+    "test": "node --test test/generation.test.ts test/prepare.test.ts test/server.test.ts test/live.test.ts"
   },
   "dependencies": {
     "fastify": "5.12.7",

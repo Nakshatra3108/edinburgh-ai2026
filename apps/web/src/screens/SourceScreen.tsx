@@ -35,6 +35,7 @@ export function SourceScreen({ source, onBack, onOpenProject, onOpenDemo }: {
   const [edits, setEdits] = useState<Record<number, string>>({});
   const [editing, setEditing] = useState(false);
   const [health, setHealth] = useState<HealthView | Failure | null>(null);
+  const [submitting, setSubmitting] = useState(false);
   const [run, setRun] = useState<Run>({ phase: 'idle' });
   const polling = useRef<AbortController | null>(null);
 
@@ -56,7 +57,7 @@ export function SourceScreen({ source, onBack, onOpenProject, onOpenDemo }: {
   const selection = useMemo(() => evaluateSelection(effective, selected), [effective, selected]);
   const activePage = effective.pages.find((p) => p.page === active);
   const ready = health && 'configured' in health && health.configured;
-  const running = run.phase === 'running';
+  const running = submitting || run.phase === 'running';
   const blocked = !ready || running || selection.problems.length > 0;
 
   const toggle = (page: number) => setSelected((s) => (s.includes(page) ? s.filter((p) => p !== page) : [...s, page]));
@@ -99,7 +100,8 @@ export function SourceScreen({ source, onBack, onOpenProject, onOpenDemo }: {
   };
 
   const prepare = async (regenerate: boolean) => {
-    setEditing(false);
+    if (running) return;
+    setSubmitting(true); setEditing(false);
     try {
       const job = await submitPreparation({
         sessionId: SESSION_ID, density, regenerate,
@@ -111,7 +113,7 @@ export function SourceScreen({ source, onBack, onOpenProject, onOpenDemo }: {
       poll(job.jobId, Date.now() + limit + 15_000);
     } catch (e) {
       setRun({ phase: 'failed', failure: toFailure(e) });
-    }
+    } finally { setSubmitting(false); }
   };
 
   const cancel = async () => {
@@ -126,7 +128,7 @@ export function SourceScreen({ source, onBack, onOpenProject, onOpenDemo }: {
       <Wordmark/>
       <span className="header-separator"/>
       <span className="project-title">{source.name}</span>
-      <span className="badge">Source and preparation</span>
+      <span className="badge">Build your knowledge base</span>
     </header>
 
     <main className="source-body">
@@ -152,14 +154,15 @@ export function SourceScreen({ source, onBack, onOpenProject, onOpenDemo }: {
           ? <label className="source-edit">Corrections are sent instead of the extracted text, and quotes are checked against your version.
               <textarea value={edits[active] ?? activePage?.text ?? ''} onChange={(e) => setEdits((m) => ({ ...m, [active]: e.target.value }))}/>
             </label>
-          : <div className="source-text">{activePage?.chars ? activePage.text : <p className="notice">This page has no selectable text. Scanned pages need OCR, which this prototype does not do.</p>}</div>}
+          : <div className="source-text" tabIndex={0}>{activePage?.chars ? activePage.text : <p className="notice">This page has no selectable text. Scanned pages need OCR, which this prototype does not do.</p>}</div>}
       </section>
 
       <aside className="source-panel" aria-label="Preparation">
+        <div className="source-panel-intro"><h1>Knowledge first.<br/>Visuals as you speak.</h1><p>Keep the full selected text as your reference. Groq indexes its topics; your explanation decides what gets drawn.</p></div>
         <label>Project title<input value={title} maxLength={160} onChange={(e) => setTitle(e.target.value)} disabled={running}/></label>
         <fieldset className="density" disabled={running}>
-          <legend>Content density</legend>
-          {(['concise', 'standard'] as const).map((d) => <label key={d} className="checkbox-label"><input type="radio" name="density" checked={density === d} onChange={() => setDensity(d)}/>{d === 'concise' ? 'Concise · up to 6 ideas' : 'Standard · up to 8 ideas'}</label>)}
+          <legend>Topic index depth</legend>
+          {(['concise', 'standard'] as const).map((d) => <label key={d} className="checkbox-label"><input type="radio" name="density" checked={density === d} onChange={() => setDensity(d)}/>{d === 'concise' ? 'Essential topics · up to 6' : 'Broader coverage · up to 8'}</label>)}
         </fieldset>
         <div className="selection-summary">
           <p><strong>{selection.pages.length}</strong> of {MAX_SELECTED_PAGES} pages · <strong>{selection.chars.toLocaleString()}</strong> of {MAX_SOURCE_CHARS.toLocaleString()} characters</p>
@@ -169,9 +172,9 @@ export function SourceScreen({ source, onBack, onOpenProject, onOpenDemo }: {
 
         <ServerStatus health={health}/>
         <button className={`prepare-button ${run.phase === 'done' ? '' : 'primary'}`} disabled={blocked} onClick={() => void prepare(run.phase === 'done')}>
-          <Sparkles size={16}/>{run.phase === 'done' ? 'Prepare again with Groq' : 'Prepare canvas with Groq'}
+          <Sparkles size={16}/>{run.phase === 'done' ? 'Rebuild knowledge index' : 'Build knowledge base'}
         </button>
-        <p className="privacy-note">Selected document text is sent to Groq for preparation. Live speech stays on this device.</p>
+        <p className="privacy-note">Selected text is kept in your session and sent to Groq to index topics and compose live visuals. Audio is transcribed locally with Whisper.</p>
 
         {run.phase !== 'idle' && <Progress run={run} pages={source.pageCount}/>}
         {run.phase === 'running' && <button onClick={() => void cancel()}><X size={16}/>Cancel</button>}
@@ -192,11 +195,11 @@ export function SourceScreen({ source, onBack, onOpenProject, onOpenDemo }: {
 function ServerStatus({ health }: { health: HealthView | Failure | null }) {
   if (!health) return <p className="server-status"><CircleDashed size={14}/>Checking the preparation server…</p>;
   if (!('configured' in health)) return <p className="server-status is-warning"><AlertTriangle size={14}/>{health.message}</p>;
-  if (!health.configured) return <p className="server-status is-warning"><AlertTriangle size={14}/>The server has no Groq key. Add GROQ_API_KEY to apps/api/.env.</p>;
+  if (!health.configured) return <p className="server-status is-warning"><AlertTriangle size={14}/>Groq is not configured. Set GROQ_API_KEY in the repository .env or apps/api/.env, then restart the API.</p>;
   return <p className="server-status is-ready"><Check size={14}/>Groq ready · {health.model}</p>;
 }
 
-const STEPS = ['Reading PDF', 'Preparing concepts', 'Checking sources', 'Arranging canvas'] as const;
+const STEPS = ['Reading PDF', 'Indexing topics', 'Checking sources', 'Knowledge base ready'] as const;
 
 function Progress({ run, pages }: { run: Exclude<Run, { phase: 'idle' }>; pages: number }) {
   const stage = run.phase === 'done' ? 'done' : run.job?.stage;
@@ -216,10 +219,10 @@ function Progress({ run, pages }: { run: Exclude<Run, { phase: 'idle' }>; pages:
 function Done({ run, onOpen }: { run: Extract<Run, { phase: 'done' }>; onOpen: () => void }) {
   const r = run.job.result!;
   return <div className="prep-done">
-    <p><strong>{r.stats.conceptsKept}</strong> ideas · <strong>{r.stats.quotesVerified}</strong> of {r.stats.quotesProposed} quotes matched the source{run.job.cached ? ' · reused earlier result' : ` · ${run.job.usage.totalTokens.toLocaleString()} tokens`}</p>
-    {r.warnings.length > 0 && <details><summary>{r.warnings.length} items removed or changed during source checks</summary><ul>{r.warnings.map((w, i) => <li key={i}>{w.message}</li>)}</ul></details>}
-    <p className="notice">Every idea starts as needing review. Check it against its sources before presenting.</p>
-    <button className="primary" onClick={onOpen}>Review your canvas<ArrowRight size={16}/></button>
+    <p><strong>{run.project.knowledgeBase?.pages.length ?? 0}</strong> full source pages · <strong>{r.stats.conceptsKept}</strong> indexed topics · <strong>{r.stats.quotesVerified}</strong> of {r.stats.quotesProposed} quotes matched the source{run.job.cached ? ' · reused earlier result' : ` · ${run.job.usage.totalTokens.toLocaleString()} tokens`}</p>
+    {r.warnings.length > 0 && <details><summary>{r.warnings.length} source-check notes</summary><ul>{r.warnings.map((w, i) => <li key={i}>{w.message}</li>)}</ul></details>}
+    <p className="notice">Your knowledge base is ready. Start explaining any topic to compose source-backed visuals. You can inspect the topic index in the studio; manual review is optional.</p>
+    <button className="primary" onClick={onOpen}>Open speaking studio<ArrowRight size={16}/></button>
   </div>;
 }
 

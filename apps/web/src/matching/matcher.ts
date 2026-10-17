@@ -71,7 +71,7 @@ export class Matcher {
       action.type === "FOCUS" &&
       this.manifest.concepts.some(
         (c) =>
-          c.id === action.conceptId && c.enabled && c.review === "reviewed",
+          c.id === action.conceptId && c.enabled && c.review !== "needs-review",
       )
     )
       this.active = action.conceptId;
@@ -88,7 +88,7 @@ export class Matcher {
   ): MatchResult {
     const eligible = new Set(
       this.manifest.concepts
-        .filter((c) => c.enabled && c.review === "reviewed")
+        .filter((c) => c.enabled && c.review !== "needs-review")
         .map((c) => c.id),
     );
     const ranked = scores

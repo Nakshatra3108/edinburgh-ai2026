@@ -26,7 +26,7 @@ function CanvasInner({ state, mode = 'studio', reducedMotion = false, onAction, 
   const [zoom, setZoom] = useState(1);
   const [dragPositions, setDragPositions] = useState<Record<string, { x: number; y: number }>>({});
   const [cameraRequest, setCameraRequest] = useState(0);
-  const renderState = useMemo(() => mode === 'audience' ? { ...state, project: { ...state.project, concepts: state.project.concepts.filter(c => c.review === 'reviewed') } } : state, [mode, state]);
+  const renderState = useMemo(() => mode === 'audience' ? { ...state, project: { ...state.project, concepts: state.project.concepts.filter(c => c.review !== 'needs-review') } } : state, [mode, state]);
   const scene = useMemo(() => getComposition(renderState), [renderState]);
   const lastCamera = useRef({ key: '', at: -Infinity });
   const nodes = useMemo<FollowNode[]>(() => scene.map(item => ({
@@ -68,13 +68,17 @@ function CanvasInner({ state, mode = 'studio', reducedMotion = false, onAction, 
     const bounds = getCompositionBounds(renderState);
     const key = JSON.stringify([bounds, size, cameraRequest]);
     if (lastCamera.current.key === key) return;
-    const viewport = getViewportForBounds(bounds, size.width, size.height, 0.01, 1.4, 0.12);
+    // Keep the composition label and studio toolbar outside the fitted content.
+    const topInset = state.pair ? (mode === 'studio' ? 64 : 32) : 0;
+    const bottomInset = mode === 'studio' ? 76 : 0;
+    const viewport = getViewportForBounds(bounds, size.width, Math.max(80, size.height - topInset - bottomInset), 0.01, 1.4, 0.12);
+    viewport.y += topInset;
     const commit = () => {
       lastCamera.current = { key, at: performance.now() };
       void flow.setViewport(viewport, { duration: reducedMotion || cameraOrigin === 'manual' ? 0 : 280, ease: cameraEase });
     };
     commit();
-  }, [ready, size, renderState, flow, reducedMotion, cameraOrigin, cameraRequest]);
+  }, [ready, size, renderState, flow, reducedMotion, cameraOrigin, cameraRequest, mode, state.pair]);
   const positionChange = useCallback((changes: NodeChange<FollowNode>[]) => {
     changes.forEach(c => {
       if (c.type !== 'position' || !c.position) return;
@@ -106,7 +110,7 @@ function CanvasInner({ state, mode = 'studio', reducedMotion = false, onAction, 
       <button aria-label="Zoom out" onClick={() => void flow.zoomOut({ duration: 0 })}><Minus size={16}/></button><span className="zoom-value">{Math.round(zoom * 100)}%</span><button aria-label="Zoom in" onClick={() => void flow.zoomIn({ duration: 0 })}><Plus size={16}/></button><span className="toolbar-divider"/>
       <button onClick={() => setLocked(v => !v)} aria-pressed={locked} title={state.view !== 'overview' ? 'Return to overview before rearranging' : 'Lock or unlock home positions'}>{locked ? <LockKeyhole size={16}/> : <UnlockKeyhole size={16}/>}<span>{locked ? 'Layout locked' : 'Rearrange'}</span></button>
     </div>}
-    {scene.length === 0 && <div className="canvas-empty" role="status"><p>{mode === 'audience' ? 'No reviewed content is ready.' : 'No enabled concepts.'}</p>{mode === 'studio' && <span>Re-enable a concept in the concept rail to restore the map.</span>}</div>}
+    {scene.length === 0 && <div className="canvas-empty" role="status"><p>{state.live ? 'Your words build the canvas.' : mode === 'audience' ? 'No reviewed content is ready.' : 'No enabled concepts.'}</p>{mode === 'studio' && <span>{state.live ? 'Start listening or type an explanation. Visuals appear as you speak.' : 'Re-enable a concept in the concept rail to restore the map.'}</span>}</div>}
     <p className="sr-only" role="status" aria-live="polite">{topic}</p>
   </div>;
 }

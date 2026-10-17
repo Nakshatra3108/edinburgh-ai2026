@@ -11,14 +11,24 @@ npm run dev
 - **Canvas / Person A:** http://127.0.0.1:5173/
 - **Speech lab / Person C:** http://127.0.0.1:5173/speech.html
 
-The pages are independent development harnesses. D's controller has not yet connected speech decisions to the canvas, audience sync or persistence. No API key is required for either harness. Use Node 22.13+; the merged PDF.js dependency requires that version even though the web build may still complete on older Node installations.
+The main studio now connects Person C's local Whisper capture to Groq live composition. Upload a PDF to build a full-text knowledge base, then explain any part of it to compose visuals on the canvas. The independent speech lab and curated manual demo remain usable without an API key. Live composition requires the Groq API server. Use Node 22.13+; the merged PDF.js dependency requires that version even though the web build may still complete on older Node installations.
+
+## Groq backend
+
+```sh
+npm ci --prefix apps/api
+npm start --prefix apps/api
+```
+
+The API loads `apps/api/.env` or falls back to the repository `.env`. Keep `GROQ_API_KEY` and `GROQ_MODEL` there. Run the web app in a second terminal with `npm run dev`; Vite proxies `/api` to port 8787. Test fixture servers use port 8790 exclusively.
 
 ## Canvas and team content
 
 Open **Open demo project** for the real curated source, or **Open example canvas** for the visual component examples. Select an idea, reveal details, or use **Action laboratory** to trigger FOCUS, REVEAL, CONNECT, COMPARE, OVERVIEW and HOLD. **Audience preview** uses the same renderer without studio controls and supports fullscreen.
 
-`demo/manifest.json` is Person B's real curated PDF manifest, with the PDF at `demo/source/follow-demo.pdf`. Uploading that exact PDF opens the curated project after local extraction and hash/quote verification. Person A's bundled example under `apps/web/src/canvas/fixtures/` remains explicitly illustrative.
+`demo/manifest.json` is Person B's real curated PDF manifest, with the PDF at `demo/source/follow-demo.pdf`. Uploading any PDF, including the demo PDF, opens source selection and knowledge-base preparation. The full selected text is retained; the topic index is optional, and the stage starts empty until you speak or type an explanation. Person A's bundled example under `apps/web/src/canvas/fixtures/` remains explicitly illustrative.
 
+- [Knowledge-base and live-composition workflow](docs/KNOWLEDGE-CANVAS.md)
 - [Light UI refresh and current visual behavior](docs/UI-REFRESH.md)
 - [Person A handoff](docs/person-a/HANDOFF.md)
 - [Team application status and remaining work](docs/APPLICATION-STATUS.md)
@@ -59,7 +69,7 @@ npm run test:browser -- tests/browser/models.spec.ts
 npm run test:models
 ```
 
-Use the root `package-lock.json` for the web/shared workspaces. `apps/api` retains Person B's independent package and lockfile; its scripts and Node requirements remain in `apps/api/package.json`. API/provider preparation is separate from the local speech lab.
+Use the root `package-lock.json` for the web/shared workspaces. `apps/api` retains Person B's independent package and lockfile; its scripts and Node requirements remain in `apps/api/package.json`. The independent speech lab stays separate; the main studio connects its local audio components to Groq live visual composition.
 
 Preparation uses **Groq**, with server-only `GROQ_API_KEY` and `GROQ_MODEL` (initial candidate `openai/gpt-oss-120b`). Run the backend smoke test with `npm run smoke:groq --prefix apps/api` after environment setup. The Fastify preparation endpoints are implemented under `apps/api`; the curated canvas and local speech lab remain usable without a key.
 

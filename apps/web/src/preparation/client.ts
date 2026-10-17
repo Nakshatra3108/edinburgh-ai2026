@@ -59,6 +59,7 @@ async function call<T>(path: string, init?: RequestInit): Promise<T> {
     if (body && typeof body.code === 'string') throw new PrepClientError(body.code, body.message, Boolean(body.retryable));
     throw new PrepClientError('SERVER_UNREACHABLE', 'The preparation server is not running. Start it with npm start --prefix apps/api.', true);
   }
+  if (body === null) throw new PrepClientError('SERVER_UNREACHABLE', 'The API did not return JSON. Start the API server and restart Vite to load its /api proxy.', true);
   return body as T;
 }
 
@@ -69,3 +70,11 @@ export const cancelJob = (jobId: string) => call<JobView>(`/prepare/${encodeURIC
 
 /** One id per page load: the server caps preparation jobs per session. */
 export const SESSION_ID = `web-${crypto.randomUUID().slice(0, 12)}`;
+
+export type LiveComposition = { project: CanvasProject; supported: boolean; warnings: GroundingWarning[]; usage: Usage };
+export const composeLive = (project: CanvasProject, utterance: string, signal: AbortSignal) => call<LiveComposition>('/live/compose', {
+  method: 'POST', signal, body: JSON.stringify({
+    utterance,
+    source: { name: project.source.name, sha256: project.source.sha256, pageCount: project.source.pages, pages: project.knowledgeBase?.pages },
+  }),
+});

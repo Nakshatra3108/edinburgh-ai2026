@@ -6,9 +6,10 @@ import { Wordmark } from '../preview/Wordmark';
 export type AudienceScreenProps = Omit<FollowCanvasProps, 'mode' | 'onPositionChange' | 'onAction'> & {
   inputMode?: 'manual' | 'microphone' | 'typed' | 'replay';
   onExit?: () => void;
+  onPause?: () => void;
   contentLabel?: string;
 };
-export function AudienceScreen({ onExit, inputMode = 'manual', contentLabel, ...canvas }: AudienceScreenProps) {
+export function AudienceScreen({ onExit, onPause, inputMode = 'manual', contentLabel, ...canvas }: AudienceScreenProps) {
   const root = useRef<HTMLElement>(null);
   const [fullscreen, setFullscreen] = useState(false);
   const [error, setError] = useState('');
@@ -22,7 +23,7 @@ export function AudienceScreen({ onExit, inputMode = 'manual', contentLabel, ...
     });
     void Promise.all([document.fonts.ready, ...images]).then(() => { if (live) setAssetsReady(true); });
     return () => { live = false; };
-  }, [canvas.state.project, canvas.resolveAsset]);
+  }, [canvas.state.project.assets, canvas.resolveAsset]);
   useEffect(() => {
     const changed = () => setFullscreen(!!document.fullscreenElement);
     document.addEventListener('fullscreenchange', changed);
@@ -42,7 +43,7 @@ export function AudienceScreen({ onExit, inputMode = 'manual', contentLabel, ...
       <div className="audience-safe-area">{assetsReady ? <FollowCanvas {...canvas} mode="audience"/> : <p className="stage-loading" role="status">Preparing stage…</p>}</div>
       {(inputMode === 'replay' || contentLabel) && <div className="audience-disclosure">{inputMode === 'replay' ? 'Recorded replay' : contentLabel}</div>}
     </div>
-    <div className="audience-controls">{onExit && <button onClick={onExit}><ArrowLeft size={16}/>Back to studio</button>}<button onClick={() => void toggleFullscreen()}>{fullscreen ? <Minimize size={16}/> : <Maximize size={16}/>}<span>{fullscreen ? 'Exit fullscreen' : 'Fullscreen'}</span></button></div>
+    <div className="audience-controls">{inputMode === 'microphone' && onPause && <button onClick={onPause}>Pause listening</button>}{onExit && <button onClick={onExit}><ArrowLeft size={16}/>Back to studio</button>}<button onClick={() => void toggleFullscreen()}>{fullscreen ? <Minimize size={16}/> : <Maximize size={16}/>}<span>{fullscreen ? 'Exit fullscreen' : 'Fullscreen'}</span></button></div>
     {error && <p className="fullscreen-error" role="alert">{error}</p>}
   </main>;
 }

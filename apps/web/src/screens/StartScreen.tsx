@@ -32,10 +32,10 @@ export function StartScreen({ onOpen, onSource, reducedMotion }: { onOpen: (proj
       const { extractPdfFile } = await import('../pdf/extract');
       const source = await extractPdfFile(file, { signal: job.signal, onProgress: (done, total) => { if (pdfJob.current === job) setStatus(`Reading PDF · ${done} of ${total} pages`); } });
       if (job.signal.aborted || pdfJob.current !== job) return;
-      if (matchCuratedSource(source, demoProject).ok) {
-        onOpen(demoProject, false);
-      } else if (onSource) {
+      if (onSource) {
         onSource(source);
+      } else if (matchCuratedSource(source, demoProject).ok) {
+        onOpen(demoProject, false);
       } else {
         setStatus(`${file.name}: ${source.pageCount} pages read locally${source.emptyPages.length ? ` (${source.emptyPages.length} without selectable text)` : ''}. Groq preparation is not connected yet. You can explore the ready-made demo or import an existing project.`);
       }
@@ -53,12 +53,12 @@ export function StartScreen({ onOpen, onSource, reducedMotion }: { onOpen: (proj
   };
   return <div className="start-screen">
     <header className="app-header"><Wordmark/><span className="header-caption">A little less clicking. A lot more explaining.</span><span className="badge">Presentation studio</span></header>
-    <main className="start-main"><div className="start-copy"><h1>Big ideas.<br/>Room to <span className="headline-accent">follow.</span></h1><p className="start-intro">Turn an explanation into a visual conversation. Explore connected ideas, reveal the details, and present on one clear canvas.</p>
-      <div className="start-actions"><button className="primary" onClick={() => onOpen(demoProject, false)}><Play size={18}/>Open demo project<ArrowRight size={18}/></button><button onClick={() => importInput.current?.click()} disabled={reading}><FolderOpen size={18}/>Import project</button></div>
-      <p className="demo-explanation"><Check size={16}/>A ready-made project. No account or API key needed.</p>
-      <ol className="entry-workflow"><li><span>1</span><div><strong>Explore the ideas</strong><p>Start with the whole picture.</p></div></li><li><span>2</span><div><strong>Bring a point into focus</strong><p>Show just what you need.</p></div></li><li><span>3</span><div><strong>Present your way</strong><p>Take any route through the story.</p></div></li></ol>
+    <main className="start-main"><div className="start-copy"><h1>Big ideas.<br/>Room to <span className="headline-accent">follow.</span></h1><p className="start-intro">Upload the knowledge. Speak the story. FOLLOW draws from your document to compose visuals as you explain, on one continuous canvas.</p>
+      <div className="start-actions"><button className="primary" onClick={() => pdfInput.current?.click()} disabled={reading}><Upload size={18}/>Upload your PDF<ArrowRight size={18}/></button><button onClick={() => onOpen(demoProject, false)}><Play size={18}/>Open demo project<ArrowRight size={18}/></button><button onClick={() => importInput.current?.click()} disabled={reading}><FolderOpen size={18}/>Import project</button></div>
+      <p className="demo-explanation"><Check size={16}/>The demo is manual and needs no API key. Live composition uses Groq.</p>
+      <ol className="entry-workflow"><li><span>1</span><div><strong>Build your knowledge base</strong><p>Keep the source material, not just a few bullet points.</p></div></li><li><span>2</span><div><strong>Explain in your own words</strong><p>Start anywhere. Your voice sets the direction.</p></div></li><li><span>3</span><div><strong>Watch the canvas take shape</strong><p>Ideas, processes and evidence appear as you speak.</p></div></li></ol>
       <div className={`pdf-drop ${dragging ? 'is-dragging' : ''}`} onDragOver={e => { e.preventDefault(); setDragging(true); }} onDragLeave={() => setDragging(false)} onDrop={e => { e.preventDefault(); setDragging(false); void inspectPdf(e.dataTransfer.files[0]); }}>
-        <FileUp size={24}/><div><h2>{dragging ? 'Drop your PDF here' : 'Have your own source?'}</h2><p>Read a PDF locally, up to 20 MB. The demo PDF opens directly.</p></div><button disabled={reading} onClick={() => pdfInput.current?.click()}><Upload size={16}/>{reading ? 'Reading…' : 'Choose PDF'}</button>
+        <FileUp size={24}/><div><h2>{dragging ? 'Drop your PDF here' : 'Have your own source?'}</h2><p>Read a PDF locally, up to 20 MB. Choose which pages to include.</p></div><button disabled={reading} onClick={() => pdfInput.current?.click()}><Upload size={16}/>{reading ? 'Reading…' : 'Choose PDF'}</button>
       </div>
       <input className="sr-only" tabIndex={-1} type="file" accept=".pdf,application/pdf" aria-label="Select source PDF" ref={pdfInput} onChange={e => { void inspectPdf(e.target.files?.[0]); e.target.value = ''; }}/>
       <input className="sr-only" tabIndex={-1} type="file" accept=".json,application/json" aria-label="Import prepared project manifest" ref={importInput} onChange={e => { void importProject(e.target.files?.[0]); e.target.value = ''; }}/>

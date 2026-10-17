@@ -2,7 +2,7 @@ import type { CanvasState, Concept } from './domain';
 export type CompositionItem = { id: string; concept: Concept; x: number; y: number; width: number; height: number; expanded: boolean; home?: boolean };
 export function getComposition(state: CanvasState): CompositionItem[] {
   const pair = state.pair;
-  return state.project.concepts.filter(c => c.enabled).flatMap(c => {
+  return state.project.concepts.filter(c => c.enabled && (!state.live || state.introduced.includes(c.id))).flatMap(c => {
     const paired = !!pair?.includes(c.id);
     const expanded = state.view !== 'overview' && (c.id === state.focusId || paired);
     const home = { id: c.id, concept: c, x: c.position.x, y: c.position.y, width: 1000, height: expanded ? 800 : 640, expanded };

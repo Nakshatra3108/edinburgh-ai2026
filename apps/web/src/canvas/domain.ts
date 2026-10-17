@@ -12,7 +12,7 @@ export type Concept = {
   visual: VisualPayload;
   details: { id: string; text: string; sources: SourceRef[]; origin: 'source' | 'user' }[];
   sources: SourceRef[]; assetIds: string[]; enabled: boolean;
-  review: 'needs-review' | 'reviewed'; position: { x: number; y: number };
+  review: 'needs-review' | 'reviewed' | 'source-checked'; position: { x: number; y: number };
 };
 export type Relationship = {
   id: string; from: string; to: string; label: string;
@@ -27,6 +27,7 @@ export type CanvasProject = {
   schemaVersion: 1; id: string; revision: number; title: string;
   source: { name: string; sha256: string; pages: number };
   preparation: { mode: 'groq' | 'curated'; model: string | null; promptVersion: string; preparedAt: string };
+  knowledgeBase?: { version: 1; pages: { page: number; text: string }[] };
   concepts: Concept[]; relationships: Relationship[]; assets: Asset[]; approvedRevision: number | null;
 };
 export type CanvasAction =
@@ -37,6 +38,7 @@ export type CanvasAction =
   | { type: 'OVERVIEW' } | { type: 'HOLD' };
 export type CanvasState = {
   project: CanvasProject;
+  live?: boolean;
   view: 'overview' | 'focus' | 'connection' | 'comparison';
   focusId: string | null;
   pair: [string, string] | null;

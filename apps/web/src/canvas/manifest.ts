@@ -11,12 +11,13 @@ const visual = z.discriminatedUnion('type', [
 ]);
 const concept = z.object({ id: text(120), title: text(64), summary: text(180), aliases: z.array(z.string()).max(50), speechExamples: z.array(z.string()).max(50), visual,
   details: z.array(z.object({ id: text(120), text: text(180), sources: z.array(source), origin: z.enum(['source', 'user']) })).max(20),
-  sources: z.array(source), assetIds: z.array(text(120)), enabled: z.boolean(), review: z.enum(['needs-review', 'reviewed']),
+  sources: z.array(source), assetIds: z.array(text(120)), enabled: z.boolean(), review: z.enum(['needs-review', 'reviewed', 'source-checked']),
   position: z.object({ x: z.number().finite().min(-100000).max(100000), y: z.number().finite().min(-100000).max(100000) }) });
 export const canvasProjectSchema = z.object({ schemaVersion: z.literal(1), id: text(120), revision: z.number().int().nonnegative(), title: text(160),
   source: z.object({ name: text(300), sha256: z.string().regex(/^[a-f0-9]{64}$/i), pages: z.number().int().positive() }),
   preparation: z.object({ mode: z.enum(['groq', 'curated']), model: z.string().nullable(), promptVersion: text(120), preparedAt: z.iso.datetime() }),
-  concepts: z.array(concept).min(1).max(24),
+  knowledgeBase: z.object({ version: z.literal(1), pages: z.array(z.object({ page: z.number().int().positive(), text: z.string().max(500000) })).min(1).max(20) }).optional(),
+  concepts: z.array(concept).max(24),
   relationships: z.array(z.object({ id: text(120), from: text(120), to: text(120), label: text(48), kind: z.enum(['sequence', 'comparison', 'association', 'causal']), sources: z.array(source), approved: z.boolean() })).max(100),
   assets: z.array(z.object({ id: text(120), kind: z.enum(['page-crop', 'image']), blobKey: text(2048), page: z.number().int().positive().nullable(),
     crop: z.object({ x: z.number().min(0).max(1), y: z.number().min(0).max(1), width: z.number().positive().max(1), height: z.number().positive().max(1) }).refine(c => c.x + c.width <= 1 && c.y + c.height <= 1, 'Crop must fit inside the page').nullable(),
@@ -24,9 +25,11 @@ export const canvasProjectSchema = z.object({ schemaVersion: z.literal(1), id: t
   approvedRevision: z.number().int().nonnegative().nullable(),
 }).superRefine((p, ctx) => {
   const error = (message: string) => ctx.addIssue({ code: 'custom', message });
+  if (!p.concepts.length && !p.knowledgeBase) error('An empty canvas requires a document knowledge base');
   for (const [label, list] of [['concept', p.concepts], ['relationship', p.relationships], ['asset', p.assets]] as const) {
     if (new Set(list.map(x => x.id)).size !== list.length) error(`Duplicate ${label} ID`);
   }
+  if (p.knowledgeBase && (new Set(p.knowledgeBase.pages.map(x => x.page)).size !== p.knowledgeBase.pages.length || p.knowledgeBase.pages.some(x => x.page > p.source.pages) || p.knowledgeBase.pages.reduce((n, x) => n + x.text.length, 0) > 500000)) error('Invalid knowledge base pages');
   const ids = new Set(p.concepts.map(c => c.id)); const assets = new Set(p.assets.map(a => a.id));
   if (p.approvedRevision !== null && p.approvedRevision !== p.revision) error('Approved revision must match project revision');
   for (const r of p.relationships) if (!ids.has(r.from) || !ids.has(r.to) || r.from === r.to) error(`Invalid endpoints: ${r.id}`);

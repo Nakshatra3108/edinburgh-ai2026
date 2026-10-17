@@ -1,0 +1,30 @@
+{
+  "provider": "test fixture, no real Groq credentials",
+  "checks": [
+    {
+      "surface": "source desktop",
+      "accessibilityViolations": []
+    },
+    "presentation starts with empty canvas",
+    {
+      "surface": "studio empty",
+      "accessibilityViolations": []
+    },
+    "live process appears without manual review",
+    "spoken comparison shows two composed ideas",
+    {
+      "surface": "studio comparison",
+      "accessibilityViolations": []
+    },
+    "typed controls visible at 720p",
+    "canvas retains usable height at 720p",
+    "unrelated speech holds current visual",
+    "manual hold suppresses delayed result",
+    {
+      "surface": "audience",
+      "accessibilityViolations": []
+    },
+    "all desktop source, studio and audience accessibility checks pass",
+    "no browser runtime errors []"
+  ]
+}

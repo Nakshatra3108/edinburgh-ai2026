@@ -44,10 +44,13 @@ test('invalid JSON gets one repair', async () => {
   assert.equal(calls.length, 2);
 });
 
-test('a plan with no verifiable quotes is repaired, then fails INVALID_PLAN', async () => {
+test('an ungrounded topic index is repaired, then preserves a source-only knowledge base', async () => {
   const fake = { title: 't', concepts: [{ ...demoPlan().concepts[5] }], relationships: [] };
   const { provider, calls } = scripted(ok(fake));
-  await rejectsWith(run(provider), 'INVALID_PLAN');
+  const result = await run(provider);
+  assert.equal(result.project.concepts.length, 0);
+  assert.equal(result.project.knowledgeBase?.pages.length, demo.pages.length);
+  assert.ok(result.warnings.some(w => w.code === 'TOPIC_INDEX_UNAVAILABLE'));
   assert.equal(calls.length, 2);
 });
 
@@ -102,4 +105,13 @@ test('Groq adapter maps HTTP errors and never exposes the provider body', async 
   }
   const r = await call(respond(200, { model: 'm', choices: [{ finish_reason: 'stop', message: { content: '{}' } }], usage: { prompt_tokens: 1, completion_tokens: 2, total_tokens: 3, completion_tokens_details: { reasoning_tokens: 1 } } }));
   assert.deepEqual(r, { content: '{}', finishReason: 'stop', model: 'm', usage: { promptTokens: 1, completionTokens: 2, reasoningTokens: 1, totalTokens: 3 } });
+});
+
+
+test('rate limiting stays retryable even when the provider mentions billing and quota', async () => {
+  const provider = createGroqProvider({ apiKey: 'test', model: 'openai/gpt-oss-120b', fetchImpl: async (_url, init) => {
+    assert.equal(JSON.parse(String(init?.body)).reasoning_effort, 'low');
+    return new Response(JSON.stringify({ error: { message: 'Rate limit reached. Visit billing to increase quota.', code: 'rate_limit_exceeded' } }), {status:429});
+  } });
+  await assert.rejects(provider({messages:[],schemaName:'t',schema:{},maxCompletionTokens:100,signal:new AbortController().signal}), (e: unknown) => e instanceof PrepError && e.code === 'PROVIDER_RATE_LIMIT' && e.retryable);
 });

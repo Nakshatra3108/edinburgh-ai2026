@@ -302,7 +302,7 @@ export class SpeechMatchingSession {
     if (
       activeId &&
       !this.manifest.concepts.some(
-        (c) => c.id === activeId && c.enabled && c.review === "reviewed",
+        (c) => c.id === activeId && c.enabled && c.review !== "needs-review",
       )
     )
       throw new Error(

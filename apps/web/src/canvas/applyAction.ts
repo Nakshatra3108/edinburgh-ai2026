@@ -6,7 +6,7 @@ export function createCanvasState(project: CanvasProject): CanvasState {
 }
 const union = (values: string[], ...ids: string[]) => [...new Set([...values, ...ids])];
 const available = (state: CanvasState, id: string): Concept | undefined =>
-  state.project.concepts.find(c => c.id === id && c.enabled && c.review === 'reviewed');
+  state.project.concepts.find(c => c.id === id && c.enabled && c.review !== 'needs-review');
 function compare(state: CanvasState, leftId: string, rightId: string, relationshipId?: string): CanvasState {
   if (leftId === rightId || !available(state, leftId) || !available(state, rightId)) return state;
   const edge = state.project.relationships.find(r => r.approved && r.kind === 'comparison'

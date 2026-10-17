@@ -32,12 +32,13 @@ with sync_playwright() as p:
  # Direct demo action and real PDF matching are checked independently of JSON import.
  page.get_by_role('button',name='Back to project entry').click()
  page.get_by_label('Select source PDF',exact=True).set_input_files({'name':'renamed.pdf','mimeType':'application/pdf','buffer':(root/'demo/source/follow-demo.pdf').read_bytes()})
- expect(page.locator('.project-title')).to_have_text(manifest['title'],timeout=15000)
- report['matching_pdf_opens_demo']='passed'
- page.get_by_role('button',name='Back to project entry').click()
+ expect(page.get_by_role('heading',name='Knowledge first. Visuals as you speak.')).to_be_visible(timeout=15000)
+ report['matching_pdf_opens_knowledge_preparation']='passed'
+ page.get_by_role('button',name='Back',exact=True).click()
  page.get_by_label('Select source PDF',exact=True).set_input_files({'name':'follow-demo.pdf','mimeType':'application/pdf','buffer':(root/'demo/source/follow-demo.pdf').read_bytes()+b'\\n% different bytes\\n'})
- expect(page.locator('.entry-message[role=status]')).to_contain_text('Groq preparation is not connected',timeout=15000)
- report['different_hash_does_not_open_curated_project']='passed'
+ expect(page.get_by_role('heading',name='Knowledge first. Visuals as you speak.')).to_be_visible(timeout=15000)
+ report['different_hash_also_opens_source_preparation']='passed'
+ page.get_by_role('button',name='Back',exact=True).click()
  page.get_by_role('button',name='Open demo project').click()
  expect(page.locator('.project-title')).to_have_text(manifest['title'])
  report['primary_demo_action']='passed'

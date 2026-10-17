@@ -1,7 +1,7 @@
 # FOLLOW
 ## Product requirements, visual design, and engineering specification
 
-**Version:** 1.4 — Groq preparation and local live control
+**Version:** 1.5 — document knowledge base and live visual composition
 
 **Date:** 17 October 2026
 
@@ -13,7 +13,9 @@
 
 **Primary deliverable:** a polished, speech-directed presentation on one continuous canvas
 
-**AI provider:** Groq for preparation; local models for live speech and matching
+**AI provider:** Groq for topic indexing and live visual composition; local Whisper for speech recognition
+
+**Current behavior amendment:** [Knowledge-base workflow and contracts](docs/KNOWLEDGE-CANVAS.md) supersedes older requirements below that limit the stage to prebuilt, manually reviewed concepts. Full selected source text is retained; the topic index is optional. Spoken explanations generate new source-checked visual compositions at runtime. Desktop studio quality is the primary target.
 
 > Usually, speakers follow their slides. With FOLLOW, the presentation follows the speaker.
 
@@ -50,7 +52,7 @@ FOLLOW converts source material from a PDF into a reviewed collection of concept
 
 The audience sees **one continuous visual canvas**. There is no slide-page sequence that the speaker must follow. The same source can support different presentations and unexpected questions.
 
-Preparation and performance are separate. Groq proposes the source-grounded content before the talk. During the talk, local speech recognition and semantic matching select from approved content. A deterministic renderer composes the visuals. It does not execute model-generated HTML or invent factual material on stage.
+The knowledge base and the visual explanation are separate. Preparation retains the selected source text and optionally indexes its topics. During the talk, local Whisper transcribes speech and Groq composes relevant structured visuals from that knowledge base. Quote checks validate provenance before a deterministic renderer updates the canvas. Manual review is optional, and the renderer never executes model-generated HTML.
 
 ### 1.2 The reversal
 
