@@ -33,6 +33,8 @@ Open **Open example canvas**, select an idea, reveal details, or use **Action la
 5. Select **Small.en** (the default), then **Load & warm Whisper**. Tiny.en is available as a speed baseline; no manual model download, Python setup or Hugging Face account is required.
 6. Test a recorded clip, then **Start microphone**. Stop releases microphone tracks and invalidates pending inference. **Cancel model loading** terminates model workers.
 
+For hands-free changes in the diagnostic stage, enable **Follow matched speech automatically in this preview** before starting the microphone. Otherwise click **Accept candidate** after a stable match. The feedback block shows **Transcribing your speech…** and **Last heard** so you can distinguish capture, recognition and matching. Pausing does not cancel an unfinished transcription.
+
 The lab and its evaluation still use `demo/speech-fixture.json` and `demo/speech-phrases.json`, the original illustrative six-concept fixture and its evaluation phrases. The team's `demo/manifest.json` and `demo/phrases.json` are preserved for the real PDF. Existing fixture scores and calibrated thresholds do not apply automatically to that PDF manifest. D/C must integrate and evaluate the reviewed team project before presenting it with speech.
 
 WASM is the tested CPU baseline; WebGPU is an explicit configuration to benchmark. After changing a model/backend, reload Whisper before testing. Keep Suggest while checking room acoustics and real phrase-end latency.

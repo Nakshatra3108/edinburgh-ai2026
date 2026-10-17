@@ -1,5 +1,7 @@
 # Person C verification — 17 October 2026
 
+Microphone pause fix: silent windows no longer cancel unfinished ASR/matching or dismiss a stable suggestion. **66 unit tests** pass, including delayed speech completing during silence and Stop still rejecting late speech. The real-model Chromium test passed with prerecorded speech routed through a MediaStream/AudioWorklet capture graph, plus optional automatic diagnostic-preview updates. This tests the live capture code path with known audio, not the operator's room acoustics. The lab now exposes transcription progress and last-heard text above the preview.
+
 Latest team update (`0af5ac8`): **64 unit tests**, **4 browser tests**, strict typechecking and the production build passed. The team's new PDF phrase package remains at `demo/phrases.json`; the original speech-lab evaluation phrases are preserved byte-for-byte at `demo/speech-phrases.json`. Real-model downloads were not rerun for this Git update.
 
 Implemented and verified locally; this does not mark the full FOLLOW PRD complete.

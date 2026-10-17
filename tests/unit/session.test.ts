@@ -6,11 +6,17 @@ const harness = vi.hoisted(() => ({
   score: undefined as undefined | (() => Promise<Response>),
   micStop: vi.fn(),
   cancelled: false,
+  transcribe: undefined as undefined | (() => Promise<Response>),
+  onChunk: undefined as
+    | undefined
+    | ((pcm: Float32Array, capturedAt: number) => void),
+  onSilence: undefined as undefined | (() => void),
 }));
 vi.mock("../../apps/web/src/workers/rpc", () => ({
   WorkerClient: class {
     async request(payload: { type: string }) {
       if (payload.type === "score") return harness.score!();
+      if (payload.type === "transcribe") return harness.transcribe!();
       return { id: 1, type: "ready" };
     }
     dispose() {}
@@ -18,7 +24,14 @@ vi.mock("../../apps/web/src/workers/rpc", () => ({
 }));
 vi.mock("../../apps/web/src/audio/capture", () => ({
   MicrophoneCapture: class {
-    async start() {}
+    async start(
+      onChunk: (pcm: Float32Array, capturedAt: number) => void,
+      _onLevel: (level: number) => void,
+      onSilence: () => void,
+    ) {
+      harness.onChunk = onChunk;
+      harness.onSilence = onSilence;
+    }
     stop() {
       harness.micStop();
     }
@@ -42,8 +55,86 @@ afterEach(() => {
   vi.unstubAllGlobals();
   harness.micStop.mockClear();
   harness.score = undefined;
+  harness.transcribe = undefined;
+  harness.onChunk = undefined;
+  harness.onSilence = undefined;
 });
 describe("Person C runtime handoff", () => {
+  it("finishes speech during a pause and preserves a stable suggestion through silence", async () => {
+    vi.stubGlobal("Worker", class {});
+    harness.score = async () => response;
+    let finishSpeech!: (result: Response) => void;
+    harness.transcribe = () =>
+      new Promise((resolve) => {
+        finishSpeech = resolve;
+      });
+    const runtime = new SpeechMatchingSession(manifest);
+    await runtime.loadEmbeddings();
+    await runtime.loadSpeech("Xenova/whisper-small.en", "wasm");
+    await runtime.startMicrophone();
+    harness.onChunk!(new Float32Array(56_000), performance.now());
+    expect(runtime.getSnapshot().transcribing).toBe(true);
+    harness.onSilence!();
+    finishSpeech({
+      id: 1,
+      type: "transcript",
+      text: "Speakers follow a fixed sequence of slides",
+      ms: 6000,
+    });
+    await settle();
+    expect(runtime.getSnapshot().transcript).toContain("Speakers follow");
+    expect(runtime.getSnapshot().latestSpeech).toContain("Speakers follow");
+    expect(runtime.getSnapshot().candidate?.stable).toBe(false);
+    harness.onChunk!(new Float32Array(56_000), performance.now());
+    harness.onSilence!();
+    finishSpeech({
+      id: 2,
+      type: "transcript",
+      text: "Operating the slide deck interrupts the explanation",
+      ms: 6000,
+    });
+    await settle();
+    expect(runtime.getSnapshot().candidate).toMatchObject({
+      stable: true,
+      action: { type: "FOCUS", conceptId: "problem" },
+    });
+    harness.onSilence!();
+    expect(runtime.getSnapshot().candidate?.stable).toBe(true);
+    expect(runtime.getSnapshot().audioChunks).toBe(2);
+    expect(runtime.getSnapshot().silences).toBe(3);
+    runtime.accept();
+    expect(runtime.getSnapshot().activeId).toBe("problem");
+    runtime.dispose();
+  });
+  it("still discards unfinished microphone speech after the user stops capture", async () => {
+    vi.stubGlobal("Worker", class {});
+    harness.score = async () => response;
+    let finishSpeech!: (result: Response) => void;
+    harness.transcribe = () =>
+      new Promise((resolve) => {
+        finishSpeech = resolve;
+      });
+    const runtime = new SpeechMatchingSession(manifest);
+    await runtime.loadEmbeddings();
+    await runtime.loadSpeech("Xenova/whisper-tiny.en", "wasm");
+    await runtime.startMicrophone();
+    harness.onChunk!(new Float32Array(56_000), performance.now());
+    runtime.stop();
+    finishSpeech({
+      id: 1,
+      type: "transcript",
+      text: "Discard old speech",
+      ms: 6000,
+    });
+    await settle();
+    expect(runtime.getSnapshot()).toMatchObject({
+      transcript: "",
+      latestSpeech: "",
+      candidate: null,
+      transcribing: false,
+    });
+    runtime.dispose();
+  });
   it("suppresses a late embedding result after stop invalidates its epoch", async () => {
     vi.stubGlobal("Worker", class {});
     let release!: (response: Response) => void;

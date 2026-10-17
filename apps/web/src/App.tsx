@@ -39,7 +39,15 @@ export function App() {
   >([]);
   const [evalProgress, setEvalProgress] = useState("");
   const [evalError, setEvalError] = useState("");
+  const [automaticPreview, setAutomaticPreview] = useState(false);
   useEffect(() => () => session.dispose(), [session]);
+  useEffect(
+    () =>
+      session.onCandidate((event) => {
+        if (automaticPreview && event.stable) session.accept(event);
+      }),
+    [session, automaticPreview],
+  );
   const loading = state.embeddings === "loading" || state.speech === "loading";
   const speechMatches =
     state.speech === "ready" && state.loadedSpeech === `${model}:${backend}`;
@@ -317,7 +325,55 @@ export function App() {
                 <span className="eyebrow" id="stage-heading">
                   DIAGNOSTIC PREVIEW
                 </span>
-                <span className="status">Suggest · accept to update</span>
+                <span className="status">
+                  {automaticPreview
+                    ? "Automatic diagnostic preview"
+                    : "Suggest · accept to update"}
+                </span>
+              </div>
+              <div className="live-feedback" aria-live="polite">
+                <strong>
+                  {state.capture === "requesting"
+                    ? "Waiting for microphone permission…"
+                    : state.capture === "active"
+                      ? state.transcribing
+                        ? "Transcribing your speech…"
+                        : state.scoring
+                          ? "Matching your words…"
+                          : "Microphone is listening"
+                      : "Microphone is off"}
+                </strong>
+                <p>
+                  {state.latestSpeech
+                    ? `Last heard: “${state.latestSpeech}”`
+                    : "Recognized speech will appear here. Recording a chunk takes 3.5 seconds; transcription takes additional time."}
+                </p>
+                <p>
+                  {candidate?.stable && !automaticPreview
+                    ? "A suggestion is ready. Click Accept candidate below, or enable automatic preview."
+                    : (candidate?.reason ??
+                      (state.capture === "active" &&
+                      !state.audioChunks &&
+                      state.silences
+                        ? "Only quiet chunks detected. Check your microphone and speak closer to it."
+                        : "The preview changes only after two eligible observations about the same topic."))}
+                </p>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={automaticPreview}
+                    onChange={(event) => {
+                      session.stop();
+                      setAutomaticPreview(event.target.checked);
+                    }}
+                  />{" "}
+                  Follow matched speech automatically in this preview
+                </label>
+                <p className="hint">
+                  Changing this option stops the microphone and clears pending
+                  decisions. Start the microphone again afterward. This controls
+                  the diagnostic preview only.
+                </p>
               </div>
               <div className="stage-content">
                 <p className="stage-kicker">
@@ -539,6 +595,8 @@ export function App() {
           <span>
             Epoch {state.epoch} · {state.events.length} observations ·{" "}
             {state.silences} silent chunks held
+            {" · "}
+            {state.audioChunks} speech chunks captured
           </span>
           <span>Prepared content. Local decisions.</span>
         </footer>

@@ -42,11 +42,13 @@ Silence, filler, duplicated final text, negation, stale sequences and uncertain 
 
 ## Audio and timing
 
-AudioWorklet mixes channels to mono, batches 4096 samples, resamples actual input-rate PCM to 16 kHz with area averaging, and emits 3.5-second windows with 0.5-second overlap. RMS <0.008 skips a window and clears old speech evidence. This is a cheap tuning gate, not diarisation or a production VAD. Test quiet voices and room noise before adjusting it. The resampler is a prototype, not a studio-quality resampling filter.
+AudioWorklet mixes channels to mono, batches 4096 samples, resamples actual input-rate PCM to 16 kHz with area averaging, and emits 3.5-second windows with 0.5-second overlap. RMS <0.008 skips a window without cancelling speech already being transcribed or dismissing a valid suggestion. Stop/reset/mute still invalidate pending inference. This is a cheap tuning gate, not diarisation or a production VAD. Test quiet voices and room noise before adjusting it. The resampler is a prototype, not a studio-quality resampling filter.
 
 Live queue: one executing ASR chunk plus newest pending. New pending audio replaces old pending audio; reset invalidates both pending work and late results. Word overlap uses case/punctuation-normalized suffix/prefix alignment; it does not claim forced alignment or perfect deduplication of inconsistent ASR hypotheses. Only complete chunk transcripts enter matching; there is no provisional-token UI.
 
 The lab displays real ASR inference duration, embedding/scoring duration, and response time after a chunk completes. These exclude time spent waiting to finish collecting the chunk. Measure actual phrase-end-to-decision delay separately. Console `[FOLLOW ASR]` entries contain model-runtime timings, not invented benchmark values. Keep Suggest when sustained real speech-to-visual delay exceeds five seconds. Recorded clips process all their chunks in order; they are explicitly labelled `recording`, not microphone input.
+
+The feedback block above the preview displays capture/transcription state and the last raw recognized phrase before semantic matching. Suggest remains default. The optional **Follow matched speech automatically in this preview** checkbox acknowledges stable candidates locally so the diagnostic stage can update hands-free. Switching it stops capture and resets pending evidence; restart the microphone afterward. It does not implement D's full controller or connect to the separate canvas page.
 
 ## Models and offline operation
 

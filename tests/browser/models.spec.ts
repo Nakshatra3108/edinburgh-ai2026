@@ -25,7 +25,8 @@ test("real browser embeddings and Whisper recording path", async () => {
     await page
       .getByRole("button", { name: "Match phrase", exact: false })
       .click();
-    await expect(page.getByText("Stability 1/2", { exact: false })).toBeVisible(
+    await expect(page.locator(".decision-summary")).toContainText(
+      "Stability 1/2",
       { timeout: 30_000 },
     );
     await page
@@ -41,13 +42,49 @@ test("real browser embeddings and Whisper recording path", async () => {
     await expect(
       page.getByRole("heading", { name: "Fixed slides", exact: true }),
     ).toBeVisible();
-    await page.getByLabel("Typed rehearsal").fill("Okay um well right");
+    await page
+      .getByRole("checkbox", {
+        name: "Follow matched speech automatically in this preview",
+      })
+      .check();
+    await page
+      .getByLabel("Typed rehearsal")
+      .fill("There are four stages between speech and the canvas.");
+    await page
+      .getByRole("button", { name: "Match phrase", exact: false })
+      .click();
+    await expect(page.locator(".decision-summary")).toContainText(
+      "Stability 1/2",
+    );
+    await page
+      .getByLabel("Typed rehearsal")
+      .fill(
+        "Our pipeline captures audio, understands speech, matches a concept, and composes the visual.",
+      );
     await page
       .getByRole("button", { name: "Match phrase", exact: false })
       .click();
     await expect(
-      page.getByText("Silence or filler", { exact: true }),
+      page.getByRole("heading", {
+        name: "Capture → Understand → Match → Compose",
+        exact: true,
+      }),
     ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Accept candidate" }),
+    ).toHaveCount(0);
+    await page
+      .getByRole("checkbox", {
+        name: "Follow matched speech automatically in this preview",
+      })
+      .uncheck();
+    await page.getByLabel("Typed rehearsal").fill("Okay um well right");
+    await page
+      .getByRole("button", { name: "Match phrase", exact: false })
+      .click();
+    await expect(page.locator(".decision-summary")).toContainText(
+      "Silence or filler",
+    );
     await page.getByRole("button", { name: "Run phrase evaluation" }).click();
     await expect(
       page.getByText("/ 24 paraphrases correct", { exact: false }),
@@ -125,6 +162,54 @@ test("real browser embeddings and Whisper recording path", async () => {
     await page.screenshot({
       path: "test-results/speech-lab-real-whisper.png",
       fullPage: true,
+    });
+    // Real microphone capture graph, driven by known audio rather than the operator's mic.
+    await page.evaluate(async (encoded) => {
+      const audio = new AudioContext(),
+        destination = audio.createMediaStreamDestination();
+      const bytes = Uint8Array.from(atob(encoded), (char) =>
+        char.charCodeAt(0),
+      );
+      const source = audio.createBufferSource();
+      source.buffer = await audio.decodeAudioData(bytes.buffer);
+      source.connect(destination);
+      navigator.mediaDevices.getUserMedia = async () => destination.stream;
+      (
+        window as unknown as {
+          testAudio: {
+            audio: AudioContext;
+            stream: MediaStream;
+            source: AudioBufferSourceNode;
+          };
+        }
+      ).testAudio = { audio, stream: destination.stream, source };
+    }, buffer.toString("base64"));
+    await page
+      .getByRole("button", { name: "Start microphone", exact: true })
+      .click();
+    await expect(
+      page.getByRole("button", { name: "Stop microphone", exact: true }),
+    ).toBeVisible();
+    await page.evaluate(async () => {
+      const { audio, source } = (
+        window as unknown as {
+          testAudio: { audio: AudioContext; source: AudioBufferSourceNode };
+        }
+      ).testAudio;
+      await audio.resume();
+      source.start();
+    });
+    await expect(page.locator(".live-feedback")).toContainText(
+      /Last heard:.*(Americans|country|ask)/i,
+      { timeout: 90_000 },
+    );
+    await page
+      .getByRole("button", { name: "Stop microphone", exact: true })
+      .click();
+    await page.evaluate(async () => {
+      await (
+        window as unknown as { testAudio: { audio: AudioContext } }
+      ).testAudio.audio.close();
     });
     // Exercise permission recovery without requesting the operator's real microphone.
     await page.evaluate(() => {

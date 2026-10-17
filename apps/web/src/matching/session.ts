@@ -51,6 +51,9 @@ export interface LabState {
   accepted: CanvasAction | null;
   transcript: string;
   silences: number;
+  audioChunks: number;
+  transcribing: boolean;
+  latestSpeech: string;
 }
 
 /** Person C handoff: subscribe to versioned candidates; D owns policy and calls accept/reset. */
@@ -81,6 +84,9 @@ export class SpeechMatchingSession {
     accepted: null,
     transcript: "",
     silences: 0,
+    audioChunks: 0,
+    transcribing: false,
+    latestSpeech: "",
   };
   private matcher: Matcher;
   private embeddingClient?: WorkerClient;
@@ -101,6 +107,7 @@ export class SpeechMatchingSession {
       { text: string; ms: number }
     >(
       async (item) => {
+        this.update({ transcribing: true });
         const reply = await this.speechClient!.request(
           { type: "transcribe", pcm: item.pcm },
           [item.pcm.buffer as ArrayBuffer],
@@ -113,7 +120,11 @@ export class SpeechMatchingSession {
         if (item.epoch !== this.state.epoch) return;
         const text = deduplicate(this.previousTranscript, result.text);
         this.previousTranscript = result.text;
-        this.update({ asrMs: result.ms });
+        this.update({
+          asrMs: result.ms,
+          transcribing: false,
+          latestSpeech: result.text,
+        });
         console.info("[FOLLOW ASR]", {
           modelInput: item.input,
           epoch: item.epoch,
@@ -124,7 +135,10 @@ export class SpeechMatchingSession {
         if (text)
           this.textQueue.push({ ...item, text, startedAt: item.capturedAt });
       },
-      (error) => this.fail(error),
+      (error) => {
+        this.update({ transcribing: false });
+        this.fail(error);
+      },
       (catchingUp) => this.update({ catchingUp }),
     );
     this.textQueue = new LatestQueue<
@@ -311,6 +325,7 @@ export class SpeechMatchingSession {
       scoring: false,
       recording: false,
       responseMs: null,
+      transcribing: false,
       embeddingProgress:
         this.state.embeddings === "ready"
           ? reason
@@ -349,7 +364,8 @@ export class SpeechMatchingSession {
     try {
       await mic.start(
         (pcm, capturedAt) => {
-          if (epoch === this.state.epoch)
+          if (epoch === this.state.epoch) {
+            this.update({ audioChunks: this.state.audioChunks + 1 });
             this.audioQueue.push({
               pcm,
               capturedAt,
@@ -357,16 +373,14 @@ export class SpeechMatchingSession {
               seq: ++this.seq,
               input: "microphone",
             });
+          }
         },
         (level) => this.update({ level }),
         () => {
           if (epoch !== this.state.epoch) return;
-          this.context = "";
-          this.previousTranscript = "";
-          this.matcher.reset(this.state.activeId);
-          this.audioQueue.clear();
-          this.textQueue.clear();
-          this.update({ silences: this.state.silences + 1, candidate: null });
+          // Silence isn't mute: let already captured speech finish, and leave
+          // a valid suggestion visible for the presenter to accept.
+          this.update({ silences: this.state.silences + 1 });
         },
         (message) => {
           this.stop();

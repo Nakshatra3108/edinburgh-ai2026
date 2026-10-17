@@ -723,3 +723,37 @@ summary {
     scroll-behavior: auto !important;
   }
 }
+.live-feedback {
+  margin: 0 24px 24px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--surface);
+}
+.live-feedback strong {
+  font-size: 13px;
+}
+.live-feedback p {
+  color: var(--secondary);
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 8px 0;
+  overflow-wrap: anywhere;
+}
+.live-feedback label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 14px 0 0;
+  line-height: 1.5;
+}
+.live-feedback input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--brand);
+  flex-shrink: 0;
+}
+.live-feedback .hint {
+  color: var(--muted);
+  font-size: 10px;
+}
