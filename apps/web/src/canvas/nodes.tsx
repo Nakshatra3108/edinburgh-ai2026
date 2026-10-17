@@ -1,6 +1,7 @@
 import { memo, type ReactNode } from 'react';
 import { Handle, Position, type Node, type NodeProps } from '@xyflow/react';
 import { ArrowRight, Layers2, GitCompareArrows, Image as ImageIcon, Route, Hash, AudioLines, BrainCircuit, Database, FileText, Workflow, ShieldCheck, Users, Zap, Network } from 'lucide-react';
+import { metricDisplay } from './metric';
 import type { Asset, Concept } from './domain';
 export type CanvasNodeData = {
   board?: boolean; compact?: boolean; concept: Concept; expanded: boolean; paired: boolean; home: boolean; introduced: boolean;
@@ -26,7 +27,7 @@ function NodeShell({ data, children }: { data: CanvasNodeData; children?: ReactN
   return <article className={`canvas-node visual-${data.concept.visual.type} ${data.expanded ? 'is-focused' : 'is-anchor'} ${data.introduced ? 'is-introduced' : ''} ${data.home ? 'is-home' : ''} ${data.paired ? 'is-paired' : ''} ${data.board ? 'is-board-element' : ''} ${data.compact ? 'is-compact' : ''}`}  aria-label={data.concept.title}>
     <Handle type="target" position={Position.Left} isConnectable={false} />
     <div className="node-type"><Icon size={24}/><span>{visualNames[data.concept.visual.type]}</span>{data.home && <span>Home anchor</span>}</div>
-    {data.board && data.concept.visual.type !== 'figure' && <TopicGlyph concept={data.concept}/>}
+    {data.board && data.concept.visual.type !== 'figure' && data.concept.visual.type !== 'metric' && <TopicGlyph concept={data.concept}/>}
     <h2>{data.concept.title}</h2>
     <div className="node-detail-group" hidden={!data.expanded}><p className="node-summary" hidden={data.concept.visual.type === 'figure' || (data.paired && !data.compact && data.revealed.length > 0 && data.concept.visual.type === 'concept')}>{data.concept.summary}</p>{children}</div>
     {!data.expanded && !data.home && <div className="anchor-rule" aria-hidden="true"><span/><ArrowRight size={32}/></div>}
@@ -57,7 +58,8 @@ export const ProcessNode = memo(({ data }: NodeProps<FollowNode>) => {
 });
 export const MetricNode = memo(({ data }: NodeProps<FollowNode>) => {
   const v = data.concept.visual;
-  return <NodeShell data={data}>{v.type === 'metric' && <div className="metric-composition"><div className="metric-value">{v.value}<span>{v.unit}</span></div><p>{v.label}</p><span className="metric-source">Source · p. {v.valueSource.page}</span></div>}<Points data={data}/></NodeShell>;
+  const display = v.type === 'metric' ? metricDisplay(v.value, v.unit) : null;
+  return <NodeShell data={data}>{v.type === 'metric' && <div className="metric-composition"><div className={`metric-value ${data.board && (display?.value.length ?? 0) > 10 ? 'metric-value-long' : ''}`}>{display?.value}{display?.unit && <span className={display.unit.length > 8 ? 'metric-unit-long' : undefined}>{display.unit}</span>}</div><p>{v.label}</p><span className="metric-source">Source · p. {v.valueSource.page}</span></div>}{!data.board && <Points data={data}/>}</NodeShell>;
 });
 export const FigureNode = memo(({ data }: NodeProps<FollowNode>) => {
   const v = data.concept.visual;

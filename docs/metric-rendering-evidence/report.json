@@ -1,0 +1,254 @@
+[
+  {
+    "extreme": false,
+    "elements": 1,
+    "viewport": [
+      1440,
+      900
+    ],
+    "value": "75.8%",
+    "label": "Average grade across Years 1\u20132",
+    "bodyFits": true,
+    "labelFits": true,
+    "valueFits": true,
+    "noOverlap": true
+  },
+  {
+    "extreme": false,
+    "elements": 1,
+    "viewport": [
+      1280,
+      720
+    ],
+    "value": "75.8%",
+    "label": "Average grade across Years 1\u20132",
+    "bodyFits": true,
+    "labelFits": true,
+    "valueFits": true,
+    "noOverlap": true
+  },
+  {
+    "extreme": false,
+    "elements": 1,
+    "viewport": [
+      2216,
+      1054
+    ],
+    "value": "75.8%",
+    "label": "Average grade across Years 1\u20132",
+    "bodyFits": true,
+    "labelFits": true,
+    "valueFits": true,
+    "noOverlap": true
+  },
+  {
+    "extreme": false,
+    "elements": 2,
+    "viewport": [
+      1440,
+      900
+    ],
+    "value": "75.8%",
+    "label": "Average grade across Years 1\u20132",
+    "bodyFits": true,
+    "labelFits": true,
+    "valueFits": true,
+    "noOverlap": true
+  },
+  {
+    "extreme": false,
+    "elements": 2,
+    "viewport": [
+      1280,
+      720
+    ],
+    "value": "75.8%",
+    "label": "Average grade across Years 1\u20132",
+    "bodyFits": true,
+    "labelFits": true,
+    "valueFits": true,
+    "noOverlap": true
+  },
+  {
+    "extreme": false,
+    "elements": 2,
+    "viewport": [
+      2216,
+      1054
+    ],
+    "value": "75.8%",
+    "label": "Average grade across Years 1\u20132",
+    "bodyFits": true,
+    "labelFits": true,
+    "valueFits": true,
+    "noOverlap": true
+  },
+  {
+    "extreme": false,
+    "elements": 3,
+    "viewport": [
+      1440,
+      900
+    ],
+    "value": "75.8%",
+    "label": "Average grade across Years 1\u20132",
+    "bodyFits": true,
+    "labelFits": true,
+    "valueFits": true,
+    "noOverlap": true
+  },
+  {
+    "extreme": false,
+    "elements": 3,
+    "viewport": [
+      1280,
+      720
+    ],
+    "value": "75.8%",
+    "label": "Average grade across Years 1\u20132",
+    "bodyFits": true,
+    "labelFits": true,
+    "valueFits": true,
+    "noOverlap": true
+  },
+  {
+    "extreme": false,
+    "elements": 3,
+    "viewport": [
+      2216,
+      1054
+    ],
+    "value": "75.8%",
+    "label": "Average grade across Years 1\u20132",
+    "bodyFits": true,
+    "labelFits": true,
+    "valueFits": true,
+    "noOverlap": true
+  },
+  {
+    "extreme": true,
+    "elements": 1,
+    "viewport": [
+      1440,
+      900
+    ],
+    "value": "1234567890123456measurements per operating period",
+    "label": "Average measurements across all academic years and research project observations.",
+    "bodyFits": true,
+    "labelFits": true,
+    "valueFits": true,
+    "noOverlap": true
+  },
+  {
+    "extreme": true,
+    "elements": 1,
+    "viewport": [
+      1280,
+      720
+    ],
+    "value": "1234567890123456measurements per operating period",
+    "label": "Average measurements across all academic years and research project observations.",
+    "bodyFits": true,
+    "labelFits": true,
+    "valueFits": true,
+    "noOverlap": true
+  },
+  {
+    "extreme": true,
+    "elements": 1,
+    "viewport": [
+      2216,
+      1054
+    ],
+    "value": "1234567890123456measurements per operating period",
+    "label": "Average measurements across all academic years and research project observations.",
+    "bodyFits": true,
+    "labelFits": true,
+    "valueFits": true,
+    "noOverlap": true
+  },
+  {
+    "extreme": true,
+    "elements": 2,
+    "viewport": [
+      1440,
+      900
+    ],
+    "value": "1234567890123456measurements per operating period",
+    "label": "Average measurements across all academic years and research project observations.",
+    "bodyFits": true,
+    "labelFits": true,
+    "valueFits": true,
+    "noOverlap": true
+  },
+  {
+    "extreme": true,
+    "elements": 2,
+    "viewport": [
+      1280,
+      720
+    ],
+    "value": "1234567890123456measurements per operating period",
+    "label": "Average measurements across all academic years and research project observations.",
+    "bodyFits": true,
+    "labelFits": true,
+    "valueFits": true,
+    "noOverlap": true
+  },
+  {
+    "extreme": true,
+    "elements": 2,
+    "viewport": [
+      2216,
+      1054
+    ],
+    "value": "1234567890123456measurements per operating period",
+    "label": "Average measurements across all academic years and research project observations.",
+    "bodyFits": true,
+    "labelFits": true,
+    "valueFits": true,
+    "noOverlap": true
+  },
+  {
+    "extreme": true,
+    "elements": 3,
+    "viewport": [
+      1440,
+      900
+    ],
+    "value": "1234567890123456measurements per operating period",
+    "label": "Average measurements across all academic years and research project observations.",
+    "bodyFits": true,
+    "labelFits": true,
+    "valueFits": true,
+    "noOverlap": true
+  },
+  {
+    "extreme": true,
+    "elements": 3,
+    "viewport": [
+      1280,
+      720
+    ],
+    "value": "1234567890123456measurements per operating period",
+    "label": "Average measurements across all academic years and research project observations.",
+    "bodyFits": true,
+    "labelFits": true,
+    "valueFits": true,
+    "noOverlap": true
+  },
+  {
+    "extreme": true,
+    "elements": 3,
+    "viewport": [
+      2216,
+      1054
+    ],
+    "value": "1234567890123456measurements per operating period",
+    "label": "Average measurements across all academic years and research project observations.",
+    "bodyFits": true,
+    "labelFits": true,
+    "valueFits": true,
+    "noOverlap": true
+  }
+]

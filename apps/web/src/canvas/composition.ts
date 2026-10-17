@@ -11,7 +11,7 @@ export function getComposition(state: CanvasState): CompositionItem[] {
       const single = concepts.length === 1;
       const width = single ? 1280 : pair ? 850 : i === 0 ? 1100 : 660;
       const dense = concepts.some(c => c.details.some(d => d.text.length > 100) || c.details.length > 3 || c.title.length > 50);
-      const fullHeight = dense || concepts.some(c => c.visual.type === 'figure') ? 780 : 620;
+      const fullHeight = dense || concepts.some(c => c.visual.type === 'figure' || c.visual.type === 'metric') ? 780 : 620;
       const height = pair || single || i === 0 || concepts.length === 2 ? fullHeight : (fullHeight - 40) / 2;
       return { id: c.id, concept: c, x: i === 0 ? 0 : pair ? 950 : 1180,
         y: i < 2 ? 0 : (fullHeight + 40) / 2, width, height, expanded: true };

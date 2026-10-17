@@ -176,3 +176,16 @@
 .canvas-board .node-points li { display:block; overflow:visible; padding:12px 0; }
 .canvas-board .point-text { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; }
 .canvas-board .is-compact h2 { padding-bottom:0; margin-bottom:8px; }
+
+/* Metrics have their own content budget. The value and its label are essential
+   and must fit in full, rather than being clipped by the generic card body. */
+.canvas-board .visual-metric:not(.is-compact) .node-detail-group { display:flex; flex-direction:column; gap:20px; overflow:visible; }
+.canvas-board .visual-metric:not(.is-compact) .node-summary { flex-shrink:0; margin-top:0; font-size:28px; line-height:1.3; -webkit-line-clamp:3; }
+.canvas-board .visual-metric:not(.is-compact) .metric-composition { display:flex; flex-direction:column; align-items:flex-start; flex-shrink:0; gap:16px; margin:0; padding:0; }
+.canvas-board .visual-metric:not(.is-compact) .metric-value { font-size:88px; line-height:1.05; }
+.canvas-board .visual-metric:not(.is-compact) .metric-composition p { font-size:28px; line-height:1.3; margin:0; max-width:100%; overflow-wrap:anywhere; }
+.canvas-board .visual-metric:not(.is-compact) h2 { font-size:44px; line-height:1.15; }
+.canvas-board .visual-metric.is-compact .node-summary { -webkit-line-clamp:2; }
+
+.canvas-board .visual-metric:not(.is-compact) .metric-value-long { font-size:64px; }
+.canvas-board .visual-metric:not(.is-compact) .metric-unit-long { display:block; margin:12px 0 0; font-size:26px; line-height:1.2; }
