@@ -1,0 +1,228 @@
+{
+  "page_errors": [],
+  "concepts": [
+    {
+      "id": "problem",
+      "viewport": [
+        1280,
+        720
+      ],
+      "measurements": [
+        {
+          "title": "Slides lock speakers into a fixed order",
+          "height": 797,
+          "scroll": 797,
+          "zoom": 0.709531,
+          "points": 1
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "id": "problem",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "measurements": [
+        {
+          "title": "Slides lock speakers into a fixed order",
+          "height": 797,
+          "scroll": 797,
+          "zoom": 1.06301,
+          "points": 1
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "id": "reversal",
+      "viewport": [
+        1280,
+        720
+      ],
+      "measurements": [
+        {
+          "title": "The speech decides what the audience sees",
+          "height": 797,
+          "scroll": 797,
+          "zoom": 0.709531,
+          "points": 3
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "id": "reversal",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "measurements": [
+        {
+          "title": "The speech decides what the audience sees",
+          "height": 797,
+          "scroll": 797,
+          "zoom": 1.06301,
+          "points": 3
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "id": "pipeline",
+      "viewport": [
+        1280,
+        720
+      ],
+      "measurements": [
+        {
+          "title": "Four steps: capture, understand, match, compose",
+          "height": 637,
+          "scroll": 696,
+          "zoom": 0.886914,
+          "points": 0
+        }
+      ],
+      "overflow": true
+    },
+    {
+      "id": "pipeline",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "measurements": [
+        {
+          "title": "Four steps: capture, understand, match, compose",
+          "height": 637,
+          "scroll": 696,
+          "zoom": 1.32876,
+          "points": 0
+        }
+      ],
+      "overflow": true
+    },
+    {
+      "id": "matching",
+      "viewport": [
+        1280,
+        720
+      ],
+      "measurements": [
+        {
+          "title": "Matching by meaning, and holding when unsure",
+          "height": 797,
+          "scroll": 797,
+          "zoom": 0.709531,
+          "points": 1
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "id": "matching",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "measurements": [
+        {
+          "title": "Matching by meaning, and holding when unsure",
+          "height": 797,
+          "scroll": 797,
+          "zoom": 1.06301,
+          "points": 1
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "id": "comparison",
+      "viewport": [
+        1280,
+        720
+      ],
+      "measurements": [
+        {
+          "title": "Slides lock speakers into a fixed order",
+          "height": 757,
+          "scroll": 757,
+          "zoom": 0.682119,
+          "points": 1
+        },
+        {
+          "title": "The speech decides what the audience sees",
+          "height": 757,
+          "scroll": 883,
+          "zoom": 0.682119,
+          "points": 3
+        }
+      ],
+      "overflow": true
+    },
+    {
+      "id": "comparison",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "measurements": [
+        {
+          "title": "Slides lock speakers into a fixed order",
+          "height": 757,
+          "scroll": 757,
+          "zoom": 1.02252,
+          "points": 1
+        },
+        {
+          "title": "The speech decides what the audience sees",
+          "height": 757,
+          "scroll": 883,
+          "zoom": 1.02252,
+          "points": 3
+        }
+      ],
+      "overflow": true
+    },
+    {
+      "id": "architecture",
+      "viewport": [
+        1280,
+        720
+      ],
+      "measurements": [
+        {
+          "title": "Prepared once with AI, presented live on the device",
+          "height": 797,
+          "scroll": 797,
+          "zoom": 0.709531,
+          "points": 3
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "id": "architecture",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "measurements": [
+        {
+          "title": "Prepared once with AI, presented live on the device",
+          "height": 797,
+          "scroll": 797,
+          "zoom": 1.06301,
+          "points": 3
+        }
+      ],
+      "overflow": false
+    }
+  ],
+  "requests": [],
+  "pdf_selection_status": "follow-demo.pdf selected. PDF preparation is not connected in Person A\u2019s preview. Open the example or import a prepared project.",
+  "manifest_import": "passed",
+  "audience_window_count": 1,
+  "reload_restores_project": false
+}

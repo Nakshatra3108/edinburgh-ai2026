@@ -108,3 +108,15 @@ describe('camera and local assets', () => {
     for (const blobKey of ['https://example.com/image.png', '//example.com/image.png', '/examples/../api/key', 'blob:unknown', 'indexeddb-key']) expect(defaultResolveAsset({ ...asset, blobKey })).toBeUndefined();
   });
 });
+
+describe('Groq preparation contract', () => {
+  it('accepts Groq-prepared projects alongside curated content', () => {
+    const project = structuredClone(exampleProject);
+    project.preparation = { ...project.preparation, mode: 'groq', model: 'openai/gpt-oss-120b' };
+    expect(parseCanvasProject(project).preparation.mode).toBe('groq');
+  });
+  it('rejects the superseded provider mode', () => {
+    const project = { ...exampleProject, preparation: { ...exampleProject.preparation, mode: 'grok' } };
+    expect(() => parseCanvasProject(project)).toThrow();
+  });
+});

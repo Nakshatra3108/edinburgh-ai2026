@@ -175,7 +175,7 @@
     {
       "id": "architecture",
       "title": "Prepared once. Followed locally.",
-      "summary": "Grok prepares the content. Local speech and matching drive the live experience.",
+      "summary": "Groq prepares the content. Local speech and matching drive the live experience.",
       "position": {
         "x": 1250,
         "y": 1040
@@ -316,7 +316,7 @@
       "blobKey": "/examples/architecture.svg",
       "page": null,
       "crop": null,
-      "alt": "Grok prepares reviewed content. Local speech passes through semantic matching and a deterministic controller to the canvas.",
+      "alt": "Groq prepares reviewed content. Local speech passes through semantic matching and a deterministic controller to the canvas.",
       "width": 1000,
       "height": 310
     }

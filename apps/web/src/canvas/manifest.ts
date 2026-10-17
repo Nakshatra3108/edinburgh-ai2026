@@ -15,7 +15,7 @@ const concept = z.object({ id: text(120), title: text(64), summary: text(180), a
   position: z.object({ x: z.number().finite().min(-100000).max(100000), y: z.number().finite().min(-100000).max(100000) }) });
 export const canvasProjectSchema = z.object({ schemaVersion: z.literal(1), id: text(120), revision: z.number().int().nonnegative(), title: text(160),
   source: z.object({ name: text(300), sha256: z.string().regex(/^[a-f0-9]{64}$/i), pages: z.number().int().positive() }),
-  preparation: z.object({ mode: z.enum(['grok', 'curated']), model: z.string().nullable(), promptVersion: text(120), preparedAt: z.iso.datetime() }),
+  preparation: z.object({ mode: z.enum(['groq', 'curated']), model: z.string().nullable(), promptVersion: text(120), preparedAt: z.iso.datetime() }),
   concepts: z.array(concept).min(1).max(24),
   relationships: z.array(z.object({ id: text(120), from: text(120), to: text(120), label: text(48), kind: z.enum(['sequence', 'comparison', 'association', 'causal']), sources: z.array(source), approved: z.boolean() })).max(100),
   assets: z.array(z.object({ id: text(120), kind: z.enum(['page-crop', 'image']), blobKey: text(2048), page: z.number().int().positive().nullable(),

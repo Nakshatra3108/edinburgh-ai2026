@@ -75,7 +75,7 @@ Audience rendering has a 16:9 region with 5% horizontal and 6% vertical safe mar
 
 `src/canvas/fixtures/manifest.json` is an explicitly illustrative six-concept example covering all five custom node types. The source name says it is not a PDF; an all-zero SHA is a sentinel, **not a verified source hash**. Its sample value 6 counts its six topics and quotes the authored example sentence; it is not a benchmark. The architecture SVG describes the intended product architecture, not an already functioning AI pipeline. Replace with B's verified source package before the pitch.
 
-This branch makes no AI calls, needs no API credits and never labels manual actions as AI. There is no live microphone, transcription, matcher, Grok preparation, save/reload guarantee or cross-window synchronization here. Content edits last only while the standalone app is open. The real document, model latency and semantic accuracy remain B/C/D's verification work.
+This branch makes no AI calls, needs no API credits and never labels manual actions as AI. There is no live microphone, transcription, matcher, Groq preparation, save/reload guarantee or cross-window synchronization here. Content edits last only while the standalone app is open. The real document, model latency and semantic accuracy remain B/C/D's verification work.
 
 ## Validation
 
