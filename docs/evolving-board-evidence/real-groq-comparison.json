@@ -1,0 +1,32 @@
+{
+  "provider": "real Groq, actual FOLLOW PDF",
+  "prompt": "follow-knowledge-v3",
+  "ms": 7314,
+  "concepts": [
+    {
+      "title": "Fixed Slides",
+      "type": "concept",
+      "review": "source-checked",
+      "details": 3
+    },
+    {
+      "title": "Speech‑Directed Canvas",
+      "type": "concept",
+      "review": "source-checked",
+      "details": 3
+    }
+  ],
+  "relationships": [
+    {
+      "kind": "comparison",
+      "approved": true
+    }
+  ],
+  "attempts": [
+    "incomplete-comparison",
+    "ok"
+  ],
+  "warnings": [
+    "UNSUPPORTED_CONCEPT"
+  ]
+}

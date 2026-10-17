@@ -1,5 +1,6 @@
 import type { CanvasProject, CanvasState, Concept } from '../canvas/domain';
 import { applyAction } from '../canvas/applyAction';
+import { defaultResolveAsset } from '../canvas/assets';
 import { parseCanvasProject } from '../canvas/manifest';
 
 // Keep a bounded history on one canvas. A fresh explanation adds visual
@@ -10,7 +11,13 @@ export function applyLiveScene(state: CanvasState, incoming: CanvasProject): Can
   if (!pages || scene.source.sha256 !== state.project.source.sha256) throw new Error('This visual belongs to another document.');
   for (const c of scene.concepts) {
     const refs = [...c.sources, ...c.details.flatMap(d => d.sources), ...(c.visual.type === 'metric' ? [c.visual.valueSource] : [])];
-    if (!c.sources.length || c.details.some(d => !d.sources.length || d.origin !== 'source')) throw new Error('This visual has no source evidence.');
+    const v=c.visual;
+    const localLink=v.type==='figure'?state.project.knowledgeBase?.figures?.find(f=>f.assetId===v.assetId&&f.enabled):undefined;
+    const asset=localLink?state.project.assets.find(a=>a.id===localLink.assetId):undefined;
+    // A locally labelled original image needs page/pixel provenance, not invented OCR quotes.
+    // Only our exact catalog entry may take this route; generated text still requires evidence.
+    const originalFigure=localLink&&asset&&defaultResolveAsset(asset)&&c.id===`source-${asset.id}`.slice(0,120)&&c.title===localLink.label.slice(0,64)&&c.summary===(localLink.caption||localLink.label).slice(0,180)&&v.type==='figure'&&v.caption===(localLink.caption||localLink.label).slice(0,120)&&c.details.length===0;
+    if ((!c.sources.length && !originalFigure) || c.details.some(d => !d.sources.length || d.origin !== 'source')) throw new Error('This visual has no source evidence.');
     for (const ref of refs) {
       if (pages.find(p => p.page === ref.page)?.text.slice(ref.start, ref.end) !== ref.quote) throw new Error('A visual quote does not match the knowledge base.');
     }
@@ -52,14 +59,26 @@ export function applyLiveScene(state: CanvasState, incoming: CanvasProject): Can
     revealed: Object.fromEntries(Object.entries(state.revealed).filter(([key]) => keptIds.has(key))),
     connected: state.connected.filter(key => relationships.some(r => r.id === key)),
   };
-  const focus = concepts.find(c => c.visual.type === 'comparison') ?? concepts.find(c => c.visual.type === 'process' || c.visual.type === 'metric') ?? concepts[0];
+  const focus = concepts.find(c => c.visual.type === 'comparison') ?? concepts.find(c => c.visual.type === 'process' || c.visual.type === 'metric') ?? concepts.find(c => c.visual.type !== 'figure') ?? concepts[0];
   if (!focus) return state;
   next = applyAction(next, { type: 'FOCUS', conceptId: focus.id });
+  // A verified contrast is sufficient even if a redundant comparison heading was
+  // removed by grounding. The two evidenced sides determine the composition.
+  const contrast = relationships.find(r => r.approved && r.kind === 'comparison' && newIds.has(r.from) && newIds.has(r.to));
+  if (contrast) next = applyAction(next, { type:'COMPARE', leftId:contrast.from, rightId:contrast.to });
   // These points were composed specifically for the current spoken explanation.
   // Show them without requiring a second click; future facts are not preloaded.
   const visibleIds = next.pair ?? [focus.id];
   for (const c of concepts.filter(c => visibleIds.includes(c.id))) {
     next = { ...next, revealed: { ...next.revealed, [c.id]: c.details.map(d => d.id) } };
   }
-  return { ...next, revision: next.revision + 1 };
+  // Keep the current explanation and up to two recent elements together. A comparison
+  // is represented by its two sides, rather than a redundant third title card.
+  const current = concepts.filter(c => c.visual.type !== 'comparison').map(c => c.id);
+  const prior = (state.boardIds ?? state.introduced).filter(key => !current.includes(key) && keptIds.has(key)
+    && kept.find(c => c.id === key)?.visual.type !== 'comparison');
+  const remaining = Math.max(0, 3 - current.length);
+  const boardIds = next.pair ? [...next.pair] : [...(remaining ? prior.slice(-remaining) : []), ...current].slice(-3);
+  for (const c of concepts) next.revealed[c.id] = c.details.map(d => d.id);
+  return { ...next, boardIds, revision: next.revision + 1 };
 }

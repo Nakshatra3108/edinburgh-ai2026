@@ -16,7 +16,7 @@ const concept = z.object({ id: text(120), title: text(64), summary: text(180), a
 export const canvasProjectSchema = z.object({ schemaVersion: z.literal(1), id: text(120), revision: z.number().int().nonnegative(), title: text(160),
   source: z.object({ name: text(300), sha256: z.string().regex(/^[a-f0-9]{64}$/i), pages: z.number().int().positive() }),
   preparation: z.object({ mode: z.enum(['groq', 'curated']), model: z.string().nullable(), promptVersion: text(120), preparedAt: z.iso.datetime() }),
-  knowledgeBase: z.object({ version: z.literal(1), pages: z.array(z.object({ page: z.number().int().positive(), text: z.string().max(500000) })).min(1).max(20) }).optional(),
+  knowledgeBase: z.object({ version: z.literal(1), pages: z.array(z.object({ page: z.number().int().positive(), text: z.string().max(500000) })).min(1).max(20), figures: z.array(z.object({ assetId: text(120), page: z.number().int().positive(), label: text(120), caption: z.string().max(300), keywords: z.array(text(80)).max(12), enabled: z.boolean(), captionSource: source.nullable() })).max(32).optional() }).optional(),
   concepts: z.array(concept).max(24),
   relationships: z.array(z.object({ id: text(120), from: text(120), to: text(120), label: text(48), kind: z.enum(['sequence', 'comparison', 'association', 'causal']), sources: z.array(source), approved: z.boolean() })).max(100),
   assets: z.array(z.object({ id: text(120), kind: z.enum(['page-crop', 'image']), blobKey: text(2048), page: z.number().int().positive().nullable(),
@@ -32,6 +32,11 @@ export const canvasProjectSchema = z.object({ schemaVersion: z.literal(1), id: t
   if (p.knowledgeBase && (new Set(p.knowledgeBase.pages.map(x => x.page)).size !== p.knowledgeBase.pages.length || p.knowledgeBase.pages.some(x => x.page > p.source.pages) || p.knowledgeBase.pages.reduce((n, x) => n + x.text.length, 0) > 500000)) error('Invalid knowledge base pages');
   const ids = new Set(p.concepts.map(c => c.id)); const assets = new Set(p.assets.map(a => a.id));
   if (p.approvedRevision !== null && p.approvedRevision !== p.revision) error('Approved revision must match project revision');
+  for (const f of p.knowledgeBase?.figures ?? []) {
+    if (!assets.has(f.assetId) || f.page > p.source.pages || p.assets.find(a => a.id === f.assetId)?.page !== f.page) error('Invalid local figure reference');
+    if (f.captionSource && (f.captionSource.page !== f.page || p.knowledgeBase?.pages.find(page => page.page === f.page)?.text.slice(f.captionSource.start, f.captionSource.end) !== f.captionSource.quote)) error('Invalid figure caption source');
+  }
+  if (new Set((p.knowledgeBase?.figures ?? []).map(f => f.assetId)).size !== (p.knowledgeBase?.figures ?? []).length) error('Duplicate local figure reference');
   for (const r of p.relationships) if (!ids.has(r.from) || !ids.has(r.to) || r.from === r.to) error(`Invalid endpoints: ${r.id}`);
   for (const c of p.concepts) {
     if (new Set(c.details.map(d => d.id)).size !== c.details.length) error(`Duplicate detail ID: ${c.id}`);

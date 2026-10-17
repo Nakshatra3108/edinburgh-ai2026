@@ -11,7 +11,7 @@ const body = { source: { ...demoSource, pages: demo.pages.map(({ page, text }) =
 test('preparation retains every selected page, beyond the short topic index', async () => {
   const result = await runPreparation(input, { provider: scripted(ok(demoPlan())).provider, model: 'm', signal: new AbortController().signal });
   assert.deepEqual(result.project.knowledgeBase?.pages, demo.pages.map(({ page, text }) => ({ page, text })));
-  assert.equal(result.project.preparation.promptVersion, 'follow-knowledge-v2');
+  assert.equal(result.project.preparation.promptVersion, 'follow-knowledge-v3');
 });
 
 test('live composition uses transcript and full knowledge; drops invented evidence; caches repeats', async () => {
@@ -73,4 +73,19 @@ test('live without credentials returns a configuration error, not a fake scene',
   const a = buildServer({ config: loadConfig({}, '/nonexistent'), logger: false });
   assert.equal((await a.inject({ method: 'POST', url: '/api/live/compose', payload: body })).statusCode, 503);
   await a.close();
+});
+
+
+test('repairs a comparison with an ungrounded side once, without bypassing grounding', async () => {
+  const good = demoPlan();
+  good.concepts = good.concepts.filter(c => ['problem','reversal','comparison'].includes(c.id));
+  good.relationships = good.relationships.filter(r => r.kind === 'comparison');
+  const bad = structuredClone(good);
+  bad.concepts.find(c => c.id === 'reversal')!.details = [];
+  bad.concepts.find(c => c.id === 'reversal')!.quotes = [{page:1,quote:'This fabricated comparison evidence does not appear in the PDF.'}];
+  const {provider,calls} = scripted(ok(bad),ok(good));
+  const result = await runPreparation({...input,utterance:'Compare fixed slides and a speech-directed canvas.'}, {provider,model:'fixture',signal:new AbortController().signal});
+  assert.equal(calls.length,2);
+  assert.ok(result.project.concepts.some(c=>c.visual.type==='comparison'));
+  assert.deepEqual(result.attempts.map(a=>a.outcome),['incomplete-comparison','ok']);
 });

@@ -4,7 +4,7 @@ import type { LivePresentation } from './useLivePresentation';
 import './live.css';
 export function LivePanel({ live, pages }: { live: LivePresentation; pages: number }) {
   const [text, setText] = useState('');
-  return <section className="live-panel" aria-label="Live presentation">
+  return <section className={`live-panel ${live.transcript ? 'has-explanation' : ''}`} aria-label="Live presentation">
     <div className="live-panel-heading"><div><h2>Your voice. A living canvas.</h2><p>{pages} source pages ready. Speak in any order.</p></div>
       {live.speechPhase !== 'ready' && <button onClick={() => void live.loadSpeech()} disabled={live.speechPhase === 'loading'}>{live.speechPhase === 'loading' ? <Loader2 size={16} className="live-spin"/> : <Mic size={16}/>}{live.speechPhase === 'loading' ? 'Loading voice model…' : 'Load local voice model'}</button>}
       <button className={live.listening ? '' : 'primary'} onClick={live.listening ? live.stop : live.start} disabled={live.speechPhase !== 'ready'} aria-pressed={live.listening}>
@@ -22,6 +22,6 @@ export function LivePanel({ live, pages }: { live: LivePresentation; pages: numb
       <input id="spoken-explanation" value={text} onChange={e => setText(e.target.value)} maxLength={2000} placeholder="Or type what you would say…"/>
       <button aria-label="Compose visual from explanation" type="submit" disabled={text.trim().length < 8}><ArrowUp size={18}/></button>
     </form>
-    <p className="live-privacy">Audio stays local with Whisper. Transcript and selected document text go to Groq to compose visuals. Typed input works without downloading a voice model.</p>
+    <p className="live-privacy">Audio and source figures stay local. Groq receives only text for generated visuals. Typed input needs no voice-model download.</p>
   </section>;
 }

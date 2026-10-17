@@ -1,6 +1,22 @@
 import type { CanvasState, Concept } from './domain';
 export type CompositionItem = { id: string; concept: Concept; x: number; y: number; width: number; height: number; expanded: boolean; home?: boolean };
 export function getComposition(state: CanvasState): CompositionItem[] {
+  if (state.live && state.boardIds?.length && state.view !== 'overview') {
+    const ids = state.boardIds;
+    const current = state.focusId && ids.includes(state.focusId) ? state.focusId : ids.at(-1)!;
+    const ordered = state.pair ? [...ids] : [current, ...ids.filter(id => id !== current)];
+    const concepts = ordered.flatMap(id => { const c = state.project.concepts.find(c => c.id === id && c.enabled); return c ? [c] : []; });
+    return concepts.map((c, i) => {
+      const pair = !!state.pair;
+      const single = concepts.length === 1;
+      const width = single ? 1280 : pair ? 850 : i === 0 ? 1100 : 660;
+      const dense = concepts.some(c => c.details.some(d => d.text.length > 100) || c.details.length > 3 || c.title.length > 50);
+      const fullHeight = dense || concepts.some(c => c.visual.type === 'figure') ? 780 : 620;
+      const height = pair || single || i === 0 || concepts.length === 2 ? fullHeight : (fullHeight - 40) / 2;
+      return { id: c.id, concept: c, x: i === 0 ? 0 : pair ? 950 : 1180,
+        y: i < 2 ? 0 : (fullHeight + 40) / 2, width, height, expanded: true };
+    });
+  }
   const pair = state.pair;
   return state.project.concepts.filter(c => c.enabled && (!state.live || state.introduced.includes(c.id))).flatMap(c => {
     const paired = !!pair?.includes(c.id);

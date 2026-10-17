@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { CanvasProject } from '../canvas/domain';
+import { localFigureScene } from './figures';
 import { composeLive } from '../preparation/client';
 import { MicrophoneCapture } from '../audio/capture';
 import { LatestQueue } from '../audio/latest-queue';
 import { deduplicate } from '../audio/pcm';
 import { WorkerClient } from '../workers/rpc';
 
-export function useLivePresentation(project: CanvasProject, onScene: (scene: CanvasProject) => void) {
+export function useLivePresentation(project: CanvasProject, onScene: (scene: CanvasProject, utterance: string) => void) {
   const [listening, setListening] = useState(false);
   const [opening, setOpening] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -48,6 +49,12 @@ export function useLivePresentation(project: CanvasProject, onScene: (scene: Can
     if (utterance.length < 8 || !latest.current.project.knowledgeBase) return;
     setTranscript(utterance);
     if (inFlight.current) { pending.current = `${pending.current} ${utterance}`.trim().slice(-2000); return; }
+    const local = /\b(?:figure|diagram|chart|image|picture)\s*(?:\d+|one|two|three|four|five)\b/i.test(utterance) ? localFigureScene(latest.current.project, utterance) : undefined;
+    if (local) {
+      try { latest.current.onScene(local, utterance); setError(''); setStatus(`Canvas updated · local source figure · page ${local.assets.find(a => a.id === local.concepts[0].assetIds[0])?.page ?? '—'}`); }
+      catch (error) { setError(error instanceof Error ? error.message : 'Could not display the local figure.'); }
+      return;
+    }
     inFlight.current = true;
     const turn = epoch.current;
     const ctl = new AbortController(); request.current = ctl;
@@ -57,7 +64,7 @@ export function useLivePresentation(project: CanvasProject, onScene: (scene: Can
       const result = await composeLive(latest.current.project, utterance, ctl.signal);
       if (epoch.current !== turn || ctl.signal.aborted) return;
       if (result.supported) {
-        latest.current.onScene(result.project);
+        latest.current.onScene(result.project, utterance);
         setStatus(`Canvas updated · source pages ${[...new Set(result.project.concepts.flatMap(c => c.sources.map(s => s.page)))].join(', ')}`);
       } else setStatus('No supporting material found in this document. Keeping the current visual.');
     } catch (e) {

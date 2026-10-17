@@ -2,6 +2,7 @@
 // Text uses the shared normalization in ./sourceText.ts, so SourceRef offsets
 // match the server-side quote validator.
 
+import type { LocalFigure } from './figures';
 import { NORMALIZATION_VERSION, pageTextFromItems, type TextItemLike } from './sourceText';
 
 /** PRD §11.2 prototype limit for the uploaded file. */
@@ -14,7 +15,7 @@ const MESSAGES: Record<PdfErrorCode, string> = {
   TOO_LARGE: 'This PDF is larger than 20 MB. Choose a smaller file.',
   ENCRYPTED: 'This PDF is password-protected or encrypted, which is not supported. Choose an unprotected copy.',
   INVALID_PDF: 'This PDF could not be read. It may be damaged; try exporting it again.',
-  NO_TEXT: 'No selectable text was found in this PDF. Use a PDF with real text, paste the text, or open the curated demo.',
+  NO_TEXT: 'No selectable text was found in this PDF. Scanned or image-only PDFs need OCR before a knowledge base can be built. Choose a text-based PDF.',
   CANCELLED: 'Reading the PDF was cancelled.',
 };
 
@@ -38,6 +39,9 @@ export type ExtractedSource = {
   /** Pages with no extractable text (scanned images, blank pages). OCR is P2. */
   emptyPages: number[];
   normalization: typeof NORMALIZATION_VERSION;
+  figures?: LocalFigure[];
+  figureWarnings?: string[];
+  file?: File;
 };
 
 /** The subset of PDFDocumentProxy this module needs; lets tests pass a Node-loaded document. */
@@ -46,7 +50,7 @@ export type PdfDocumentLike = {
   getPage(n: number): Promise<{ getTextContent(): Promise<{ items: readonly object[] }> }>;
 };
 
-export type ExtractOptions = { signal?: AbortSignal; onProgress?: (pagesDone: number, pageCount: number) => void };
+export type ExtractOptions = { signal?: AbortSignal; onProgress?: (pagesDone: number, pageCount: number) => void; onFiguresProgress?: (pagesDone: number, pageCount: number, figures: number) => void };
 
 export async function sha256Hex(data: ArrayBuffer): Promise<string> {
   const digest = await crypto.subtle.digest('SHA-256', data);
@@ -106,7 +110,10 @@ export async function extractPdfFile(file: File, options: ExtractOptions = {}): 
   options.signal?.addEventListener('abort', abort, { once: true });
   try {
     const doc = await task.promise;
-    return summarizeSource(file.name, file.size, sha256, await extractPages(doc, options));
+    const source = summarizeSource(file.name, file.size, sha256, await extractPages(doc, options));
+    const { extractPdfFigures } = await import('./figures');
+    const local = await extractPdfFigures(doc, source.pages, sha256, options);
+    return { ...source, file, figures: local.figures, figureWarnings: local.warnings };
   } catch (error) {
     throw toPdfSourceError(options.signal?.aborted ? new PdfSourceError('CANCELLED') : error);
   } finally {

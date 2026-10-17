@@ -20,6 +20,7 @@ test('success on first attempt records usage', async () => {
   assert.deepEqual(r.attempts.map((a) => a.outcome), ['ok']);
   assert.equal(r.usage.totalTokens, 150);
   assert.ok(r.project.concepts.length > 0);
+  assert.ok(r.project.concepts.every(c => c.review === 'source-checked'), 'grounded topics are ready without a human approval gate');
 });
 
 test("finish_reason 'length' is retried once with a larger budget", async () => {

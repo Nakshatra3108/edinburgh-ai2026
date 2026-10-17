@@ -23,11 +23,12 @@ export type Asset = {
   crop: { x: number; y: number; width: number; height: number } | null;
   alt: string; width: number; height: number;
 };
+export type FigureLink = { assetId: string; page: number; label: string; caption: string; keywords: string[]; enabled: boolean; captionSource: SourceRef | null };
 export type CanvasProject = {
   schemaVersion: 1; id: string; revision: number; title: string;
   source: { name: string; sha256: string; pages: number };
   preparation: { mode: 'groq' | 'curated'; model: string | null; promptVersion: string; preparedAt: string };
-  knowledgeBase?: { version: 1; pages: { page: number; text: string }[] };
+  knowledgeBase?: { version: 1; pages: { page: number; text: string }[]; figures?: FigureLink[] };
   concepts: Concept[]; relationships: Relationship[]; assets: Asset[]; approvedRevision: number | null;
 };
 export type CanvasAction =
@@ -39,6 +40,8 @@ export type CanvasAction =
 export type CanvasState = {
   project: CanvasProject;
   live?: boolean;
+  /** Current spoken explanation plus nearby visual context; history remains on the canvas. */
+  boardIds?: string[];
   view: 'overview' | 'focus' | 'connection' | 'comparison';
   focusId: string | null;
   pair: [string, string] | null;

@@ -3,7 +3,7 @@
 import { PLAN_LIMITS, type Density } from './planSchema.ts';
 import { BUDGET } from './project.ts';
 
-export const PROMPT_VERSION = 'follow-knowledge-v2';
+export const PROMPT_VERSION = 'follow-knowledge-v3';
 
 export type PageText = { page: number; text: string };
 

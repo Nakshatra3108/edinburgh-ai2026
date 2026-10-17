@@ -2,7 +2,7 @@
 
 The uploaded PDF is reference material, not a prewritten slide deck. The selected pages are retained in full, with their page numbers. Groq builds a small topic index for inspection, but live composition reads the full selected text, including information absent from that index.
 
-This document supersedes earlier requirements that restricted live presentation to prebuilt, manually reviewed visuals. The desktop studio is the primary target.
+This document supersedes earlier requirements that restricted live presentation to prebuilt, manually reviewed visuals. The desktop studio is the primary target. The 17 October evolving-board update also supersedes mandatory topic review: verified index concepts are immediately usable, with optional inspection and editing.
 
 ## User flow
 
@@ -12,7 +12,7 @@ This document supersedes earlier requirements that restricted live presentation 
 4. Load and warm the local Whisper Tiny English model, then start the microphone. The first download needs internet; transcription itself runs locally using Person C's existing audio capture, PCM worklet, worker and RPC implementation. Typed rehearsal uses the same live composition path without a model download.
 5. A spoken explanation and the source pages go to Groq. Groq composes up to three relevant visual elements: an idea, a source-backed number, an ordered process, or a comparison between two ideas. The latest clause controls the visual; earlier speech provides context.
 6. The server locates exact source quotes and computes offsets. The browser validates the scene and checks every quote against its retained document before applying it. The renderer receives structured data, never model-generated HTML.
-7. New elements appear on the same canvas. Existing elements retain their home anchors; the active explanation receives focus. Overview shows the introduced visual history. There is no slide index or next-slide sequence.
+7. New elements appear on the same canvas. The active board keeps up to three complementary visual elements visible: a primary explanation and recent context, or two explicit comparison sides. Processes draw connected steps; evidence uses quoted metrics; concepts carry topic pictograms and supporting points. Earlier elements retain their home anchors in Overview. Overview shows the introduced visual history. There is no slide index or next-slide sequence.
 8. A manual hold aborts the browser request, clears queued input and invalidates delayed results. Unsupported speech and request failures preserve the last visual. Audience view continues to receive the same live state and includes a pause-listening control.
 
 ## Architecture and contracts
@@ -48,7 +48,7 @@ Run `npm test`, `npm run build`, `npm run typecheck --prefix apps/api`, and `npm
 
 Browser integration checks live under `apps/web/src/live/qa/`. Their explicit fixture API is `node apps/api/test/browser-fixture.ts` on **8790**, separate from the real API on **8787**. The fixture must never replace the user's API. The microphone wiring check uses synthetic audio and a fixture speech worker; it does not measure real Whisper accuracy. Real Groq evidence is identified separately from fixture evidence.
 
-This remains a bounded prototype: PDF text extraction does not perform OCR or extract arbitrary figures, live layouts use authored visual types, Groq needs internet and is subject to account rate limits, and state is currently held in memory. No sub-second latency, unlimited free allowance, real-room microphone accuracy or durable project storage is claimed. The source-checking layer rejects unmatched quotations; it does not establish semantic entailment of every AI paraphrase.
+This remains a bounded prototype: PDF text extraction does not perform OCR, caption and geometry retrieval do not understand arbitrary image contents, live layouts use authored visual types, Groq needs internet and is subject to account rate limits, and state is currently held in memory. No sub-second latency, unlimited free allowance, real-room microphone accuracy or durable project storage is claimed. The source-checking layer rejects unmatched quotations; it does not establish semantic entailment of every AI paraphrase.
 
 Groq parameter reference: [reasoning effort](https://console.groq.com/docs/reasoning).
 
@@ -59,3 +59,17 @@ Groq parameter reference: [reasoning effort](https://console.groq.com/docs/reaso
 - Real Groq: the actual four-page FOLLOW PDF produced a process visual with four verified quotations in 2,164 ms for one measured generation. A separate one-page fictional farm source produced a process visual in 1,568 ms and its index had 13 verified quotations. These are generation timings after transcript input, not end-to-end speech latency. The farm check used supplied page text, not a PDF extraction test.
 - A burst of real requests also hit a temporary Groq rate limit. HTTP 429 now remains retryable rather than being mislabelled as exhausted billing quota; the live output budget is 2,048 tokens, with one 4,096-token repair if truncated. Failed requests keep the last visual and expose a retry action.
 - Reports and desktop captures: [knowledge-canvas-evidence](knowledge-canvas-evidence/).
+
+## Evolving board and local figures (17 October)
+
+- Knowledge preparation marks every successfully grounded index concept `source-checked` automatically. No accept-each-topic workflow is required. Quotes that fail grounding are discarded; source-only recovery remains available.
+- Groq chooses process, comparison, metric or connected-concept structures from what the speaker says. It receives selected source text and the transcript, never image pixels, local image descriptions or asset URLs. The v3 prompt asks for concrete contrasting details and complementary evidence rather than headings.
+- The board presents up to three elements at once for desktop readability. A current explanation shares the stage with recent context. Comparisons show their two sides together; approved source-backed connections carry labels. Overview retains up to 24 introduced concepts. This is a bounded visual grammar, not arbitrary AI drawing or generated photography.
+- Native vector icons, arrows and process diagrams are rendered locally from validated structure. Process paths and supporting points reveal with motion; reduced-motion settings disable these effects. Voice controls compact after the first explanation to give the canvas more room.
+- Original raster and captioned vector PDF regions can be rendered locally and attached to their source pages. Caption/keyword matches add a figure alongside generated explanation; explicitly naming a numbered figure can display it without a Groq request. An image never replaces the generated process just because it shares the same page.
+- Optional source controls let users inspect figures and include a whole-page visual. Captioned figures default to enabled; uncaptioned regions need opt-in to avoid decorative logos. Blob assets live only in this browser session and are revoked when the document is discarded. Exported manifests do not embed those pixels.
+- Known limits: English caption patterns, bounded extraction (30 pages, 32 figures, 24 MB), no OCR, no image semantics, no newly generated photographs, and no guarantee that arbitrary PDF layouts will yield useful crops. Showcase content should be rehearsed with the actual PDF and voice in the room.
+
+Validation: root unit tests cover exact-quote rejection, automatic use, multi-element retention, bounded history and non-overlapping board geometry. Desktop fixture browser checks cover evolving boards, comparisons, pause/unsupported holds, audience view and accessibility. Figure checks use a three-page internal PDF fixture (raster chart, vector diagram, text-only page) and assert text-only API traffic. These fixture checks do not measure real Groq quality or microphone recognition.
+
+A real v3 Groq check against the actual FOLLOW PDF produced two comparison sides with three grounded details each and an approved comparison relationship. It took 7,314 ms including one grounding repair; the unsupported redundant comparison heading was discarded. The renderer recognizes a verified comparison relationship directly, so dropping that extra heading does not destroy the two-sided layout. This is a single measured result, not a latency guarantee.

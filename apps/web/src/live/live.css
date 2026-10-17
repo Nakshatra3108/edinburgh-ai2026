@@ -39,3 +39,13 @@
 .live-panel button.primary:disabled { color: var(--text-secondary); background: var(--surface-raised); border-color: var(--line); }
 
 .live-error { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
+
+/* Once presenting, the canvas gets the space; input remains within reach. */
+.live-panel.has-explanation { padding:12px 20px; margin-top:4px; display:grid; grid-template-columns:minmax(0,1fr) 340px; column-gap:20px; }
+.has-explanation .live-panel-heading { grid-column:1/-1; }
+.has-explanation .live-panel-heading h2 { font-size:16px; }
+.has-explanation .live-panel-heading > div > p,.has-explanation .live-privacy { display:none; }
+.has-explanation .live-status { grid-column:1; margin-top:10px; }
+.has-explanation .live-transcript { grid-column:1; max-height:42px; margin-top:4px; }
+.has-explanation .live-text-input { grid-column:2; grid-row:2/4; align-self:center; margin-top:8px; }
+.has-explanation .live-error,.has-explanation .live-model-progress,.has-explanation .live-audio-level { grid-column:1/-1; }

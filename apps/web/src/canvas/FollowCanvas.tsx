@@ -36,6 +36,7 @@ function CanvasInner({ state, mode = 'studio', reducedMotion = false, onAction, 
     selectable: false, focusable: mode === 'studio' && !item.home,
     ariaLabel: `${item.concept.title}, ${item.concept.visual.type}. Press Enter to focus.`,
     data: { concept: item.concept, expanded: item.expanded, paired: !!state.pair?.includes(item.concept.id), home: !!item.home,
+      board: !!(state.live && state.boardIds?.length && state.view !== 'overview'), compact: item.height < 500,
       introduced: state.introduced.includes(item.concept.id), revealed: state.revealed[item.concept.id] ?? EMPTY,
       highlightedDetailId: state.highlightedDetailId,
       ...(item.concept.visual.type === 'figure' ? (() => {
@@ -45,8 +46,8 @@ function CanvasInner({ state, mode = 'studio', reducedMotion = false, onAction, 
   })), [scene, state, locked, mode, resolveAsset, dragPositions]);
   const edges = useMemo<Edge[]>(() => state.project.relationships.filter(r => r.approved && nodes.some(n => n.id === r.from) && nodes.some(n => n.id === r.to)).map(r => ({
     id: r.id, source: r.from, target: r.to, type: 'smoothstep', focusable: false, selectable: false,
-    hidden: state.view !== 'overview' && r.id !== state.activeRelationshipId,
-    label: undefined,
+    hidden: state.view !== 'overview' && !(state.live && state.boardIds?.includes(r.from) && state.boardIds.includes(r.to)) && r.id !== state.activeRelationshipId,
+    label: state.live && state.boardIds?.includes(r.from) && state.boardIds.includes(r.to) ? r.label : undefined,
     className: r.id === state.activeRelationshipId || state.connected.includes(r.id) ? 'edge-active' : 'edge-context',
     style: { strokeWidth: r.id === state.activeRelationshipId ? 4 : 3 },
     labelStyle: { fill: 'var(--text-secondary)', fontSize: 28 },
@@ -88,7 +89,7 @@ function CanvasInner({ state, mode = 'studio', reducedMotion = false, onAction, 
     });
   }, [onPositionChange]);
   const topic = state.focusId ? state.project.concepts.find(c => c.id === state.focusId)?.title : state.view === 'comparison' ? 'Comparison' : state.view === 'connection' ? 'Connected ideas' : 'Canvas overview';
-  return <div ref={ref} className={`follow-canvas canvas-${mode} ${reducedMotion ? 'reduced-motion' : ''}`} data-view={state.view} onKeyDown={event => {
+  return <div ref={ref} className={`follow-canvas ${state.live && state.boardIds?.length && state.view !== 'overview' ? 'canvas-board' : ''} canvas-${mode} ${reducedMotion ? 'reduced-motion' : ''}`} data-view={state.view} onKeyDown={event => {
       if (mode === 'audience' || event.key !== 'Enter') return;
       const id = (event.target as HTMLElement).closest<HTMLElement>('.react-flow__node')?.dataset.id;
       const node = nodes.find(n => n.id === id);

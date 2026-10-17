@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { applyAction, createCanvasState } from '../canvas/applyAction';
 import type { CanvasAction, CanvasProject, CanvasState, Concept } from '../canvas/domain';
 import { exampleProject } from '../canvas/fixtures/project';
@@ -9,6 +9,8 @@ import { demoProject } from './demoProject';
 import type { ExtractedSource } from '../pdf/extract';
 import { StudioScreen } from '../screens/StudioScreen';
 import { useLivePresentation } from '../live/useLivePresentation';
+import { retainPdfAssets } from '../pdf/localAssets';
+import { withRelevantFigure } from '../live/figures';
 import { applyLiveScene } from '../live/scene';
 import { useReducedMotion } from './useReducedMotion';
 export function App() {
@@ -18,11 +20,12 @@ export function App() {
   const [illustrative, setIllustrative] = useState(true);
   const [held, setHeld] = useState(false); const [lastAction, setLastAction] = useState('Ready');
   const { reducedMotion, system, setExplicit } = useReducedMotion();
-  const live = useLivePresentation(state.project, scene => {
-    setState(applyLiveScene(state, scene)); setHeld(false); setLastAction('Live composition');
+  useEffect(()=>()=>retainPdfAssets([]),[]);
+  const live = useLivePresentation(state.project, (scene, utterance) => {
+    setState(applyLiveScene(state, withRelevantFigure(state.project, scene, utterance))); setHeld(false); setLastAction('Live composition');
   });
   const onAction = useCallback((action: CanvasAction) => {
-    live.stop(); setState(s => applyAction(s, action)); setHeld(action.type === 'HOLD'); setLastAction(action.type);
+    live.stop(); setState(s => action.type === 'HOLD' ? s : applyAction({ ...s, boardIds: undefined }, action)); setHeld(action.type === 'HOLD'); setLastAction(action.type);
   }, [live.stop]);
   const onConceptEdit = useCallback((id: string, patch: Partial<Concept>) => {
     live.stop();
@@ -36,8 +39,8 @@ export function App() {
   const onPositionChange = useCallback((id: string, position: { x: number; y: number }) => {
     setState(s => ({ ...s, project: { ...s.project, concepts: s.project.concepts.map(c => c.id === id ? { ...c, position } : c) } }));
   }, []);
-  const open = (project: CanvasProject, example: boolean) => { live.stop(); setState({ ...createCanvasState(project), live: Boolean(project.knowledgeBase) }); setIllustrative(example); setHeld(false); setScreen('studio'); };
-  if (screen === 'start') return <StartScreen onOpen={open} onSource={s => { setSource(s); setScreen('source'); }} reducedMotion={reducedMotion}/>;
+  const open = (project: CanvasProject, example: boolean) => { live.stop(); retainPdfAssets(project.assets); setSource(null); setState({ ...createCanvasState(project), live: Boolean(project.knowledgeBase) }); setIllustrative(example); setHeld(false); setScreen('studio'); };
+  if (screen === 'start') return <StartScreen onOpen={open} onSource={s => { retainPdfAssets((s.figures??[]).map(f=>f.asset)); setSource(s); setScreen('source'); }} reducedMotion={reducedMotion}/>;
   if (screen === 'source' && source) return <SourceScreen source={source} onBack={() => setScreen('start')} onOpenProject={p => open(p, false)} onOpenDemo={() => open(demoProject, false)}/>;
   if (screen === 'audience') return <AudienceScreen state={state} onPause={live.stop} inputMode={live.listening ? 'microphone' : state.live ? 'typed' : 'manual'} reducedMotion={reducedMotion} onExit={() => setScreen('studio')} contentLabel={illustrative ? 'Illustrative example · manually controlled' : undefined}/>;
   return <StudioScreen state={state} onAction={onAction} onConceptEdit={onConceptEdit} onPositionChange={onPositionChange}

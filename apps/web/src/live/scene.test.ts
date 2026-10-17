@@ -52,6 +52,33 @@ describe('speech-driven canvas', () => {
     expect(s.project.concepts.filter(c => c.id === first.id)).toHaveLength(1);
     expect(s.project.concepts.find(c => c.id === first.id)?.position).toEqual(first.position);
     expect(getComposition(applyAction(s, { type: 'OVERVIEW' }))).toHaveLength(2);
+    const board = getComposition(s);
+    expect(board).toHaveLength(2);
+    expect(board.every(n => n.expanded)).toBe(true);
+    expect(board[0].x + board[0].width).toBeLessThan(board[1].x);
+    expect(s.boardIds).toContain(first.id);
+  });
+  it('bounds the active board while preserving introduced history and non-overlapping geometry', () => {
+    const p = prepared(); let state: CanvasState = {...createCanvasState(p), live:true};
+    for(let i=0;i<7;i++) {
+      const incoming=scene(p); incoming.concepts[0].title=`Mechanism ${i}`;
+      state=applyLiveScene(state,incoming);
+    }
+    expect(state.boardIds).toHaveLength(3);
+    const items=getComposition(state);
+    expect(items).toHaveLength(3);
+    for(const a of items) for(const b of items) if(a!==b) {
+      expect(a.x+a.width<=b.x || b.x+b.width<=a.x || a.y+a.height<=b.y || b.y+b.height<=a.y).toBe(true);
+    }
+    expect(getComposition(applyAction(state,{type:'OVERVIEW'}))).toHaveLength(7);
+  });
+  it('renders a verified comparison even when its redundant heading was discarded', () => {
+    const p=prepared();
+    const incoming={...structuredClone(p),concepts:p.concepts.filter(c=>['problem','reversal'].includes(c.id)),relationships:p.relationships.filter(r=>r.kind==='comparison')};
+    const next=applyLiveScene({...createCanvasState(p),live:true},incoming);
+    expect(next.view).toBe('comparison');
+    expect(next.boardIds).toHaveLength(2);
+    expect(getComposition(next)).toHaveLength(2);
   });
   it('rejects mismatched documents and fabricated quotes', () => {
     const p = prepared(); const initial = createCanvasState(p);

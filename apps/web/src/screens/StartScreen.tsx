@@ -5,6 +5,7 @@ import { FollowCanvas } from '../canvas/FollowCanvas';
 import { applyAction, createCanvasState } from '../canvas/applyAction';
 import { exampleProject } from '../canvas/fixtures/project';
 import { demoProject } from '../preview/demoProject';
+import { releasePdfAssets } from '../pdf/localAssets';
 import { matchCuratedSource } from '../pdf/curated';
 import type { ExtractedSource } from '../pdf/extract';
 import { parseCanvasProject } from '../canvas/manifest';
@@ -30,8 +31,8 @@ export function StartScreen({ onOpen, onSource, reducedMotion }: { onOpen: (proj
     try {
       setStatus('Reading your PDF on this device…');
       const { extractPdfFile } = await import('../pdf/extract');
-      const source = await extractPdfFile(file, { signal: job.signal, onProgress: (done, total) => { if (pdfJob.current === job) setStatus(`Reading PDF · ${done} of ${total} pages`); } });
-      if (job.signal.aborted || pdfJob.current !== job) return;
+      const source = await extractPdfFile(file, { signal: job.signal, onProgress: (done, total) => { if (pdfJob.current === job) setStatus(`Reading PDF · ${done} of ${total} pages`); }, onFiguresProgress: (done, total, figures) => { if (pdfJob.current === job) setStatus(`Keeping figures locally · page ${done} of ${total} · ${figures} found`); } });
+      if (job.signal.aborted || pdfJob.current !== job) { releasePdfAssets((source.figures??[]).map(f=>f.asset.blobKey)); return; }
       if (onSource) {
         onSource(source);
       } else if (matchCuratedSource(source, demoProject).ok) {

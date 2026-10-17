@@ -1,0 +1,31 @@
+{
+  "provider": "fixture provider isolated on 8790; no real Groq calls in this browser test",
+  "checks": [
+    "raster chart rendered locally at useful resolution; logo excluded",
+    {
+      "surface": "source raster",
+      "accessibilityViolations": []
+    },
+    "captioned vector diagram rendered with labels",
+    "text-only page has no decorative false-positive figure",
+    "uncaptioned full-page fallback requires explicit opt-in",
+    "spoken reactor topic displays original local chart",
+    "two caption-supported figure explanations make zero composition API calls",
+    "original figure and caption fit audience composition at 1440x900",
+    "original figure and caption fit audience composition at 1280x720",
+    {
+      "surface": "audience figure",
+      "accessibilityViolations": []
+    },
+    "unsupported unrelated topic does not select another image",
+    "preparation and composition API requests contain text only, no image pixels or asset keys",
+    "no browser runtime errors []",
+    "desktop figure screens pass accessibility checks"
+  ],
+  "requests": [
+    "health",
+    "health",
+    "prepare",
+    "live/compose"
+  ]
+}

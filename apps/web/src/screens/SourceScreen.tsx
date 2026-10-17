@@ -5,13 +5,17 @@
 // the reviewed draft.
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { AlertTriangle, ArrowLeft, ArrowRight, Check, CircleDashed, FileText, Loader2, PenLine, RotateCcw, Sparkles, X } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, ArrowRight, Check, CircleDashed, FileText, Loader2, PenLine, Image, RotateCcw, Sparkles, X } from 'lucide-react';
 import { Wordmark } from '../preview/Wordmark';
 import type { CanvasProject } from '../canvas/domain';
 import { parseCanvasProject } from '../canvas/manifest';
 import { defaultSelection, evaluateSelection, MAX_SELECTED_PAGES, MAX_SOURCE_CHARS, normalizeText, pageLabelledText, type ExtractedSource, type SelectionProblem } from '../pdf';
 import { SESSION_ID, cancelJob, getHealth, getJob, isTerminal, submitPreparation, type HealthView, type JobView } from '../preparation/client';
 import '../styles/source.css';
+import { FigurePicker } from '../pdf/FigurePicker';
+import { attachPdfFigures } from '../pdf/attachFigures';
+import type { LocalFigure } from '../pdf/figures';
+import { releasePdfAssets } from '../pdf/localAssets';
 
 type Failure = { code: string; message: string; retryable: boolean };
 type Run =
@@ -28,6 +32,10 @@ export function SourceScreen({ source, onBack, onOpenProject, onOpenDemo }: {
   onOpenProject: (project: CanvasProject) => void;
   onOpenDemo: () => void;
 }) {
+  const [figures,setFigures]=useState<LocalFigure[]>(()=>source.figures??[]);
+  const [figureMode,setFigureMode]=useState(false);
+  const [addingFigure,setAddingFigure]=useState(false);
+  const [figureError,setFigureError]=useState('');
   const [title, setTitle] = useState(() => source.name.replace(/\.pdf$/i, ''));
   const [selected, setSelected] = useState<number[]>(() => defaultSelection(source).pages);
   const [active, setActive] = useState(() => source.pages.find((p) => p.chars > 0)?.page ?? 1);
@@ -37,12 +45,13 @@ export function SourceScreen({ source, onBack, onOpenProject, onOpenDemo }: {
   const [health, setHealth] = useState<HealthView | Failure | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [run, setRun] = useState<Run>({ phase: 'idle' });
+  const alive=useRef(true);
   const polling = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    let live = true;
+    let live = true;alive.current=true;
     getHealth().then((h) => live && setHealth(h), (e) => live && setHealth({ code: e.code ?? 'SERVER_UNREACHABLE', message: e.message, retryable: true }));
-    return () => { live = false; polling.current?.abort(); };
+    return () => { live = false;alive.current=false; polling.current?.abort(); };
   }, []);
 
   // The text that would be sent: extracted pages, with any user edits applied.
@@ -122,6 +131,18 @@ export function SourceScreen({ source, onBack, onOpenProject, onOpenDemo }: {
     try { finish(await cancelJob(run.job.jobId)); } catch (e) { setRun({ phase: 'failed', failure: toFailure(e) }); }
   };
 
+  const addPage = async () => {
+    if (!source.file || addingFigure) return;
+    setAddingFigure(true);setFigureError('');
+    try {
+      const {addPageFigure}=await import('../pdf/figures');
+      const figure=await addPageFigure(source.file,active,source.sha256,activePage?.text??'');
+      if(!alive.current){releasePdfAssets([figure.asset.blobKey]);return;}
+      setFigures(current=>{const previous=current.find(f=>f.asset.id===figure.asset.id);if(previous)releasePdfAssets([previous.asset.blobKey]);return [...current.filter(f=>f.asset.id!==figure.asset.id),figure];});
+    }catch(error){setFigureError(error instanceof Error?error.message:'Could not render this page.');}
+    finally{setAddingFigure(false);}
+  };
+
   return <div className="source-screen">
     <header className="app-header studio-header">
       <button className="ghost" onClick={onBack} disabled={running}><ArrowLeft size={16}/>Back</button>
@@ -139,7 +160,7 @@ export function SourceScreen({ source, onBack, onOpenProject, onOpenDemo }: {
           return <li key={p.page} className={`source-page ${p.page === active ? 'is-active' : ''}`}>
             <input type="checkbox" checked={on} disabled={running || p.chars === 0} onChange={() => toggle(p.page)} aria-label={`Send page ${p.page}`}/>
             <button className="ghost" onClick={() => { setActive(p.page); setEditing(false); }} aria-current={p.page === active}>
-              <FileText size={16}/><span><strong>Page {p.page}</strong><small>{p.chars ? `${p.chars.toLocaleString()} characters` : 'No selectable text'}{edits[p.page] !== undefined ? ' · edited' : ''}</small></span>
+              <FileText size={16}/><span><strong>Page {p.page}</strong><small>{p.chars ? `${p.chars.toLocaleString()} characters` : 'No selectable text'}{figures.some(f=>f.link.page===p.page)?' · figures':''}{edits[p.page] !== undefined ? ' · edited' : ''}</small></span>
             </button>
           </li>;
         })}</ul>
@@ -147,14 +168,16 @@ export function SourceScreen({ source, onBack, onOpenProject, onOpenDemo }: {
 
       <section className="source-preview" aria-label={`Page ${active} text`}>
         <div className="source-preview-topline">
-          <strong>Page {active} · extracted text</strong>
-          {activePage && activePage.chars > 0 && !running && <button className="ghost" onClick={() => setEditing((v) => !v)}><PenLine size={14}/>{editing ? 'Done editing' : 'Edit text'}</button>}
+          <strong>Page {active} · {figureMode?'local figures':'extracted text'}</strong>
+          {activePage && activePage.chars > 0 && !running && !figureMode && <button className="ghost" onClick={() => setEditing((v) => !v)}><PenLine size={14}/>{editing ? 'Done editing' : 'Edit text'}</button>}
         </div>
-        {editing
+        <div className="source-preview-tabs" aria-label="Source view"><button aria-pressed={!figureMode} onClick={()=>setFigureMode(false)}>Text</button><button aria-pressed={figureMode} onClick={()=>{setFigureMode(true);setEditing(false);}}><Image size={14}/>Figures {figures.filter(f=>f.link.page===active).length}</button></div>
+        {figureError&&<p className="error" role="alert">{figureError}</p>}
+        {figureMode?<FigurePicker figures={figures} page={active} disabled={running} adding={addingFigure} onAddPage={source.file?()=>void addPage():undefined} onChange={(id,patch)=>setFigures(current=>current.map(f=>f.asset.id===id?{...f,link:{...f.link,...patch}}:f))}/>:editing
           ? <label className="source-edit">Corrections are sent instead of the extracted text, and quotes are checked against your version.
               <textarea value={edits[active] ?? activePage?.text ?? ''} onChange={(e) => setEdits((m) => ({ ...m, [active]: e.target.value }))}/>
             </label>
-          : <div className="source-text" tabIndex={0}>{activePage?.chars ? activePage.text : <p className="notice">This page has no selectable text. Scanned pages need OCR, which this prototype does not do.</p>}</div>}
+          : <div className="source-text" tabIndex={0}>{activePage?.chars ? activePage.text : <p className="notice">This page has no selectable text. You can add it as a local visual from Figures; reading its contents as text would require OCR.</p>}</div>}
       </section>
 
       <aside className="source-panel" aria-label="Preparation">
@@ -176,9 +199,11 @@ export function SourceScreen({ source, onBack, onOpenProject, onOpenDemo }: {
         </button>
         <p className="privacy-note">Selected text is kept in your session and sent to Groq to index topics and compose live visuals. Audio is transcribed locally with Whisper.</p>
 
+        <p className="local-figures-summary"><Image size={15}/>{figures.length} figures kept locally · {figures.filter(f=>f.link.enabled).length} enabled. Images are never sent to Groq.</p>
+        {source.figureWarnings?.map((warning,i)=><p key={i} className="notice">{warning}</p>)}
         {run.phase !== 'idle' && <Progress run={run} pages={source.pageCount}/>}
         {run.phase === 'running' && <button onClick={() => void cancel()}><X size={16}/>Cancel</button>}
-        {run.phase === 'done' && <Done run={run} onOpen={() => onOpenProject(run.project)}/>}
+        {run.phase === 'done' && <Done run={run} onOpen={() => onOpenProject(attachPdfFigures(run.project,figures))}/>}
         {run.phase === 'failed' && <div className="prep-failure" role="alert">
           <p className="error"><AlertTriangle size={14}/>{run.failure.message}</p>
           <div className="button-row">
