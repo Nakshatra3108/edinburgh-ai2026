@@ -11,11 +11,11 @@ const visualIcons = { concept: Layers2, process: Route, metric: Hash, figure: Im
 const visualNames = { concept: 'Idea', process: 'Process', metric: 'Evidence', figure: 'Figure', comparison: 'Comparison' };
 function NodeShell({ data, children }: { data: CanvasNodeData; children?: ReactNode }) {
   const Icon = visualIcons[data.concept.visual.type];
-  return <article className={`canvas-node ${data.expanded ? 'is-focused' : 'is-anchor'} ${data.introduced ? 'is-introduced' : ''} ${data.home ? 'is-home' : ''} ${data.paired ? 'is-paired' : ''}`} aria-label={data.concept.title}>
+  return <article className={`canvas-node visual-${data.concept.visual.type} ${data.expanded ? 'is-focused' : 'is-anchor'} ${data.introduced ? 'is-introduced' : ''} ${data.home ? 'is-home' : ''} ${data.paired ? 'is-paired' : ''}`} aria-label={data.concept.title}>
     <Handle type="target" position={Position.Left} isConnectable={false} />
     <div className="node-type"><Icon size={24}/><span>{visualNames[data.concept.visual.type]}</span>{data.home && <span>Home anchor</span>}</div>
     <h2>{data.concept.title}</h2>
-    <div className="node-detail-group" hidden={!data.expanded}><p className="node-summary">{data.concept.summary}</p>{children}</div>
+    <div className="node-detail-group" hidden={!data.expanded}><p className="node-summary" hidden={data.paired && data.revealed.length > 0 && data.concept.visual.type === 'concept'}>{data.concept.summary}</p>{children}</div>
     {!data.expanded && !data.home && <div className="anchor-rule" aria-hidden="true"><span/><ArrowRight size={32}/></div>}
     <Handle type="source" position={Position.Right} isConnectable={false}/>
   </article>;

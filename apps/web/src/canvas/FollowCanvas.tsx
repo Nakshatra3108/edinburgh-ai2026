@@ -48,7 +48,7 @@ function CanvasInner({ state, mode = 'studio', reducedMotion = false, onAction, 
     hidden: state.view !== 'overview' && r.id !== state.activeRelationshipId,
     label: undefined,
     className: r.id === state.activeRelationshipId || state.connected.includes(r.id) ? 'edge-active' : 'edge-context',
-    style: { strokeWidth: r.id === state.activeRelationshipId ? 3 : 2 },
+    style: { strokeWidth: r.id === state.activeRelationshipId ? 4 : 3 },
     labelStyle: { fill: 'var(--text-secondary)', fontSize: 28 },
     labelBgStyle: { fill: 'var(--canvas)' }, labelBgPadding: [12, 10],
   })), [state, nodes]);
@@ -96,9 +96,9 @@ function CanvasInner({ state, mode = 'studio', reducedMotion = false, onAction, 
       onMove={(_, viewport) => setZoom(viewport.zoom)} minZoom={0.01} maxZoom={1.4}
       nodesConnectable={false} elementsSelectable={false} nodesDraggable={!locked && mode === 'studio'}
       panOnDrag={mode === 'studio'} zoomOnScroll={mode === 'studio'} zoomOnPinch={mode === 'studio'} zoomOnDoubleClick={false}
-      preventScrolling={mode === 'studio'} deleteKeyCode={null} colorMode="dark"
+      preventScrolling={mode === 'studio'} deleteKeyCode={null} colorMode="light"
       ariaLabelConfig={{ 'controls.zoomIn.ariaLabel': 'Zoom into canvas', 'controls.zoomOut.ariaLabel': 'Zoom out of canvas' }}>
-      {mode === 'studio' && <Background variant={BackgroundVariant.Dots} color="var(--line)" gap={28} size={1}/>}
+      {mode === 'studio' && <Background variant={BackgroundVariant.Dots} color="var(--line)" gap={32} size={1}/>}
     </ReactFlow>
     {(state.view === 'comparison' || state.view === 'connection') && <div className="composition-label">{state.project.relationships.find(r => r.id === state.activeRelationshipId)?.label}</div>}
     {mode === 'studio' && <div className="canvas-toolbar" aria-label="Canvas view controls">

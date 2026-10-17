@@ -1,8 +1,14 @@
 :root {
-  --canvas: #0A0A0B; --surface: #15171B; --surface-raised: #1F2328;
-  --text-primary: #F5F5F2; --text-secondary: #B7BDC6; --text-muted: #929AA5;
-  --line: #343940; --brand: #FF102A; --brand-deep: #89001E;
-  --success: #91D7AD; --warning: #E7BB72; --danger: #FF8F9C;
+  --canvas: #F5F6FB; --surface: #FFFFFF; --surface-raised: #ECEEF7;
+  --text-primary: #20253D; --text-secondary: #4F5972; --text-muted: #687189;
+  --line: #D4D9E6; --connector: #9DA8C0;
+  --brand: #5945CC; --brand-deep: #EEEAFB; --brand-ink: #FFFFFF;
+  --success: #226C4D; --success-soft: #E9F5EE;
+  --warning: #875309; --warning-soft: #FFF4DE; --danger: #B42B45;
+  --process-soft: #EAF5F0; --process-ink: #25654D;
+  --figure-soft: #EAF0FD; --figure-ink: #345A93;
+  --metric-soft: #FCF0E4; --metric-ink: #89511A;
+  --shadow: 0 12px 36px #20253D0C; --shadow-popover: 0 16px 48px #20253D26; --shadow-drawer: -12px 0 32px #20253D12;
   --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
   --space-6: 24px; --space-8: 32px; --space-12: 48px; --space-16: 64px; --space-24: 96px;
   --radius-field: 8px; --radius-panel: 12px; --radius-dialog: 16px;
@@ -10,5 +16,5 @@
   --duration-reveal: 240ms; --duration-focus: 280ms;
   --ease-out: cubic-bezier(.23, 1, .32, 1); --ease-in-out: cubic-bezier(.77, 0, .175, 1);
   --font-display: 'Sora Variable', sans-serif; --font-body: 'Inter Variable', sans-serif;
-  color-scheme: dark;
+  color-scheme: light;
 }
