@@ -1,0 +1,325 @@
+{
+  "schemaVersion": 1,
+  "id": "follow-illustrative",
+  "revision": 1,
+  "title": "An explanation, set free.",
+  "source": {
+    "name": "Illustrative content — not a source PDF",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "pages": 1
+  },
+  "preparation": {
+    "mode": "curated",
+    "model": null,
+    "promptVersion": "person-a-example-v1",
+    "preparedAt": "2026-10-17T10:00:00Z"
+  },
+  "concepts": [
+    {
+      "id": "problem",
+      "title": "Your story. Not your slide order.",
+      "summary": "A fixed deck asks the speaker to follow it. An explanation should be free to find its own path.",
+      "position": {
+        "x": 80,
+        "y": 120
+      },
+      "visual": {
+        "type": "concept"
+      },
+      "details": [
+        {
+          "id": "fixed",
+          "text": "A fixed sequence, even when the conversation changes.",
+          "sources": [],
+          "origin": "user"
+        },
+        {
+          "id": "interrupt",
+          "text": "Questions interrupt the deck’s planned order.",
+          "sources": [],
+          "origin": "user"
+        },
+        {
+          "id": "click",
+          "text": "The speaker has to keep finding the right slide.",
+          "sources": [],
+          "origin": "user"
+        }
+      ],
+      "aliases": [],
+      "speechExamples": [],
+      "sources": [],
+      "assetIds": [],
+      "enabled": true,
+      "review": "reviewed"
+    },
+    {
+      "id": "pipeline",
+      "title": "From voice to visual.",
+      "summary": "Prepared ideas. Live understanding. One continuous canvas.",
+      "position": {
+        "x": 1250,
+        "y": 120
+      },
+      "visual": {
+        "type": "process",
+        "stepDetailIds": [
+          "capture",
+          "understand",
+          "match",
+          "compose"
+        ]
+      },
+      "details": [
+        {
+          "id": "capture",
+          "text": "Capture speech",
+          "sources": [],
+          "origin": "user"
+        },
+        {
+          "id": "understand",
+          "text": "Understand meaning",
+          "sources": [],
+          "origin": "user"
+        },
+        {
+          "id": "match",
+          "text": "Match a reviewed idea",
+          "sources": [],
+          "origin": "user"
+        },
+        {
+          "id": "compose",
+          "text": "Compose the canvas",
+          "sources": [],
+          "origin": "user"
+        }
+      ],
+      "aliases": [],
+      "speechExamples": [],
+      "sources": [],
+      "assetIds": [],
+      "enabled": true,
+      "review": "reviewed"
+    },
+    {
+      "id": "matching",
+      "title": "Meaning, beyond keywords.",
+      "summary": "Speech selects reviewed material. It never invents claims during the presentation.",
+      "position": {
+        "x": 2420,
+        "y": 120
+      },
+      "visual": {
+        "type": "metric",
+        "value": "6",
+        "unit": null,
+        "label": "topics in this illustrative canvas",
+        "valueSource": {
+          "page": 1,
+          "quote": "This illustrative canvas contains 6 concepts.",
+          "start": 0,
+          "end": 45
+        }
+      },
+      "details": [
+        {
+          "id": "paraphrase",
+          "text": "Paraphrases can return to an earlier idea.",
+          "sources": [],
+          "origin": "user"
+        },
+        {
+          "id": "uncertain",
+          "text": "Uncertain input holds the current visual.",
+          "sources": [],
+          "origin": "user"
+        },
+        {
+          "id": "reviewed",
+          "text": "Only reviewed content reaches the audience.",
+          "sources": [],
+          "origin": "user"
+        }
+      ],
+      "aliases": [],
+      "speechExamples": [],
+      "sources": [],
+      "assetIds": [],
+      "enabled": true,
+      "review": "reviewed"
+    },
+    {
+      "id": "canvas",
+      "title": "Flip who follows whom.",
+      "summary": "Compare a fixed sequence with an explanation that follows the speaker.",
+      "position": {
+        "x": 80,
+        "y": 1040
+      },
+      "visual": {
+        "type": "comparison",
+        "leftId": "problem",
+        "rightId": "closing",
+        "relationshipId": "flip"
+      },
+      "details": [],
+      "aliases": [],
+      "speechExamples": [],
+      "sources": [],
+      "assetIds": [],
+      "enabled": true,
+      "review": "reviewed"
+    },
+    {
+      "id": "architecture",
+      "title": "Prepared once. Followed locally.",
+      "summary": "Grok prepares the content. Local speech and matching drive the live experience.",
+      "position": {
+        "x": 1250,
+        "y": 1040
+      },
+      "visual": {
+        "type": "figure",
+        "assetId": "architecture-figure",
+        "caption": "Intended architecture · preparation and live runtime are separate."
+      },
+      "details": [
+        {
+          "id": "local",
+          "text": "Microphone audio stays on the presenting device.",
+          "sources": [],
+          "origin": "user"
+        },
+        {
+          "id": "controller",
+          "text": "A deterministic controller decides what appears.",
+          "sources": [],
+          "origin": "user"
+        },
+        {
+          "id": "override",
+          "text": "A manual choice immediately holds automatic follow.",
+          "sources": [],
+          "origin": "user"
+        }
+      ],
+      "aliases": [],
+      "speechExamples": [],
+      "sources": [],
+      "assetIds": [
+        "architecture-figure"
+      ],
+      "enabled": true,
+      "review": "reviewed"
+    },
+    {
+      "id": "closing",
+      "title": "The canvas follows you.",
+      "summary": "Speak in ideas. Let the canvas keep up.",
+      "position": {
+        "x": 2420,
+        "y": 1040
+      },
+      "visual": {
+        "type": "concept"
+      },
+      "details": [
+        {
+          "id": "free",
+          "text": "Move between ideas in any order.",
+          "sources": [],
+          "origin": "user"
+        },
+        {
+          "id": "questions",
+          "text": "Follow a question, then return to your story.",
+          "sources": [],
+          "origin": "user"
+        },
+        {
+          "id": "control",
+          "text": "Keep the final say with manual controls.",
+          "sources": [],
+          "origin": "user"
+        }
+      ],
+      "aliases": [],
+      "speechExamples": [],
+      "sources": [],
+      "assetIds": [],
+      "enabled": true,
+      "review": "reviewed"
+    }
+  ],
+  "relationships": [
+    {
+      "id": "voice",
+      "from": "problem",
+      "to": "pipeline",
+      "label": "let speech lead",
+      "kind": "association",
+      "sources": [],
+      "approved": true
+    },
+    {
+      "id": "semantic",
+      "from": "pipeline",
+      "to": "matching",
+      "label": "match meaning",
+      "kind": "sequence",
+      "sources": [],
+      "approved": true
+    },
+    {
+      "id": "runtime",
+      "from": "pipeline",
+      "to": "architecture",
+      "label": "runs locally",
+      "kind": "association",
+      "sources": [],
+      "approved": true
+    },
+    {
+      "id": "flip",
+      "from": "problem",
+      "to": "closing",
+      "label": "speaker follows deck → canvas follows speaker",
+      "kind": "comparison",
+      "sources": [],
+      "approved": true
+    },
+    {
+      "id": "canvas-close",
+      "from": "canvas",
+      "to": "architecture",
+      "label": "one persistent world",
+      "kind": "association",
+      "sources": [],
+      "approved": true
+    },
+    {
+      "id": "control",
+      "from": "architecture",
+      "to": "closing",
+      "label": "keep the speaker in control",
+      "kind": "association",
+      "sources": [],
+      "approved": true
+    }
+  ],
+  "assets": [
+    {
+      "id": "architecture-figure",
+      "kind": "image",
+      "blobKey": "/examples/architecture.svg",
+      "page": null,
+      "crop": null,
+      "alt": "Grok prepares reviewed content. Local speech passes through semantic matching and a deterministic controller to the canvas.",
+      "width": 1000,
+      "height": 310
+    }
+  ],
+  "approvedRevision": 1
+}
