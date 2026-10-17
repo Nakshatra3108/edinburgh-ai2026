@@ -1,5 +1,7 @@
 # Person C: speech + matching
 
+After the team merge, open **http://127.0.0.1:5173/speech.html**. The root URL serves Person A's canvas. This lab and its tests use `demo/speech-fixture.json`; the team's `demo/manifest.json` is B's real curated PDF manifest and is preserved independently. Existing accuracy results apply only to the illustrative speech fixture.
+
 ## Handoff to D
 
 ```ts
@@ -68,6 +70,6 @@ References: [Transformers.js](https://huggingface.co/docs/transformers.js/), [Mi
 - Verify microphone permission denial, disconnect/reconnect, and cancellation during permission prompt.
 - Integrate D's policy/manual-hold controller, approved revision changes, and audience-window activity.
 - Validate offline reload on the actual demo browser after cache warm-up.
-- Build the real PDF manifest with B; this fixture has no PDF grounding.
+- Integrate B's real `demo/manifest.json` into the speech runtime and recalibrate with fresh phrases; the lab's `demo/speech-fixture.json` remains illustrative.
 
 Do not mark these live acceptance checks passed based on unit tests or a prerecorded model smoke test.

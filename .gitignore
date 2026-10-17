@@ -9,3 +9,6 @@ playwright-report/
 *.log
 apps/web/public/ort/
 artifacts/
+*.tsbuildinfo
+.DS_Store
+CLAUDE.local.md

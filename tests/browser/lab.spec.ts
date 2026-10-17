@@ -9,7 +9,7 @@ test("honest initial state and responsive diagnostic controls", async ({
     if (request.url().includes("huggingface.co"))
       modelRequests.push(request.url());
   });
-  await page.goto("/");
+  await page.goto("/speech.html");
   await expect(
     page.getByRole("heading", { name: "Let the explanation lead." }),
   ).toBeVisible();
@@ -58,7 +58,7 @@ test("model download failure offers an explicit retry without enabling inference
   await page.route("https://huggingface.co/**", (route) =>
     route.abort("failed"),
   );
-  await page.goto("/");
+  await page.goto("/speech.html");
   await page
     .getByRole("button", { name: "Load embeddings", exact: true })
     .click();
@@ -75,7 +75,7 @@ test("model loading can be cancelled without enabling an unready model", async (
 }) => {
   // Leave public model requests pending until the worker is terminated by Cancel.
   await page.route("https://huggingface.co/**", () => {});
-  await page.goto("/");
+  await page.goto("/speech.html");
   await page
     .getByRole("button", { name: "Load embeddings", exact: true })
     .click();

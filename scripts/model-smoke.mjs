@@ -6,7 +6,7 @@ import { performance } from "node:perf_hooks";
 import assert from "node:assert/strict";
 env.cacheDir = ".cache/models";
 env.allowLocalModels = false;
-const manifest = JSON.parse(await readFile("demo/manifest.json", "utf8"));
+const manifest = JSON.parse(await readFile("demo/speech-fixture.json", "utf8"));
 const config = JSON.parse(await readFile("demo/matcher-config.json", "utf8"));
 const calibrate = process.argv.includes("--calibrate");
 const phrases = JSON.parse(

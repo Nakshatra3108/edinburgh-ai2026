@@ -1,0 +1,2 @@
+# PDFs must remain byte-for-byte identical for curated SHA-256 verification.
+*.pdf binary

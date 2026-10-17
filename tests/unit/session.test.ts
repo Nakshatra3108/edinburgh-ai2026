@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { manifestSchema } from "@follow/shared";
-import fixture from "../../demo/manifest.json";
+import fixture from "../../demo/speech-fixture.json";
 import type { Response } from "../../apps/web/src/workers/protocol";
 const harness = vi.hoisted(() => ({
   score: undefined as undefined | (() => Promise<Response>),

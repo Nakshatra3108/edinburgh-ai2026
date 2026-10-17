@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { candidateSchema, manifestSchema } from "@follow/shared";
-import fixture from "../../demo/manifest.json";
+import fixture from "../../demo/speech-fixture.json";
 import {
   bestTwo,
   cosine,

@@ -1,0 +1,14 @@
+:root {
+  --canvas: #0A0A0B; --surface: #15171B; --surface-raised: #1F2328;
+  --text-primary: #F5F5F2; --text-secondary: #B7BDC6; --text-muted: #929AA5;
+  --line: #343940; --brand: #FF102A; --brand-deep: #89001E;
+  --success: #91D7AD; --warning: #E7BB72; --danger: #FF8F9C;
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+  --space-6: 24px; --space-8: 32px; --space-12: 48px; --space-16: 64px; --space-24: 96px;
+  --radius-field: 8px; --radius-panel: 12px; --radius-dialog: 16px;
+  --duration-press: 120ms; --duration-fast: 160ms; --duration-ui: 220ms;
+  --duration-reveal: 240ms; --duration-focus: 280ms;
+  --ease-out: cubic-bezier(.23, 1, .32, 1); --ease-in-out: cubic-bezier(.77, 0, .175, 1);
+  --font-display: 'Sora Variable', sans-serif; --font-body: 'Inter Variable', sans-serif;
+  color-scheme: dark;
+}

@@ -1,6 +1,6 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { manifestSchema } from "@follow/shared";
-import fixture from "../../../demo/manifest.json";
+import fixture from "../../../demo/speech-fixture.json";
 import phrases from "../../../demo/phrases.json";
 import { SpeechMatchingSession } from "./matching/session";
 import { defaults, isFiller } from "./matching/matcher";

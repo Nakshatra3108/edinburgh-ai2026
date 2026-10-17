@@ -15,7 +15,7 @@ test("real browser embeddings and Whisper recording path", async () => {
   try {
     const errors: string[] = [];
     page.on("pageerror", (e) => errors.push(e.message));
-    await page.goto("/");
+    await page.goto("/speech.html");
     await page
       .getByRole("button", { name: "Load embeddings", exact: true })
       .click();

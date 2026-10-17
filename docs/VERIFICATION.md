@@ -2,6 +2,8 @@
 
 Implemented and verified locally; this does not mark the full FOLLOW PRD complete.
 
+Team merge verification: `origin/main`'s canvas, API and curated manifest were merged into the Person C feature branch. The combined suite passed **62 unit tests**, **4 browser tests**, strict typechecking and a production build of both pages. The opt-in real-model test was not rerun for this Git recovery. The canvas at `/` successfully imports B's unchanged curated manifest; the speech lab at `/speech.html` retains its separate illustrative fixture and original matching/audio workers. Windows checkout had converted the PDF's line endings: the exact repository bytes were restored and `*.pdf binary` added to `.gitattributes`. Its SHA-256 now matches the curated manifest; a regression test checks this.
+
 | Check                                                          | Observed result                                                                                |
 | -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
 | TypeScript strict check and Vite production build              | Passed                                                                                         |
