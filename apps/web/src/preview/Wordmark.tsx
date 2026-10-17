@@ -1,0 +1,1 @@
+export function Wordmark() { return <span className="wordmark"><svg className="brand-mark" viewBox="0 0 20 24" fill="none" aria-hidden="true"><path d="M3 21V3H18M3 11H14" stroke="currentColor" strokeWidth="4"/><path d="M14 18H18V22H14Z" fill="currentColor"/></svg>FOLLOW</span>; }
