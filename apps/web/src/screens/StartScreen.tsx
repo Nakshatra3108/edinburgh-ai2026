@@ -6,6 +6,7 @@ import { applyAction, createCanvasState } from '../canvas/applyAction';
 import { exampleProject } from '../canvas/fixtures/project';
 import { demoProject } from '../preview/demoProject';
 import { matchCuratedSource } from '../pdf/curated';
+import type { ExtractedSource } from '../pdf/extract';
 import { parseCanvasProject } from '../canvas/manifest';
 import type { CanvasAction, CanvasProject } from '../canvas/domain';
 const INITIAL_PREVIEW = ['capture', 'understand', 'match', 'compose'].reduce((state, detailId) => applyAction(state, { type: 'REVEAL', conceptId: 'pipeline', detailId }), createCanvasState(demoProject));
@@ -14,7 +15,7 @@ const PREVIEW_OPTIONS: {label: string; icon: typeof Focus; action: CanvasAction}
   { label: 'The process', icon: Route, action: { type: 'REVEAL', conceptId: 'pipeline', detailId: 'capture' } },
   { label: 'The flip', icon: GitCompareArrows, action: { type: 'COMPARE', leftId: 'problem', rightId: 'reversal' } },
 ];
-export function StartScreen({ onOpen, reducedMotion }: { onOpen: (project: CanvasProject, illustrative: boolean) => void; reducedMotion: boolean }) {
+export function StartScreen({ onOpen, onSource, reducedMotion }: { onOpen: (project: CanvasProject, illustrative: boolean) => void; onSource?: (source: ExtractedSource) => void; reducedMotion: boolean }) {
   const pdfInput = useRef<HTMLInputElement>(null); const importInput = useRef<HTMLInputElement>(null);
   const pdfJob = useRef<AbortController | null>(null);
   useEffect(() => () => pdfJob.current?.abort(), []);
@@ -33,6 +34,8 @@ export function StartScreen({ onOpen, reducedMotion }: { onOpen: (project: Canva
       if (job.signal.aborted || pdfJob.current !== job) return;
       if (matchCuratedSource(source, demoProject).ok) {
         onOpen(demoProject, false);
+      } else if (onSource) {
+        onSource(source);
       } else {
         setStatus(`${file.name}: ${source.pageCount} pages read locally${source.emptyPages.length ? ` (${source.emptyPages.length} without selectable text)` : ''}. Groq preparation is not connected yet. You can explore the ready-made demo or import an existing project.`);
       }
