@@ -9,7 +9,8 @@
   "scripts": {
     "smoke:groq": "node scripts/smoke-groq.ts",
     "verify:manifest": "node scripts/verify-manifest.ts",
-    "typecheck": "tsc -p ."
+    "typecheck": "tsc -p .",
+    "verify:phrases": "node scripts/verify-phrases.ts"
   },
   "dependencies": {
     "pdfjs-dist": "6.4.299",

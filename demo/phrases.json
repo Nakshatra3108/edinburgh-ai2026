@@ -1,0 +1,923 @@
+{
+  "schemaVersion": 1,
+  "manifestId": "follow-demo",
+  "manifestRevision": 1,
+  "description": "Matcher test phrases for demo/manifest.json (PRD §15.2-15.3). Calibrate only on \"rehearsal\"; score \"heldOut\" once, untouched.",
+  "semantics": {
+    "cases": "Each case is scored independently from an Overview state with nothing focused.",
+    "expect": "FOCUS/REVEAL/COMPARE/HOLD use CanvasAction names. REVEAL implies its concept is focused. COMPARE on the comparison concept means composing its approved endpoints.",
+    "settling": "In sequences, settling: true marks the first utterance on a new topic: HOLD or the expected action are both acceptable (two-consecutive-match rule).",
+    "manual": "kind \"manual\" is a presenter action that enters manual hold; kind \"control\" with \"resume\" clears it and starts a fresh decision window.",
+    "silence": "kind \"silence\" is durationMs of no speech; the canvas must not move."
+  },
+  "cases": [
+    {
+      "id": "r01",
+      "split": "rehearsal",
+      "kind": "paraphrase",
+      "text": "The trouble with a normal deck is that you've committed to the running order before you've said a word.",
+      "expect": {
+        "action": "FOCUS",
+        "conceptId": "problem"
+      }
+    },
+    {
+      "id": "r02",
+      "split": "rehearsal",
+      "kind": "paraphrase",
+      "text": "You know that moment when somebody asks about slide three and you're frantically clicking back?",
+      "expect": {
+        "action": "FOCUS",
+        "conceptId": "problem"
+      }
+    },
+    {
+      "id": "r03",
+      "split": "rehearsal",
+      "kind": "paraphrase",
+      "text": "Slides basically force you down one single path through the material.",
+      "expect": {
+        "action": "FOCUS",
+        "conceptId": "problem"
+      }
+    },
+    {
+      "id": "r04",
+      "split": "rehearsal",
+      "kind": "paraphrase",
+      "text": "Honestly, most talks end up with the presenter working for the slides.",
+      "expect": {
+        "action": "FOCUS",
+        "conceptId": "problem"
+      }
+    },
+    {
+      "id": "r05",
+      "split": "rehearsal",
+      "kind": "paraphrase",
+      "text": "We wanted to turn that relationship completely upside down.",
+      "expect": {
+        "action": "FOCUS",
+        "conceptId": "reversal"
+      }
+    },
+    {
+      "id": "r06",
+      "split": "rehearsal",
+      "kind": "paraphrase",
+      "text": "Instead of me keeping up with the deck, the visuals keep up with me.",
+      "expect": {
+        "action": "FOCUS",
+        "conceptId": "reversal"
+      }
+    },
+    {
+      "id": "r07",
+      "split": "rehearsal",
+      "kind": "paraphrase",
+      "text": "There's nothing to stick to, I just talk and the right thing shows up.",
+      "expect": {
+        "action": "FOCUS",
+        "conceptId": "reversal"
+      }
+    },
+    {
+      "id": "r08",
+      "split": "rehearsal",
+      "kind": "paraphrase",
+      "text": "So the idea is that the talk drives the screen, not the other way around.",
+      "expect": {
+        "action": "FOCUS",
+        "conceptId": "reversal"
+      }
+    },
+    {
+      "id": "r09",
+      "split": "rehearsal",
+      "kind": "paraphrase",
+      "text": "Under the hood there are really four stages.",
+      "expect": {
+        "action": "FOCUS",
+        "conceptId": "pipeline"
+      }
+    },
+    {
+      "id": "r10",
+      "split": "rehearsal",
+      "kind": "paraphrase",
+      "text": "Let me explain what's happening behind the scenes while I speak.",
+      "expect": {
+        "action": "FOCUS",
+        "conceptId": "pipeline"
+      }
+    },
+    {
+      "id": "r11",
+      "split": "rehearsal",
+      "kind": "paraphrase",
+      "text": "It's a loop: hear me, transcribe me, figure out which idea I mean, and draw it.",
+      "expect": {
+        "action": "FOCUS",
+        "conceptId": "pipeline"
+      }
+    },
+    {
+      "id": "r12",
+      "split": "rehearsal",
+      "kind": "paraphrase",
+      "text": "Here is the chain of steps that gets my voice onto the screen.",
+      "expect": {
+        "action": "FOCUS",
+        "conceptId": "pipeline"
+      }
+    },
+    {
+      "id": "r13",
+      "split": "rehearsal",
+      "kind": "paraphrase",
+      "text": "It goes by what I mean, not by the exact words I happen to use.",
+      "expect": {
+        "action": "FOCUS",
+        "conceptId": "matching"
+      }
+    },
+    {
+      "id": "r14",
+      "split": "rehearsal",
+      "kind": "paraphrase",
+      "text": "If it can't tell what I'm on about, it simply doesn't move.",
+      "expect": {
+        "action": "FOCUS",
+        "conceptId": "matching"
+      }
+    },
+    {
+      "id": "r15",
+      "split": "rehearsal",
+      "kind": "paraphrase",
+      "text": "How does it decide which idea I am referring to? By meaning.",
+      "expect": {
+        "action": "FOCUS",
+        "conceptId": "matching"
+      }
+    },
+    {
+      "id": "r16",
+      "split": "rehearsal",
+      "kind": "paraphrase",
+      "text": "I don't need to memorise any phrasing for this to work.",
+      "expect": {
+        "action": "FOCUS",
+        "conceptId": "matching"
+      }
+    },
+    {
+      "id": "r17",
+      "split": "rehearsal",
+      "kind": "paraphrase",
+      "text": "Let's put the old way and the new way next to each other.",
+      "expect": {
+        "action": "COMPARE",
+        "leftId": "problem",
+        "rightId": "reversal",
+        "relationshipId": "slides-vs-follow"
+      },
+      "note": "Focusing the comparison concept composes its approved endpoints."
+    },
+    {
+      "id": "r18",
+      "split": "rehearsal",
+      "kind": "paraphrase",
+      "text": "A deck is fixed in advance, whereas this follows whatever I happen to be saying.",
+      "expect": {
+        "action": "COMPARE",
+        "leftId": "problem",
+        "rightId": "reversal",
+        "relationshipId": "slides-vs-follow"
+      }
+    },
+    {
+      "id": "r19",
+      "split": "rehearsal",
+      "kind": "paraphrase",
+      "text": "Compared with traditional slides, the order here comes from my speech.",
+      "expect": {
+        "action": "COMPARE",
+        "leftId": "problem",
+        "rightId": "reversal",
+        "relationshipId": "slides-vs-follow"
+      }
+    },
+    {
+      "id": "r20",
+      "split": "rehearsal",
+      "kind": "paraphrase",
+      "text": "Think of separate pages versus one big canvas that I move around.",
+      "expect": {
+        "action": "COMPARE",
+        "leftId": "problem",
+        "rightId": "reversal",
+        "relationshipId": "slides-vs-follow"
+      }
+    },
+    {
+      "id": "r21",
+      "split": "rehearsal",
+      "kind": "paraphrase",
+      "text": "Let me tell you how the system is actually put together.",
+      "expect": {
+        "action": "FOCUS",
+        "conceptId": "architecture"
+      }
+    },
+    {
+      "id": "r22",
+      "split": "rehearsal",
+      "kind": "paraphrase",
+      "text": "The AI part happens beforehand, not while I'm up here on stage.",
+      "expect": {
+        "action": "FOCUS",
+        "conceptId": "architecture"
+      }
+    },
+    {
+      "id": "r23",
+      "split": "rehearsal",
+      "kind": "paraphrase",
+      "text": "Nothing I say leaves this machine during the talk.",
+      "expect": {
+        "action": "FOCUS",
+        "conceptId": "architecture"
+      }
+    },
+    {
+      "id": "r24",
+      "split": "rehearsal",
+      "kind": "paraphrase",
+      "text": "All the heavy preparation is done once, ahead of time, and then I check it.",
+      "expect": {
+        "action": "FOCUS",
+        "conceptId": "architecture"
+      }
+    },
+    {
+      "id": "h25",
+      "split": "heldOut",
+      "kind": "paraphrase",
+      "text": "Ever been stuck behind a slide you weren't ready to talk about yet?",
+      "expect": {
+        "action": "FOCUS",
+        "conceptId": "problem"
+      }
+    },
+    {
+      "id": "h26",
+      "split": "heldOut",
+      "kind": "paraphrase",
+      "text": "The deck dictates the path and the speaker just tags along.",
+      "expect": {
+        "action": "FOCUS",
+        "conceptId": "problem"
+      }
+    },
+    {
+      "id": "h27",
+      "split": "heldOut",
+      "kind": "paraphrase",
+      "text": "What if the screen just listened and followed along with you?",
+      "expect": {
+        "action": "FOCUS",
+        "conceptId": "reversal"
+      }
+    },
+    {
+      "id": "h28",
+      "split": "heldOut",
+      "kind": "paraphrase",
+      "text": "Here the talk is in charge and the visuals respond to it.",
+      "expect": {
+        "action": "FOCUS",
+        "conceptId": "reversal"
+      }
+    },
+    {
+      "id": "h29",
+      "split": "heldOut",
+      "kind": "paraphrase",
+      "text": "From the microphone all the way to the screen, there are a few stages.",
+      "expect": {
+        "action": "FOCUS",
+        "conceptId": "pipeline"
+      }
+    },
+    {
+      "id": "h30",
+      "split": "heldOut",
+      "kind": "paraphrase",
+      "text": "Walk with me through what happens to my words once I say them.",
+      "expect": {
+        "action": "FOCUS",
+        "conceptId": "pipeline"
+      }
+    },
+    {
+      "id": "h31",
+      "split": "heldOut",
+      "kind": "paraphrase",
+      "text": "It's clever enough to recognise an idea even when I phrase it differently.",
+      "expect": {
+        "action": "FOCUS",
+        "conceptId": "matching"
+      }
+    },
+    {
+      "id": "h32",
+      "split": "heldOut",
+      "kind": "paraphrase",
+      "text": "When it's unsure, it plays it safe and keeps the current picture.",
+      "expect": {
+        "action": "FOCUS",
+        "conceptId": "matching"
+      }
+    },
+    {
+      "id": "h33",
+      "split": "heldOut",
+      "kind": "paraphrase",
+      "text": "Side by side, the traditional deck loses on almost every point.",
+      "expect": {
+        "action": "COMPARE",
+        "leftId": "problem",
+        "rightId": "reversal",
+        "relationshipId": "slides-vs-follow"
+      }
+    },
+    {
+      "id": "h34",
+      "split": "heldOut",
+      "kind": "paraphrase",
+      "text": "Separate pages and a clicker on one hand, one canvas and my voice on the other.",
+      "expect": {
+        "action": "COMPARE",
+        "leftId": "problem",
+        "rightId": "reversal",
+        "relationshipId": "slides-vs-follow"
+      }
+    },
+    {
+      "id": "h35",
+      "split": "heldOut",
+      "kind": "paraphrase",
+      "text": "What runs remotely and what runs locally? Let me explain.",
+      "expect": {
+        "action": "FOCUS",
+        "conceptId": "architecture"
+      }
+    },
+    {
+      "id": "h36",
+      "split": "heldOut",
+      "kind": "paraphrase",
+      "text": "Preparation is a one-off step before the presentation; the live part is all on the laptop.",
+      "expect": {
+        "action": "FOCUS",
+        "conceptId": "architecture"
+      }
+    },
+    {
+      "id": "r37",
+      "split": "rehearsal",
+      "kind": "detail",
+      "text": "The first thing is just picking up my voice through the mic.",
+      "expect": {
+        "action": "REVEAL",
+        "conceptId": "pipeline",
+        "detailId": "capture"
+      }
+    },
+    {
+      "id": "r38",
+      "split": "rehearsal",
+      "kind": "detail",
+      "text": "Then that audio becomes a transcript, right here on the laptop.",
+      "expect": {
+        "action": "REVEAL",
+        "conceptId": "pipeline",
+        "detailId": "understand"
+      }
+    },
+    {
+      "id": "r39",
+      "split": "rehearsal",
+      "kind": "detail",
+      "text": "After that it works out which prepared idea those words line up with.",
+      "expect": {
+        "action": "REVEAL",
+        "conceptId": "pipeline",
+        "detailId": "match"
+      }
+    },
+    {
+      "id": "r40",
+      "split": "rehearsal",
+      "kind": "detail",
+      "text": "And last, it places that idea and its connections onto the canvas.",
+      "expect": {
+        "action": "REVEAL",
+        "conceptId": "pipeline",
+        "detailId": "compose"
+      }
+    },
+    {
+      "id": "r41",
+      "split": "rehearsal",
+      "kind": "detail",
+      "text": "And no, the recording doesn't get uploaded anywhere.",
+      "expect": {
+        "action": "REVEAL",
+        "conceptId": "architecture",
+        "detailId": "audio"
+      }
+    },
+    {
+      "id": "r42",
+      "split": "rehearsal",
+      "kind": "detail",
+      "text": "If it ever gets it wrong, I just hit a key and take over.",
+      "expect": {
+        "action": "REVEAL",
+        "conceptId": "matching",
+        "detailId": "override"
+      }
+    },
+    {
+      "id": "h43",
+      "split": "heldOut",
+      "kind": "detail",
+      "text": "Both the transcription and the matching happen on this computer.",
+      "expect": {
+        "action": "REVEAL",
+        "conceptId": "architecture",
+        "detailId": "local"
+      }
+    },
+    {
+      "id": "h44",
+      "split": "heldOut",
+      "kind": "detail",
+      "text": "And every time I reach for the remote, people tune out.",
+      "expect": {
+        "action": "REVEAL",
+        "conceptId": "problem",
+        "detailId": "clicker"
+      }
+    },
+    {
+      "id": "h45",
+      "split": "heldOut",
+      "kind": "detail",
+      "text": "I can jump back for a question or wander off and it keeps pace.",
+      "expect": {
+        "action": "REVEAL",
+        "conceptId": "reversal",
+        "detailId": "freedom"
+      }
+    },
+    {
+      "id": "h46",
+      "split": "heldOut",
+      "kind": "detail",
+      "text": "Nothing it shows was made up live; it is all stuff I signed off on.",
+      "expect": {
+        "action": "REVEAL",
+        "conceptId": "architecture",
+        "detailId": "approved"
+      }
+    },
+    {
+      "id": "r47",
+      "split": "rehearsal",
+      "kind": "similar",
+      "text": "The matching works on meaning, so keywords barely matter.",
+      "expect": {
+        "action": "FOCUS",
+        "conceptId": "matching"
+      },
+      "note": "Not pipeline, despite \"matching\"."
+    },
+    {
+      "id": "r48",
+      "split": "rehearsal",
+      "kind": "similar",
+      "text": "Step three is where it finds the concept we prepared.",
+      "expect": {
+        "action": "REVEAL",
+        "conceptId": "pipeline",
+        "detailId": "match"
+      },
+      "note": "Pipeline step, not the matching concept."
+    },
+    {
+      "id": "h49",
+      "split": "heldOut",
+      "kind": "similar",
+      "text": "The way it understands me is about meaning, not vocabulary.",
+      "expect": {
+        "action": "FOCUS",
+        "conceptId": "matching"
+      },
+      "note": "Not pipeline/understand, despite \"understands\"."
+    },
+    {
+      "id": "r50",
+      "split": "rehearsal",
+      "kind": "off-topic",
+      "text": "Can everyone at the back hear me okay?",
+      "expect": {
+        "action": "HOLD"
+      }
+    },
+    {
+      "id": "r51",
+      "split": "rehearsal",
+      "kind": "off-topic",
+      "text": "I grabbed a coffee on the way here and it was terrible.",
+      "expect": {
+        "action": "HOLD"
+      }
+    },
+    {
+      "id": "r52",
+      "split": "rehearsal",
+      "kind": "off-topic",
+      "text": "Edinburgh weather has been surprisingly kind this week.",
+      "expect": {
+        "action": "HOLD"
+      }
+    },
+    {
+      "id": "r53",
+      "split": "rehearsal",
+      "kind": "off-topic",
+      "text": "Let me just check how much time I have left.",
+      "expect": {
+        "action": "HOLD"
+      }
+    },
+    {
+      "id": "r54",
+      "split": "rehearsal",
+      "kind": "off-topic",
+      "text": "Big thanks to the organisers for the pizza.",
+      "expect": {
+        "action": "HOLD"
+      }
+    },
+    {
+      "id": "r55",
+      "split": "rehearsal",
+      "kind": "off-topic",
+      "text": "Is the projector looking a bit dim for anyone else?",
+      "expect": {
+        "action": "HOLD"
+      }
+    },
+    {
+      "id": "r56",
+      "split": "rehearsal",
+      "kind": "filler",
+      "text": "Um, so, yeah.",
+      "expect": {
+        "action": "HOLD"
+      }
+    },
+    {
+      "id": "r57",
+      "split": "rehearsal",
+      "kind": "filler",
+      "text": "Right, okay, let me think.",
+      "expect": {
+        "action": "HOLD"
+      }
+    },
+    {
+      "id": "r58",
+      "split": "rehearsal",
+      "kind": "filler",
+      "text": "Uh, where was I?",
+      "expect": {
+        "action": "HOLD"
+      }
+    },
+    {
+      "id": "r59",
+      "split": "rehearsal",
+      "kind": "negation",
+      "text": "I'm not going to get into the architecture today.",
+      "expect": {
+        "action": "HOLD"
+      },
+      "note": "Known-hard: mentions a concept but rules it out."
+    },
+    {
+      "id": "r60",
+      "split": "rehearsal",
+      "kind": "negation",
+      "text": "We won't go through the pipeline in detail, that's for another time.",
+      "expect": {
+        "action": "HOLD"
+      },
+      "note": "Known-hard: mentions a concept but rules it out."
+    },
+    {
+      "id": "h61",
+      "split": "heldOut",
+      "kind": "off-topic",
+      "text": "Does anyone know the wifi password?",
+      "expect": {
+        "action": "HOLD"
+      }
+    },
+    {
+      "id": "h62",
+      "split": "heldOut",
+      "kind": "off-topic",
+      "text": "Sorry, my phone just buzzed in my pocket.",
+      "expect": {
+        "action": "HOLD"
+      }
+    },
+    {
+      "id": "h63",
+      "split": "heldOut",
+      "kind": "off-topic",
+      "text": "Thanks so much for coming out tonight, everyone.",
+      "expect": {
+        "action": "HOLD"
+      }
+    },
+    {
+      "id": "h64",
+      "split": "heldOut",
+      "kind": "filler",
+      "text": "Hmm, okay, so.",
+      "expect": {
+        "action": "HOLD"
+      }
+    },
+    {
+      "id": "h65",
+      "split": "heldOut",
+      "kind": "negation",
+      "text": "This part isn't about how the matching works.",
+      "expect": {
+        "action": "HOLD"
+      },
+      "note": "Known-hard: mentions a concept but rules it out."
+    },
+    {
+      "id": "r66",
+      "split": "rehearsal",
+      "kind": "comparison-cue-only",
+      "text": "Let me compare that for you in a second.",
+      "expect": {
+        "action": "HOLD"
+      },
+      "note": "A lone \"compare\" must not change the layout."
+    },
+    {
+      "id": "r67",
+      "split": "rehearsal",
+      "kind": "comparison-unapproved",
+      "text": "Compare the matching with the architecture for a moment.",
+      "expect": {
+        "action": "HOLD"
+      },
+      "note": "No approved comparison between these two concepts."
+    },
+    {
+      "id": "h68",
+      "split": "heldOut",
+      "kind": "comparison-cue-only",
+      "text": "Compared with last year's hackathon, this room is huge.",
+      "expect": {
+        "action": "HOLD"
+      },
+      "note": "Comparison cue, but off topic."
+    }
+  ],
+  "sequences": [
+    {
+      "id": "demo-run",
+      "split": "rehearsal",
+      "description": "PRD §3.3 live example: problem, pipeline reveals, comparison, offline question, return to the problem.",
+      "steps": [
+        {
+          "kind": "speech",
+          "text": "Let me start with what's wrong with slides today.",
+          "expect": {
+            "action": "FOCUS",
+            "conceptId": "problem"
+          },
+          "settling": true
+        },
+        {
+          "kind": "speech",
+          "text": "You're locked into an order you chose weeks ago.",
+          "expect": {
+            "action": "FOCUS",
+            "conceptId": "problem"
+          }
+        },
+        {
+          "kind": "speech",
+          "text": "So how does this actually work? There are four stages.",
+          "expect": {
+            "action": "FOCUS",
+            "conceptId": "pipeline"
+          },
+          "settling": true
+        },
+        {
+          "kind": "speech",
+          "text": "It starts by listening through the laptop's microphone.",
+          "expect": {
+            "action": "REVEAL",
+            "conceptId": "pipeline",
+            "detailId": "capture"
+          }
+        },
+        {
+          "kind": "speech",
+          "text": "Then my speech is transcribed locally into text.",
+          "expect": {
+            "action": "REVEAL",
+            "conceptId": "pipeline",
+            "detailId": "understand"
+          }
+        },
+        {
+          "kind": "speech",
+          "text": "Then it finds the prepared concept closest in meaning.",
+          "expect": {
+            "action": "REVEAL",
+            "conceptId": "pipeline",
+            "detailId": "match"
+          }
+        },
+        {
+          "kind": "speech",
+          "text": "And finally it composes that onto the canvas.",
+          "expect": {
+            "action": "REVEAL",
+            "conceptId": "pipeline",
+            "detailId": "compose"
+          }
+        },
+        {
+          "kind": "silence",
+          "durationMs": 4000,
+          "expect": {
+            "action": "HOLD"
+          }
+        },
+        {
+          "kind": "speech",
+          "text": "Now compare that with a normal slide deck, where everything's decided in advance.",
+          "expect": {
+            "action": "COMPARE",
+            "leftId": "problem",
+            "rightId": "reversal",
+            "relationshipId": "slides-vs-follow"
+          },
+          "settling": true
+        },
+        {
+          "kind": "speech",
+          "text": "Slides give you separate pages and a clicker, whereas here it's one canvas and your voice.",
+          "expect": {
+            "action": "COMPARE",
+            "leftId": "problem",
+            "rightId": "reversal",
+            "relationshipId": "slides-vs-follow"
+          }
+        },
+        {
+          "kind": "speech",
+          "text": "Someone asked whether this needs an internet connection during the talk.",
+          "expect": {
+            "action": "FOCUS",
+            "conceptId": "architecture"
+          },
+          "settling": true
+        },
+        {
+          "kind": "speech",
+          "text": "No, the speech and the matching both run right here on the laptop.",
+          "expect": {
+            "action": "REVEAL",
+            "conceptId": "architecture",
+            "detailId": "local"
+          }
+        },
+        {
+          "kind": "silence",
+          "durationMs": 3000,
+          "expect": {
+            "action": "HOLD"
+          }
+        },
+        {
+          "kind": "speech",
+          "text": "So, coming back to where we started: the fixed order of slides.",
+          "expect": {
+            "action": "FOCUS",
+            "conceptId": "problem"
+          },
+          "settling": true
+        },
+        {
+          "kind": "speech",
+          "text": "That rigid running order is exactly what we're getting rid of.",
+          "expect": {
+            "action": "FOCUS",
+            "conceptId": "problem"
+          }
+        }
+      ],
+      "topicReturns": 1
+    },
+    {
+      "id": "manual-override",
+      "split": "rehearsal",
+      "description": "Manual focus interrupts automatic follow; speech must not undo it until follow resumes; then a topic return.",
+      "steps": [
+        {
+          "kind": "speech",
+          "text": "It's matching on meaning rather than on exact words.",
+          "expect": {
+            "action": "FOCUS",
+            "conceptId": "matching"
+          },
+          "settling": true
+        },
+        {
+          "kind": "speech",
+          "text": "So I can phrase things however I like.",
+          "expect": {
+            "action": "FOCUS",
+            "conceptId": "matching"
+          }
+        },
+        {
+          "kind": "manual",
+          "action": {
+            "type": "FOCUS",
+            "conceptId": "architecture"
+          },
+          "expect": {
+            "action": "FOCUS",
+            "conceptId": "architecture"
+          }
+        },
+        {
+          "kind": "speech",
+          "text": "And it holds whenever it isn't confident about what I mean.",
+          "expect": {
+            "action": "HOLD"
+          },
+          "note": "Manual hold dominates: on-topic speech for matching must not move the camera back."
+        },
+        {
+          "kind": "control",
+          "control": "resume"
+        },
+        {
+          "kind": "speech",
+          "text": "Right, back to how it matches by meaning.",
+          "expect": {
+            "action": "FOCUS",
+            "conceptId": "matching"
+          },
+          "settling": true
+        },
+        {
+          "kind": "speech",
+          "text": "It doesn't care about my exact wording, only about what I mean.",
+          "expect": {
+            "action": "FOCUS",
+            "conceptId": "matching"
+          }
+        },
+        {
+          "kind": "silence",
+          "durationMs": 5000,
+          "expect": {
+            "action": "HOLD"
+          }
+        }
+      ],
+      "topicReturns": 1
+    }
+  ]
+}
