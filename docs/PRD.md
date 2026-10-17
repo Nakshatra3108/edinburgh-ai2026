@@ -1,7 +1,7 @@
 # FOLLOW
 ## Product requirements, visual design, and engineering specification
 
-**Version:** 1.0 — implementation proposal
+**Version:** 1.3 — Groq preparation and local live control
 
 **Date:** 17 October 2026
 
@@ -9,11 +9,11 @@
 
 **Reference build window:** six hours; rebase milestones to the time actually remaining
 
-**Status:** specification, not an implemented or validated product
+**Status:** requirements specification; current implementation and verified gaps are recorded in [APPLICATION-STATUS.md](docs/APPLICATION-STATUS.md)
 
 **Primary deliverable:** a polished, speech-directed presentation on one continuous canvas
 
-**AI provider:** Grok for preparation; local models for live speech and matching
+**AI provider:** Groq for preparation; local models for live speech and matching
 
 > Usually, speakers follow their slides. With FOLLOW, the presentation follows the speaker.
 
@@ -32,7 +32,7 @@
 9. Speech, matching, and session behaviour
 10. Technical stack and architecture
 11. Data contracts and API
-12. Grok preparation and source grounding
+12. Groq preparation and source grounding
 13. Storage, privacy, security, and cost
 14. Curated-PDF fallback
 15. Performance and testing
@@ -50,7 +50,7 @@ FOLLOW converts source material from a PDF into a reviewed collection of concept
 
 The audience sees **one continuous visual canvas**. There is no slide-page sequence that the speaker must follow. The same source can support different presentations and unexpected questions.
 
-Preparation and performance are separate. Grok proposes the source-grounded content before the talk. During the talk, local speech recognition and semantic matching select from approved content. A deterministic renderer composes the visuals. It does not execute model-generated HTML or invent factual material on stage.
+Preparation and performance are separate. Groq proposes the source-grounded content before the talk. During the talk, local speech recognition and semantic matching select from approved content. A deterministic renderer composes the visuals. It does not execute model-generated HTML or invent factual material on stage.
 
 ### 1.2 The reversal
 
@@ -66,13 +66,13 @@ Single-canvas appearance alone does not establish this reversal. The demo must s
 | --- | --- |
 | Presentation form | One persistent canvas, not automatically changing PowerPoint pages |
 | Input | One PDF per project initially |
-| Preparation AI | Grok through a server-side API adapter |
+| Preparation AI | Groq through a server-side API adapter |
 | Live AI | Local speech recognition and semantic embeddings |
 | Visual quality | A first-class deliverable; polished even in curated mode |
 | Generality | Attempt the general PDF pipeline first; time-box unreliable automation |
 | Fallback | A manually curated manifest for one specific PDF, using the same renderer |
 | Honesty | Distinguish generated/curated content and microphone/typed/replay/manual input |
-| Budget | No paid speech or embedding APIs; Grok consumes the account's available credits and is not assumed universally free |
+| Budget | No paid speech or embedding APIs; Groq account-tier quotas and rate limits apply; no provider calls during a cached live talk |
 | Platform | Desktop browser first; local demo deployment on one laptop |
 
 ### 1.4 What this release does not promise
@@ -101,7 +101,7 @@ No arbitrary live graphic generation, internet research, automatic fact verifica
 - Remain still on silence, off-topic speech, or an uncertain match.
 - Override an incorrect decision immediately and prevent stale audio from undoing that choice.
 - Keep presenter controls and transcripts out of the audience window.
-- Complete a rehearsed talk using cached content and local live models without Grok calls during the talk.
+- Complete a rehearsed talk using cached content and local live models without Groq calls during the talk.
 
 These are acceptance goals. They are not statements of results already measured.
 
@@ -109,7 +109,7 @@ These are acceptance goals. They are not statements of results already measured.
 
 **P0 — demo release:** the reviewed manifest, polished canvas, concept/process/figure/comparison components, editing essentials, local speech, semantic focus, controlled reveal, one curated PDF package, manual controls, typed rehearsal, audience window, local save/export, and the key failure states.
 
-**P1 — general preparation target:** PDF extraction, Grok generation, validated source references, page crops, general deterministic layout, and regeneration. Start this immediately, but ship the curated content path if it misses the feasibility cutoff. P1 failure must not stop P0.
+**P1 — general preparation target:** PDF extraction, Groq generation, validated source references, page crops, general deterministic layout, and regeneration. Start this immediately, but ship the curated content path if it misses the feasibility cutoff. P1 failure must not stop P0.
 
 **P2 — later:** OCR for scanned PDFs, automatic figure boundary detection, numerical chart extraction, arbitrary scene generation, multiple documents, remote audience devices, recorded video export, live multi-speaker support, multilingual matching, full text editor undo history, custom themes, and imported PPTX.
 
@@ -122,7 +122,7 @@ Every feature below is assigned one of these priorities. P2 is explicitly outsid
 1. Open the app. Choose **Upload PDF** or **Open demo project**.
 2. Select one PDF. Validate the file, show its name, size, and page count when known.
 3. Extract page text locally. Let the user inspect the extraction and limit the pages sent for preparation.
-4. Explain that selected text will be sent to Grok. The action **Prepare canvas with Grok** initiates that transmission.
+4. Explain that selected text will be sent to Groq. The action **Prepare canvas with Groq** initiates that transmission.
 5. Generate a bounded structured plan, validate it, and arrange its content on the canvas.
 6. Review source excerpts, correct or remove content, choose figure crops, and approve the project.
 7. Download/warm the local models if necessary. Perform a short microphone and matching check.
@@ -136,10 +136,10 @@ Every feature below is assigned one of these priorities. P2 is explicitly outsid
 1. Open the supplied demo project or upload the exact known PDF.
 2. Verify its SHA-256 against the curated package. A filename alone is not sufficient.
 3. Load the authored manifest, source references, crops, and layout.
-4. Show **Curated content** in the preparation view. Do not show a fake Grok generation progress animation.
+4. Show **Curated content** in the preparation view. Do not show a fake Groq generation progress animation.
 5. Review and present with the identical live-control pipeline used by generated projects.
 
-The actual presentation PDF has not yet been supplied. Selecting it and preparing its manifest are implementation prerequisites, not completed work.
+The curated source is now supplied at `demo/source/follow-demo.pdf`, with `demo/manifest.json`. The CLI verifier checks its source hash and quote offsets. The app currently imports that manifest manually; matching an uploaded PDF to the curated package still needs implementation.
 
 ### 3.3 Live example
 
@@ -232,9 +232,9 @@ States: empty, drag-over, validating, valid file selected, unsupported format, o
 
 **Primary task:** understand the source and approve external processing.
 
-Left: page thumbnails and text extraction status. Centre: the selected PDF page or extraction preview. Right: project title, selected page range, content density (Concise / Standard), detected sections, and **Prepare canvas with Grok**.
+Left: page thumbnails and text extraction status. Centre: the selected PDF page or extraction preview. Right: project title, selected page range, content density (Concise / Standard), detected sections, and **Prepare canvas with Groq**.
 
-Show **Selected document text is sent to Grok for preparation. Live speech stays on this device.** immediately beside the action. A page crop selected later is local unless a future image-understanding feature explicitly requests sending it.
+Show **Selected document text is sent to Groq for preparation. Live speech stays on this device.** immediately beside the action. A page crop selected later is local unless a future image-understanding feature explicitly requests sending it.
 
 Progress is stage-based: **Reading PDF → Preparing concepts → Checking sources → Arranging canvas**. Show real completed page counts and download byte counts when available. Use an indeterminate stage indicator otherwise; never manufacture a percentage or inferred completion time.
 
@@ -276,7 +276,7 @@ Controls: **Test microphone**, **Warm up models**, **Open audience window**, **S
 
 Rehearsal defaults to **Suggest**. A typed phrase box is a first-class diagnostic control labelled **Typed rehearsal — not microphone input**. The same matching and rendering controller handles typed segments and recognised segments. Capture test observations locally: intended concept, predicted concept, delay, and whether the operator accepted it.
 
-Preflight distinguishes blockers from warnings. Missing Grok credentials do not block a cached approved project. Missing local embeddings blocks semantic Auto but allows manual mode. Missing microphone permission blocks microphone input but allows typed rehearsal and manual presentation.
+Preflight distinguishes blockers from warnings. Missing Groq credentials do not block a cached approved project. Missing local embeddings blocks semantic Auto but allows manual mode. Missing microphone permission blocks microphone input but allows typed rehearsal and manual presentation.
 
 ### 5.5 Screen E — Live presenter console
 
@@ -417,7 +417,7 @@ Shortcuts are disabled in text fields and while a modal consumes them. Controls 
 | --- | --- | --- | --- |
 | F01 | PDF selection and validation | P1 | Accept actual PDF bytes, reject unsupported/encrypted/oversized files with actionable messages |
 | F02 | Text extraction and page provenance | P1 | Extract by page; preserve page IDs and exact source text; never silently claim complete extraction |
-| F03 | Grok content preparation | P1 | Produce a validated bounded plan or a clear retry/fallback state |
+| F03 | Groq content preparation | P1 | Produce a validated bounded plan or a clear retry/fallback state |
 | F04 | Editable concept studio | P0 | Edit content, enabled state, cues, connections, positions, and review state without editing source code |
 | F05 | Page crop selection | P1 | Render a PDF page, crop locally, save normalized crop coordinates and page identity |
 | F06 | Shared visual renderer | P0 | Generated and curated manifests render through identical components |
@@ -478,7 +478,7 @@ Manual focus invalidates pending decisions, clears candidate history, and enters
 
 Use `BroadcastChannel` between same-origin tabs/windows on the same browser. The presenter is authoritative. Messages carry project ID, session ID, manifest revision, sequence number, semantic composition, and motion policy. An audience window announces readiness and requests the latest snapshot; it ignores stale sequences and refuses mismatched project revisions.
 
-Send semantic state, not transcript, notes, tokens, or the Grok key. Both windows load approved assets from local storage. Audience refresh requests a fresh snapshot. The presenter shows connection status from heartbeats. A blocked popup yields an explicit **Open audience window** retry; single-window fullscreen is the fallback. Remote devices and cross-origin syncing are P2.
+Send semantic state, not transcript, notes, tokens, or the Groq key. Both windows load approved assets from local storage. Audience refresh requests a fresh snapshot. The presenter shows connection status from heartbeats. A blocked popup yields an explicit **Open audience window** retry; single-window fullscreen is the fallback. Remote devices and cross-origin syncing are P2.
 
 ## 10. Technical stack and architecture
 
@@ -502,10 +502,10 @@ Send semantic state, not transcript, notes, tokens, or the Grok key. Both window
 | Speech candidate | `Xenova/whisper-tiny.en` | Small English model; measure actual device latency first |
 | Embedding candidate | `Xenova/all-MiniLM-L6-v2` | Compact sentence embeddings; use normalized mean pooling as specified by the model |
 | Inference backend | WebGPU when supported/tested; WASM fallback | Detect capability; do not silently promise equal performance |
-| Backend | Fastify + native `fetch` | One small server-side Grok adapter; no Python service required |
+| Backend | Fastify + native `fetch` | One small server-side Groq adapter; no Python service required |
 | Validation | Zod + generated JSON Schema | Validate provider output, manifests, imports, requests, and events |
-| Grok endpoint | xAI Responses API | Current provider-recommended integration; see reference R1 |
-| Grok model | `XAI_MODEL` environment configuration; initial candidate `grok-4.7` | Smoke-test account access and structured output; record actual model used |
+| Groq endpoint | `https://api.groq.com/openai/v1/chat/completions` | Matches the existing server-side smoke test; see R1/R2 |
+| Groq model | `GROQ_MODEL` environment configuration; initial candidate `openai/gpt-oss-120b` | Smoke-test account access and structured output; record actual model used |
 | Local persistence | IndexedDB through `idb` | Documents, manifests, crops, and local project data |
 | Window transport | Browser `BroadcastChannel` | Local presenter/audience synchronisation |
 | Unit / integration tests | Vitest + Testing Library; `fast-check` for state invariants | Core matching/controller correctness |
@@ -521,8 +521,8 @@ Package versions must be resolved together, checked for compatibility, and locke
 flowchart LR
     PDF[Local PDF] --> EX[PDF.js extraction]
     EX --> API[Fastify preparation endpoint]
-    API --> GROK[Grok structured content plan]
-    GROK --> VALID[Schema and source validation]
+    API --> GROQ[Groq structured content plan]
+    GROQ --> VALID[Schema and source validation]
     VALID --> EDIT[Studio and human review]
     FIX[Curated manifest] --> EDIT
     EDIT --> STORE[Approved project in IndexedDB]
@@ -554,7 +554,7 @@ apps/
     styles/               # tokens, typography, motion, responsive rules
   api/src/
     routes/               # health, prepare, cancel, status
-    providers/            # xAI adapter
+    providers/            # Groq adapter
     generation/           # schema, prompts, source checks, limits
 packages/
   shared/src/             # schemas, types, event contracts, reducers
@@ -645,7 +645,7 @@ type Project = {
   title: string;
   source: { name: string; sha256: string; pages: number };
   preparation: {
-    mode: 'grok' | 'curated';
+    mode: 'groq' | 'curated';
     model: string | null;
     promptVersion: string;
     preparedAt: string;
@@ -678,45 +678,44 @@ Embedding cache keys include project revision, model ID/revision, pooling config
 | `GET /api/prepare/:jobId` | Stage, completion/error, validated plan when ready | Poll at a bounded interval; actual stages only |
 | `DELETE /api/prepare/:jobId` | Cancellation result | Abort active upstream request where possible; suppress late results |
 
-Initial PDF limit: 20 MB and 20 selected pages, with a maximum 80,000 extracted characters in one preparation job. Treat these as prototype limits, not the Grok model's context limits. Explain truncation and page selection; never silently discard middle pages. Initial generated plan limit: eight concepts, five details each, twelve relationships.
+Initial PDF limit: 20 MB and 20 selected pages, with a maximum 80,000 extracted characters in one preparation job. Treat these as prototype limits, not the Groq model's context limits. Explain truncation and page selection; never silently discard middle pages. Initial generated plan limit: eight concepts, five details each, twelve relationships.
 
-Use a 90-second provider deadline and a visible timeout recovery state. Retry transport/429/5xx failures at most once within the job deadline when instructed by the adapter policy; do not retry authentication or exhausted-credit errors. A schema/content repair may use one separate bounded repair request. Every retry/repair is recorded and can consume credits. Duplicate submissions reuse the active local job where safe. Cancellation cannot promise refund or termination of provider billing.
+Use a 90-second provider deadline and a visible timeout recovery state. Retry transport/429/5xx failures at most once within the job deadline when instructed by the adapter policy; do not retry authentication or exhausted-allowance errors. A schema/content repair may use one separate bounded repair request. Every retry/repair is recorded and consumes request/token allowance. Duplicate submissions reuse the active local job where safe. Cancellation cannot promise reversal of upstream usage already consumed.
 
 Error envelope: `{ code, message, retryable, requestId }`. Codes include `INVALID_SOURCE`, `SOURCE_TOO_LARGE`, `PROVIDER_AUTH`, `PROVIDER_QUOTA`, `PROVIDER_RATE_LIMIT`, `PREP_TIMEOUT`, `INVALID_PLAN`, and `CANCELLED`. Never return provider stack traces or credentials to the browser.
 
-### 11.3 Grok adapter
+### 11.3 Groq adapter
 
-Use server-side `fetch` to `https://api.x.ai/v1/responses` with bearer authentication. Set `store: false` for stateless preparation if supported by the chosen model and verified request. Follow the current Responses API structured-output format for the selected endpoint; do not copy Chat Completions' `response_format` into Responses without checking the provider's documented schema. Parse typed output text from the response rather than assuming a legacy `choices` array.
-
-The documented Responses API structured-output location is `text.format`. The initial request has this shape; `preparedPlanJsonSchema` is generated from the bounded Zod plan schema, and the input contains the versioned instructions and page-labelled source:
+Use server-side `fetch` to `https://api.groq.com/openai/v1/chat/completions`, authenticated with `GROQ_API_KEY`. Match `apps/api/scripts/smoke-groq.ts`. Configure `GROQ_MODEL`; the initial candidate is `openai/gpt-oss-120b`. This is a preparation provider; live speech and embeddings remain local.
 
 ```ts
 const request = {
-  model: process.env.XAI_MODEL,
-  store: false,
-  input: [
+  model: process.env.GROQ_MODEL,
+  messages: [
     { role: 'system', content: preparationInstructions },
     { role: 'user', content: pageLabelledSource },
   ],
-  text: {
-    format: {
-      type: 'json_schema',
+  response_format: {
+    type: 'json_schema',
+    json_schema: {
       name: 'follow_prepared_plan',
       strict: true,
       schema: preparedPlanJsonSchema,
     },
   },
-  max_output_tokens: 6000,
+  max_completion_tokens: 6000,
 };
 ```
 
-This is a request contract, not a tested integration. Check schema compatibility with the selected model and handle incomplete/truncated output. The adapter owns timeout, typed response parsing, usage metadata, and error mapping. The rest of FOLLOW receives only a validated `PreparedPlan`. No web search, code execution, external tools, or image generation is enabled. Run a tiny schema-constrained request on the team's actual account before building the full generation pipeline. Account access and credits have not been tested. See [the provider's structured-output examples](https://docs.x.ai/developers/model-capabilities/text/structured-outputs).
+Use a strict-compatible schema: list every property in `required`, set `additionalProperties: false` on every object, and express nullable fields explicitly. Parse `choices[0].message.content` as JSON; reject missing content, unsuccessful completion, invalid plans, and unsupported claims. The adapter owns timeout, bounded retries, usage and error mapping. Only a validated `PreparedPlan` reaches the app; schema compliance is not source verification. No external tools or executable generated visuals are enabled.
+
+The smoke-test script exists, but a real authenticated request has not been verified in this workspace. Run `npm run smoke:groq --prefix apps/api` after configuring the local server environment. See [Groq structured outputs](https://console.groq.com/docs/structured-outputs).
 
 ### 11.4 Environment
 
 ```dotenv
-XAI_API_KEY=                         # server only; never VITE_ prefixed
-XAI_MODEL=grok-4.7                   # verify access; record actual tested model
+GROQ_API_KEY=                         # server only; never VITE_ prefixed
+GROQ_MODEL=openai/gpt-oss-120b                   # verify access; record actual tested model
 API_HOST=127.0.0.1
 API_PORT=8787
 WEB_ORIGIN=http://localhost:5173
@@ -727,7 +726,7 @@ MAX_PREP_JOBS_PER_SESSION=3
 
 Provide `.env.example` with blank credentials and ignore real environment files. Frontend configuration contains only nonsecret asset paths and feature flags. Do not ask anyone to paste API keys into the presentation or a chat transcript.
 
-## 12. Grok preparation and source grounding
+## 12. Groq preparation and source grounding
 
 ### 12.1 Extraction
 
@@ -739,7 +738,7 @@ Figures in P1 are **manual page crops**. The page renderer preserves visual fide
 
 Supply a versioned system instruction and page-labelled source text. Treat document contents as untrusted reference data, not instructions to the application. Request concise concepts, exact supporting quotations, labelled relationships, aliases, and semantically varied speech examples. Bound content length and allowed visual types. Request an empty list where evidence is absent, not fabricated filler.
 
-Grok does not choose arbitrary JavaScript, CSS, remote URLs, or executable diagram code. The renderer selects layout from allowed component types. The model's schema compliance does not establish factual correctness.
+Groq does not choose arbitrary JavaScript, CSS, remote URLs, or executable diagram code. The renderer selects layout from allowed component types. The model's schema compliance does not establish factual correctness.
 
 ### 12.3 Validation
 
@@ -763,7 +762,7 @@ Autosave valid edits locally after 500 ms idle, with explicit save errors. A gen
 
 ### 13.1 Data lifecycle
 
-PDF bytes, page text, crops, approved manifests, and revisions are stored in local IndexedDB. Grok preparation transmits only the selected page text and necessary project settings to the server/provider. Raw audio and live transcripts are not transmitted to Grok. API job bodies/results are held in memory, bounded, and discarded after completion/cancellation with a short expiration; no production database is required.
+PDF bytes, page text, crops, approved manifests, and revisions are stored in local IndexedDB. Groq preparation transmits only the selected page text and necessary project settings to the server/provider. Raw audio and live transcripts are not transmitted to Groq. API job bodies/results are held in memory, bounded, and discarded after completion/cancellation with a short expiration; no production database is required.
 
 Local transcripts and event logs default to session memory. Opt-in export can retain them, with clear deletion. **Delete project** removes its PDF, text, assets, manifest, embeddings, and session artifacts; shared model caches are a separate setting. Warn when browser storage fails or is unavailable; allow export without pretending a save succeeded.
 
@@ -779,7 +778,7 @@ Public deployment is a separate decision. An unauthenticated publicly accessible
 
 ### 13.3 Cost controls
 
-The user selected Grok and may have promotional credits. Do not label the API free. Confirm the account balance separately. Cache approved plans by source hash, selected pages, settings, model, prompt version, and schema version. Require explicit regeneration, cap jobs, bound output, and avoid sending every utterance to Grok.
+The user selected Groq. Check the account's tier, remaining allowance and rate limits before generation. Use the available free tier where applicable; never promise unlimited requests or automatic paid fallback. Cache approved plans by source hash, selected pages, settings, model, prompt version, and schema version. Require explicit regeneration, cap jobs, bound output, and avoid sending every utterance to Groq.
 
 Keep usage counters and model information in diagnostics. Estimate cost only from observed token usage and verified current rates; do not invent a dollar budget from absent account information. No hosted vector database, paid STT, or paid embedding API is required.
 
@@ -795,7 +794,7 @@ The live core remains real: microphone capture, transcription, semantic matching
 
 | Level | Content | Input/control | Accurate description |
 | --- | --- | --- | --- |
-| A | Grok-generated, reviewed | Live microphone and local semantic Auto | Full tested workflow |
+| A | Groq-generated, reviewed | Live microphone and local semantic Auto | Full tested workflow |
 | B | Curated for the selected PDF | Live microphone and local semantic Auto | Curated-content prototype with live AI control |
 | C | Generated or curated | Typed phrases through semantic matcher | Typed semantic-control demonstration |
 | D | Generated or curated | Manual operator | Visual interaction demonstration |
@@ -805,7 +804,7 @@ Do not silently move between these levels during a pitch. Keep source mode separ
 
 ### 14.3 Trigger for using it
 
-Attempt general extraction and one real Grok plan in the first feasibility phase. If generation/grounding is not dependable by the agreed cutoff, freeze the shared schema and curate the real demo PDF. If microphone latency is unacceptable on the laptop, try the smaller/local backend configuration within the next bounded check; otherwise use a disclosed input fallback. UI work continues against a validated fixture throughout.
+Attempt general extraction and one real Groq plan in the first feasibility phase. If generation/grounding is not dependable by the agreed cutoff, freeze the shared schema and curate the real demo PDF. If microphone latency is unacceptable on the laptop, try the smaller/local backend configuration within the next bounded check; otherwise use a disclosed input fallback. UI work continues against a validated fixture throughout.
 
 ## 15. Performance and testing
 
@@ -821,7 +820,7 @@ These are release targets to measure on the demo laptop, not guarantees:
 | Speech-to-visual response | Aim ≤3 seconds after a meaningful phrase ends; if sustained >5 seconds, use Suggest and investigate |
 | Stage rendering | Aim 60 fps; degrade safely on the target machine without unreadable text |
 | Cached project opening | ≤2 seconds excluding model warm-up |
-| Grok preparation | Bounded by the 90-second job deadline; show actual stage |
+| Groq preparation | Bounded by the 90-second job deadline; show actual stage |
 | Audience event delivery | Aim <250 ms locally; resync after refresh |
 
 Warm models before the pitch. Run inference in workers. Use quantized model weights where supported and verify accuracy against the phrase set. Keep one ASR instance and one embedding instance; do not create duplicates for the audience window. A browser's background-tab throttling must be tested in the actual two-window setup. Keep the presenter window active on the laptop while the audience window is projected.
@@ -860,7 +859,7 @@ Provisional gate: at least 85% correct topic selections on the small labelled pa
 | Owner | Responsibility | Owned areas | Integration contract |
 | --- | --- | --- | --- |
 | A — visual/frontend | Shared canvas, components, camera, stage, motion | `canvas/`, `styles/`, audience screen | Consumes approved manifest + semantic composition |
-| B — preparation | PDF extraction, Grok adapter, grounding, curated source | `pdf/`, API, `generation/`, demo source | Produces validated plan; no canvas implementation |
+| B — preparation | PDF extraction, Groq adapter, grounding, curated source | `pdf/`, API, `generation/`, demo source | Produces validated plan; no canvas implementation |
 | C — live AI | Audio capture, workers, embeddings, semantic actions | `audio/`, `workers/`, `matching/` | Emits versioned transcript/candidate events |
 | D — integration/product | Console, controller, sync, persistence, QA and pitch | `state/`, `persistence/`, presenter/rehearsal, tests | Owns shared schemas with team review |
 
@@ -871,7 +870,7 @@ Everyone works against the same minimal manifest early. Agree IDs, events, and a
 | Window | Outcome |
 | --- | --- |
 | 0:00–0:25 | Freeze concept, stack, manifest/action contracts, actual PDF, and demo laptop. Start downloads. |
-| 0:25–1:15 | A builds the main stage from fixture; B attempts extraction and a real Grok plan; C measures real mic transcription and embeddings; D builds controller and sync skeleton. |
+| 0:25–1:15 | A builds the main stage from fixture; B attempts extraction and a real Groq plan; C measures real mic transcription and embeddings; D builds controller and sync skeleton. |
 | 1:15–1:30 | Feasibility gate: decide general vs curated content; record actual mic latency. Keep one working vertical slice. |
 | 1:30–3:00 | Integrate speech → matching → controller → stage. Complete visual types, manual hold, studio essentials, and source review. |
 | 3:00–4:00 | Finish audience window, comparison/reveal, persistence, error states, and preflight. Freeze optional features. |
@@ -882,15 +881,19 @@ If less than six hours remain, preserve the live slice, visual quality, controls
 
 ### 16.3 Dependencies to settle immediately
 
-The chosen PDF and its usage rights; the actual laptop/browser and microphone; Grok API access and available credits; model download completion; projector/window arrangement; and the event's actual rubric, required technology, pitch duration, and submission deadline. These are not yet established by this document. Keep event-specific obligations unverified until an official brief is supplied.
+The curated PDF/manifest are supplied, and the user's event slide establishes the rubric and two-minute presentation plus one-minute Q&A (section 17.1). Still verify source usage rights, the actual demo laptop/microphone, Groq account access/limits, model download completion, projector/window arrangement, any required technology and submission deadline. Current implementation evidence is recorded in APPLICATION-STATUS.md.
 
 ## 17. Demo, risks, and release checklist
 
-### 17.1 Suggested demonstration
+### 17.1 Event rubric and demonstration
 
-Use FOLLOW to explain FOLLOW. Introduce the reversal in one sentence. Start from a reviewed concept overview, speak about the problem, reveal the processing pipeline, and form a comparison. Let a judge choose one of the available concepts or deliberately change the order. Return to the opening idea. End with the complete visual map.
+The event slide supplied by the user specifies **two minutes presenting and one minute Q&A**. Judges visit the table; the top four teams present. Creativity carries 40%, Execution 15%, Presentation 15%, Tech stack explanation 10%, Understanding 10%, and Fit and ambition 10%.
 
-For a three-minute reference pitch, allow 20 seconds for the problem, 90 seconds for live interaction, 30 seconds for the architecture and scope disclosure, and 40 seconds for value and recovery margin. Replace this timing with the event's actual limit. A random judge question outside the prepared source should produce HOLD or manual handling, not a hallucinated new scene.
+Use FOLLOW to explain FOLLOW. State the old assumption and reversal in one sentence: **Usually, speakers follow their slides; with FOLLOW, the presentation follows the speaker.** Show the narrative order changing in response to the speaker, rather than presenting a voice-controlled next-slide button.
+
+For the two-minute pitch, spend 15 seconds on the problem/reversal, 60 seconds on live non-sequential focus plus a process reveal and comparison, 20 seconds on why the flip helps a real conversation, 15 seconds on the stack and why each part serves the flip, and 10 seconds on the closing map. Use the Q&A to explain semantic matching, controller safeguards, source grounding and the limits of the implemented build.
+
+Let a judge choose one of the reviewed concepts or deliberately change topic order. Out-of-source questions should HOLD or be handled manually. Disclose curated material, typed input, manual control and replay accurately. The rubric explicitly rewards knowing what is mocked and explaining AI tools used. Do not claim a pipeline is live because its architecture diagram exists.
 
 ### 17.2 Principal risks
 
@@ -909,7 +912,7 @@ For a three-minute reference pitch, allow 20 seconds for the problem, 90 seconds
 ### 17.3 Definition of done
 
 - [ ] Shared schema and renderer are implemented and validated.
-- [ ] Actual PDF supplied; generated or curated preparation mode recorded.
+- [x] Actual PDF supplied; curated preparation mode recorded and source references verified by the CLI.
 - [ ] All audience claims can be traced to source or labelled user-authored content.
 - [ ] Local models warmed; microphone path tested rather than only mocked.
 - [ ] Two different topic orders work on the same project.
@@ -930,9 +933,9 @@ For a three-minute reference pitch, allow 20 seconds for the problem, 90 seconds
 
 These primary sources were consulted on 17 October 2026. They support implementation choices, not a claim that the proposed app has been built or tested.
 
-- **R1:** [xAI Responses API and migration guidance](https://docs.x.ai/developers/model-capabilities/text/comparison) — endpoint choice, output structure, storage control.
-- **R2:** [xAI structured outputs](https://docs.x.ai/developers/model-capabilities/text/structured-outputs) — schema-constrained generation; endpoint-specific formatting still needs a smoke test.
-- **R3:** [xAI models](https://docs.x.ai/developers/models) and [billing](https://docs.x.ai/developers/faq/billing) — account/model verification and metered API use.
+- **R1:** [Groq overview and API reference](https://console.groq.com/docs/overview) — server-side provider integration.
+- **R2:** [Groq structured outputs](https://console.groq.com/docs/structured-outputs) — strict schema requirements, supported models and Chat Completions formatting.
+- **R3:** [Groq rate limits](https://console.groq.com/docs/rate-limits) — account-tier request/token limits; inspect actual account access separately.
 - **R4:** [PDF.js examples](https://mozilla.github.io/pdf.js/examples/) — browser-side page loading and rendering.
 - **R5:** [Transformers.js](https://huggingface.co/docs/transformers.js/en/index), [WebGPU](https://huggingface.co/docs/transformers.js/guides/webgpu), and [local asset configuration](https://huggingface.co/docs/transformers.js/custom_usage) — local model execution and asset hosting.
 - **R6:** [React Flow](https://reactflow.dev/learn) — node/edge canvas foundation.

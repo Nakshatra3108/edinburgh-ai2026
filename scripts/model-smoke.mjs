@@ -11,7 +11,7 @@ const config = JSON.parse(await readFile("demo/matcher-config.json", "utf8"));
 const calibrate = process.argv.includes("--calibrate");
 const phrases = JSON.parse(
   await readFile(
-    calibrate ? "demo/rehearsal.json" : "demo/phrases.json",
+    calibrate ? "demo/rehearsal.json" : "demo/speech-phrases.json",
     "utf8",
   ),
 );

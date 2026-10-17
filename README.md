@@ -20,6 +20,7 @@ Open **Open example canvas**, select an idea, reveal details, or use **Action la
 `demo/manifest.json` is Person B's real curated PDF manifest, with the PDF at `demo/source/follow-demo.pdf`. Use **Import project** on the canvas start screen to inspect it. Person A's bundled example under `apps/web/src/canvas/fixtures/` remains explicitly illustrative.
 
 - [Person A handoff](docs/person-a/HANDOFF.md)
+- [Team application status and remaining work](docs/APPLICATION-STATUS.md)
 - [Design implementation](docs/person-a/DESIGN.md)
 - [Person A validation](docs/person-a/QA.md)
 
@@ -32,7 +33,7 @@ Open **Open example canvas**, select an idea, reveal details, or use **Action la
 5. Select **Small.en** (the default), then **Load & warm Whisper**. Tiny.en is available as a speed baseline; no manual model download, Python setup or Hugging Face account is required.
 6. Test a recorded clip, then **Start microphone**. Stop releases microphone tracks and invalidates pending inference. **Cancel model loading** terminates model workers.
 
-The lab and its evaluation still use `demo/speech-fixture.json`, the original illustrative six-concept fixture. Its phrase-set results and calibrated thresholds do not apply automatically to the real PDF manifest. D/C must integrate and evaluate the reviewed team project before presenting it with speech.
+The lab and its evaluation still use `demo/speech-fixture.json` and `demo/speech-phrases.json`, the original illustrative six-concept fixture and its evaluation phrases. The team's `demo/manifest.json` and `demo/phrases.json` are preserved for the real PDF. Existing fixture scores and calibrated thresholds do not apply automatically to that PDF manifest. D/C must integrate and evaluate the reviewed team project before presenting it with speech.
 
 WASM is the tested CPU baseline; WebGPU is an explicit configuration to benchmark. After changing a model/backend, reload Whisper before testing. Keep Suggest while checking room acoustics and real phrase-end latency.
 
@@ -57,6 +58,8 @@ npm run test:models
 
 Use the root `package-lock.json` for the web/shared workspaces. `apps/api` retains Person B's independent package and lockfile; its scripts and Node requirements remain in `apps/api/package.json`. API/provider preparation is separate from the local speech lab.
 
+Preparation uses **Groq**, with server-only `GROQ_API_KEY` and `GROQ_MODEL` (initial candidate `openai/gpt-oss-120b`). Run the backend smoke test with `npm run smoke:groq --prefix apps/api` after environment setup. The full preparation endpoint remains to be implemented; neither manual harness requires a key. The team status document describes the upstream-main snapshot; this local feature branch additionally contains the Person C lab.
+
 ## Git workflow
 
 Work on your own feature branch. Commit your changes before merging the team's main branch:
@@ -69,5 +72,7 @@ git merge origin/main
 ```
 
 Resolve overlaps by preserving both teammates' work, then test and commit. Do not remove untracked source files just to make a pull succeed.
+
+Locally, `codex/person-c-speech-matching` tracks `origin/main` with merge-based pulls, so plain `git pull` brings in team changes. This does not publish your branch; explicitly push your feature branch when ready to share it.
 
 The original product plan is [FOLLOW-PRD.md](FOLLOW-PRD.md). Copies under `docs/` are reference documents, not claims that the whole PRD is implemented. Shared contracts remain provisional until D reviews and freezes them.

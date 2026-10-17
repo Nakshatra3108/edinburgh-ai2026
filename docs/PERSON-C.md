@@ -2,6 +2,8 @@
 
 After the team merge, open **http://127.0.0.1:5173/speech.html**. The root URL serves Person A's canvas. This lab and its tests use `demo/speech-fixture.json`; the team's `demo/manifest.json` is B's real curated PDF manifest and is preserved independently. Existing accuracy results apply only to the illustrative speech fixture.
 
+The lab's 24 paraphrases and six distractors now live in `demo/speech-phrases.json`. The team's new `demo/phrases.json` is the evaluation package for the real PDF and is preserved independently.
+
 ## Handoff to D
 
 ```ts
