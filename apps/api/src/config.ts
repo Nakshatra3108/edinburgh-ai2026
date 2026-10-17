@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 export type Config = {
   groqApiKey: string | null;
+  groqApiKeys: string[];
   groqModel: string;
   host: string;
   port: number;
@@ -31,7 +32,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env, envFile = resol
   const host = env.API_HOST || '127.0.0.1';
   // PRD §13.2: the demo backend binds to loopback only. Public deployment needs auth first.
   if (!LOOPBACK.has(host)) throw new Error(`API_HOST must be a loopback address, got ${host}`);
+  const groqApiKeys = [...new Set(['GROQ_API_KEY', 'GROQ_API_KEY_2', 'GROQ_API_KEY_3', 'GROQ_API_KEY_4'].map(name => env[name]?.trim()).filter((key): key is string => !!key))];
   return {
+    groqApiKeys,
     groqApiKey: env.GROQ_API_KEY?.trim() || null,
     groqModel: env.GROQ_MODEL?.trim() || 'openai/gpt-oss-120b',
     host,

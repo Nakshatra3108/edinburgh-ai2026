@@ -22,15 +22,36 @@ export const emptyUsage = (): Usage => ({ promptTokens: 0, completionTokens: 0, 
 
 /** Seconds from a retry-after header, if present and sane. */
 export function retryAfterMs(headers: Headers): number | null {
-  const s = Number(headers.get('retry-after'));
-  return Number.isFinite(s) && s >= 0 && s <= 60 ? s * 1000 : null;
+  const raw = headers.get('retry-after');
+  if (raw === null) return null;
+  const s = Number(raw);
+  return Number.isFinite(s) && s >= 0 && s <= 604800 ? s * 1000 : null;
+}
+
+/** Duration strings returned by Groq, e.g. 2m59.56s or 7.66s. */
+export function rateLimitCooldownMs(headers: Headers): number | null {
+  const values: number[] = [];
+  const retry=retryAfterMs(headers);if(retry!==null)values.push(retry);
+  for(const suffix of ['requests','tokens']) {
+    const remaining=headers.get(`x-ratelimit-remaining-${suffix}`);
+    if(remaining===null || !Number.isFinite(Number(remaining)) || Number(remaining)>0)continue;
+    const raw=headers.get(`x-ratelimit-reset-${suffix}`);
+    if(!raw)continue;
+    const matches=[...raw.matchAll(/(\d+(?:\.\d+)?)(ms|s|m|h|d)/g)];
+    if(!matches.length || matches.map(m=>m[0]).join('')!==raw.trim())continue;
+    const units:Record<string,number>={ms:1,s:1000,m:60000,h:3600000,d:86400000};
+    values.push(matches.reduce((total,m)=>total+Number(m[1])*units[m[2]],0));
+  }
+  return values.length ? Math.max(...values) : null;
 }
 
 export class ProviderHttpError extends PrepError {
   readonly retryAfterMs: number | null;
-  constructor(error: PrepError, retryAfter: number | null) {
+  readonly cooldownMs: number | null;
+  constructor(error: PrepError, retryAfter: number | null, cooldownMs: number | null = retryAfter) {
     super(error.code, error.message, { retryable: error.retryable });
     this.retryAfterMs = retryAfter;
+    this.cooldownMs = cooldownMs;
   }
 }
 
@@ -79,7 +100,7 @@ export function createGroqProvider(opts: { apiKey: string; model: string; fetchI
     }
     if (!res.ok) {
       const e = body?.error ?? {};
-      throw new ProviderHttpError(mapStatus(res.status, e.code ?? e.type, String(e.message ?? '')), retryAfterMs(res.headers));
+      throw new ProviderHttpError(mapStatus(res.status, e.code ?? e.type, String(e.message ?? '')), retryAfterMs(res.headers), rateLimitCooldownMs(res.headers));
     }
     const choice = body?.choices?.[0];
     const u = body?.usage ?? {};

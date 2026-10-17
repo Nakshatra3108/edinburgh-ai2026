@@ -13,7 +13,8 @@ import { normalizeText } from './generation/sourceText.ts';
 import { PLAN_LIMITS, PLAN_SCHEMA_VERSION } from './generation/planSchema.ts';
 import { runPreparation } from './generation/prepare.ts';
 import { PROMPT_VERSION } from './generation/prompt.ts';
-import { createGroqProvider, type CompletionProvider } from './providers/groq.ts';
+import type { CompletionProvider } from './providers/groq.ts';
+import { createRotatingGroqProvider } from './providers/rotatingGroq.ts';
 
 export const MAX_SELECTED_PAGES = 20;
 const BODY_LIMIT = 1024 * 1024;
@@ -34,8 +35,8 @@ export type ServerDeps = { config: Config; provider?: CompletionProvider; logger
 
 export function buildServer({ config, provider, logger = true }: ServerDeps): FastifyInstance {
   const app = Fastify({ logger, bodyLimit: BODY_LIMIT, genReqId: () => randomUUID() });
-  const configured = Boolean(provider ?? config.groqApiKey);
-  const completion = provider ?? (config.groqApiKey ? createGroqProvider({ apiKey: config.groqApiKey, model: config.groqModel }) : null);
+  const configured = Boolean(provider || config.groqApiKeys.length);
+  const completion = provider ?? (config.groqApiKeys.length ? createRotatingGroqProvider({ apiKeys: config.groqApiKeys, model: config.groqModel }) : null);
   let liveBusy = false;
   const liveCache = new Map<string, unknown>();
   const jobs = configured
