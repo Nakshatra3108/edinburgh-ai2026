@@ -144,3 +144,35 @@
 .canvas-board .is-compact .node-points { display:none; }
 .canvas-board .is-compact .node-summary { -webkit-line-clamp:3; }
 .canvas-board .is-compact .topic-glyph { margin-bottom:4px; }
+
+/* Reserve content and provenance as separate layout rows. Long text must never
+   paint over the next element or an original figure. */
+.canvas-board .canvas-node { display:flex; flex-direction:column; gap:0; }
+.canvas-board .topic-glyph { flex-shrink:0; }
+.canvas-board .canvas-node h2 { flex-shrink:0; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; }
+.canvas-board .node-detail-group:not([hidden]) { flex:1; min-height:0; overflow:hidden; }
+.canvas-board .board-provenance { position:static; flex-shrink:0; margin-top:18px; padding-top:10px; line-height:1.2; }
+.canvas-board .node-points { gap:16px; }
+.canvas-board .node-points li { -webkit-line-clamp:2; line-height:1.35; }
+.canvas-board .is-compact .topic-glyph { display:none; }
+.canvas-board .is-compact h2 { font-size:32px; padding-bottom:8px; }
+.canvas-board .is-compact .node-summary { margin-top:0; font-size:25px; line-height:1.3; -webkit-line-clamp:3; }
+.canvas-board .is-compact .board-provenance { margin-top:8px; padding-top:0; }
+.canvas-board .is-compact .process-path,.canvas-board .is-compact .metric-composition { display:none; }
+.canvas-board .visual-process .process-path { margin-top:24px; }
+.canvas-board .step-label { line-height:1.25; }
+.canvas-board .metric-value { overflow-wrap:anywhere; font-size:88px; }
+.canvas-board .metric-value>span { font-size:30px; }
+.canvas-board .metric-composition p { font-size:28px; }
+.canvas-board .visual-figure .node-detail-group:not([hidden]) { overflow:hidden; }
+.canvas-board .source-figure figcaption { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; }
+/* Connection labels belong in the gap. Duplicate labels across a two-sided
+   comparison used to run through its content; the composition title names it. */
+.canvas-board .react-flow__edge-textwrapper { pointer-events:none; }
+
+/* Clamp an unpadded text box: padding on a line-clamped element can expose
+   fragments of a third line beneath the ellipsis. */
+.canvas-board .canvas-node h2 { padding-bottom:0; margin-bottom:16px; }
+.canvas-board .node-points li { display:block; overflow:visible; padding:12px 0; }
+.canvas-board .point-text { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; }
+.canvas-board .is-compact h2 { padding-bottom:0; margin-bottom:8px; }

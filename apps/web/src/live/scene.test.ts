@@ -80,6 +80,16 @@ describe('speech-driven canvas', () => {
     expect(next.boardIds).toHaveLength(2);
     expect(getComposition(next)).toHaveLength(2);
   });
+  it('replaces provisional local material with its refinement instead of duplicating it', () => {
+    const p=prepared();
+    let next=applyLiveScene({...createCanvasState(p),live:true},scene(p),'instant');
+    expect(next.provisionalIds).toHaveLength(1);
+    const refined=scene(p);refined.concepts[0].title='A refined mechanism';
+    next=applyLiveScene(next,refined,'refined');
+    expect(getComposition(next)).toHaveLength(1);
+    expect(next.provisionalIds).toEqual([]);
+    expect(next.project.concepts.filter(c=>c.id.startsWith('live-'))).toHaveLength(1);
+  });
   it('rejects mismatched documents and fabricated quotes', () => {
     const p = prepared(); const initial = createCanvasState(p);
     expect(() => applyLiveScene(initial, { ...scene(p), source: { ...p.source, sha256: 'a'.repeat(64) } })).toThrow('another document');

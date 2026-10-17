@@ -1,0 +1,27 @@
+{
+  "provider": "held fixture responses, no real Groq",
+  "firstLocalVisualMsIncludingInput": 144,
+  "checks": [
+    "visual visible before first AI response",
+    "second and third explanations update during pending generation",
+    "only latest pending explanation sent",
+    "no concatenated duplicate windows",
+    "late old result cannot replace latest board",
+    "refinement replaces provisional visuals without duplicates",
+    "content and provenance do not overlap",
+    "64-character titles and three 180-character details stay in separate layout regions",
+    "no browser runtime errors"
+  ],
+  "geometry": [
+    {
+      "title": "Slides lock speakers into a fixed order",
+      "noFooterOverlap": true,
+      "inside": true
+    },
+    {
+      "title": "The speech decides what the audience sees",
+      "noFooterOverlap": true,
+      "inside": true
+    }
+  ]
+}

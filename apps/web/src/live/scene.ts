@@ -5,7 +5,7 @@ import { parseCanvasProject } from '../canvas/manifest';
 
 // Keep a bounded history on one canvas. A fresh explanation adds visual
 // elements; it never advances a slide index or replaces the knowledge base.
-export function applyLiveScene(state: CanvasState, incoming: CanvasProject): CanvasState {
+export function applyLiveScene(state: CanvasState, incoming: CanvasProject, phase?: 'instant' | 'refined'): CanvasState {
   const scene = parseCanvasProject(incoming);
   const pages = state.project.knowledgeBase?.pages;
   if (!pages || scene.source.sha256 !== state.project.source.sha256) throw new Error('This visual belongs to another document.');
@@ -24,6 +24,16 @@ export function applyLiveScene(state: CanvasState, incoming: CanvasProject): Can
   }
   for (const r of scene.relationships) {
     if (!r.sources.length || r.sources.some(ref => pages.find(p => p.page === ref.page)?.text.slice(ref.start, ref.end) !== ref.quote)) throw new Error('A connection has no matching source evidence.');
+  }
+  // The local response is provisional: a newer source match or its AI refinement
+  // replaces it, rather than adding a duplicate explanation to the board.
+  if (phase && state.provisionalIds?.length) {
+    const drop = new Set(state.provisionalIds);
+    state = {...state,project:{...state.project,concepts:state.project.concepts.filter(c=>!drop.has(c.id)),
+      relationships:state.project.relationships.filter(r=>!drop.has(r.from)&&!drop.has(r.to))},
+      introduced:state.introduced.filter(id=>!drop.has(id)),boardIds:state.boardIds?.filter(id=>!drop.has(id)),
+      revealed:Object.fromEntries(Object.entries(state.revealed).filter(([id])=>!drop.has(id))),
+      focusId:null,pair:null,activeRelationshipId:null,provisionalIds:[]};
   }
   // Content-addressed IDs reuse exact repeated explanations and preserve their anchors.
   let hash = 2166136261;
@@ -80,5 +90,5 @@ export function applyLiveScene(state: CanvasState, incoming: CanvasProject): Can
   const remaining = Math.max(0, 3 - current.length);
   const boardIds = next.pair ? [...next.pair] : [...(remaining ? prior.slice(-remaining) : []), ...current].slice(-3);
   for (const c of concepts) next.revealed[c.id] = c.details.map(d => d.id);
-  return { ...next, boardIds, revision: next.revision + 1 };
+  return { ...next, boardIds, provisionalIds: phase === 'instant' ? [...newIds] : [], revision: next.revision + 1 };
 }

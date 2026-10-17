@@ -13,12 +13,12 @@ with sync_playwright() as p:
     window.Worker=class {
       constructor(url,options) {
         if (!String(url).includes('speech.worker')) return new NativeWorker(url,options);
-        this.disposed=false;
+        this.disposed=false;this.turn=0;
       }
       postMessage(message) {
         setTimeout(()=> { if(!this.disposed) this.onmessage?.({data:message.type==='init-speech'
           ? {id:message.id,type:'ready'}
-          : {id:message.id,type:'transcript',text:'Explain the process used to turn speech into a canvas.',ms:1}}); },30);
+          : {id:message.id,type:'transcript',text:(this.turn++%2===0 ? 'Explain the process used to turn speech into a canvas.' : 'Please compare fixed slides with a speech-directed canvas.'),ms:1}}); },30);
       }
       terminate(){this.disposed=true;}
     };
@@ -39,6 +39,13 @@ with sync_playwright() as p:
     page.get_by_role('button',name='Start listening',exact=True).click()
     expect(page.locator('.live-status')).to_contain_text('Canvas updated',timeout=20000)
     expect(page.locator('.canvas-node.is-focused h2')).to_have_text('Four steps')
+    expect(page.locator('.follow-canvas')).to_have_attribute('data-view','comparison',timeout=20000)
+    expect(page.get_by_role('button',name='Pause listening',exact=True)).to_have_attribute('aria-pressed','true')
+    # Meter/status/transcript must not occupy the typed input's screen rectangle.
+    assert page.locator('.live-text-input').evaluate('''input=>{
+      const b=input.getBoundingClientRect();return [...document.querySelectorAll('.live-audio-level,.live-model-progress,.live-status,.live-transcript')].every(el=>{const a=el.getBoundingClientRect();return a.right<=b.left || a.left>=b.right || a.bottom<=b.top || a.top>=b.bottom;});
+    }''')
+    page.screenshot(path=str(OUT/'continuous-microphone.png'),full_page=True)
     page.get_by_role('button',name='Pause listening',exact=True).click()
     assert page.evaluate('window.__microphoneTracks.every(t=>t.readyState==="ended")')
     expect(page.locator('.live-status')).to_contain_text('Paused')
@@ -49,6 +56,6 @@ with sync_playwright() as p:
     page.get_by_role('button',name='Pause listening',exact=True).click()
     assert page.evaluate('window.__microphoneTracks.every(t=>t.readyState==="ended")')
     assert not errors,errors
-    result={'asr':'fixture, not real Whisper inference','audio':'Chromium synthetic microphone through real AudioWorklet','checks':['model load gates microphone','microphone PCM -> transcript -> composition -> canvas','pause releases tracks','restart reuses model and resumes composition','audience continues receiving live canvas','audience pause stops microphone','no browser runtime errors']}
+    result={'asr':'fixture, not real Whisper inference','audio':'Chromium synthetic microphone through real AudioWorklet','checks':['model load gates microphone','microphone PCM -> transcript -> composition -> canvas','two spoken topics render while microphone stays active','meter and transcript do not overlap typed input','pause releases tracks','restart reuses model and resumes composition','audience continues receiving live canvas','audience pause stops microphone','no browser runtime errors']}
     (OUT/'microphone-report.json').write_text(json.dumps(result,indent=2));print(json.dumps(result,indent=2))
     browser.close()

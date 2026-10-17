@@ -7,9 +7,10 @@ checks=[]
 def check(ok,label):
     assert ok,label
     checks.append(label)
-def send(page,text):
+def send(page,text,settle=True):
     page.get_by_label('Type an explanation', exact=True).fill(text)
     page.get_by_role('button',name='Compose visual from explanation').click()
+    if settle: expect(page.locator('.live-status .live-spin')).to_have_count(0,timeout=15000)
 def audit(page,label):
     page.add_script_tag(path=str(ROOT/'node_modules/axe-core/axe.min.js'))
     violations=page.evaluate("async()=> (await axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21aa']}})).violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>n.target)}))")
@@ -61,14 +62,15 @@ with sync_playwright() as p:
     expect(page.locator('.live-status')).to_contain_text('No supporting material',timeout=15000)
     expect(page.locator('.follow-canvas')).to_have_attribute('data-view','comparison')
     checks.append('unrelated speech holds current visual')
-    send(page,'A slow request explaining the speech-directed canvas. '+str(time.time_ns()))
+    send(page,'A slow request explaining the speech-directed canvas. '+str(time.time_ns()),settle=False)
+    held_view=page.locator('.follow-canvas').get_attribute('data-view')
     page.get_by_role('button',name='Hold canvas',exact=True).click()
     page.wait_for_timeout(1800)
-    expect(page.locator('.follow-canvas')).to_have_attribute('data-view','comparison')
+    expect(page.locator('.follow-canvas')).to_have_attribute('data-view',held_view)
     expect(page.locator('.live-status')).to_contain_text('Paused')
     checks.append('manual hold suppresses delayed result')
     page.get_by_role('button',name='Audience preview').click()
-    expect(page.locator('.audience-safe-area .follow-canvas')).to_have_attribute('data-view','comparison')
+    expect(page.locator('.audience-safe-area .follow-canvas')).to_have_attribute('data-view',held_view)
     page.wait_for_timeout(500);page.screenshot(path=str(OUT/'audience-720.png'),full_page=True)
     audit(page,'audience')
     page.get_by_role('button',name='Back to studio').click()

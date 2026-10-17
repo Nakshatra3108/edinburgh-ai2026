@@ -42,7 +42,7 @@ function Points({ data }: { data: CanvasNodeData }) {
   const points = (!data.board && candidate.reduce((n, d) => n + d.text.length, 0) > 180) || data.concept.visual.type === 'metric'
     ? [revealed.find(d => d.id === data.highlightedDetailId) ?? revealed.at(-1)].filter((d): d is NonNullable<typeof d> => !!d)
     : candidate;
-  return <ul className="node-points">{points.map(d => <li key={d.id} className={data.highlightedDetailId === d.id ? 'detail-highlighted' : ''}><span className="point-mark" aria-hidden="true"/>{d.text}</li>)}</ul>;
+  return <ul className="node-points">{points.map(d => <li key={d.id} className={data.highlightedDetailId === d.id ? 'detail-highlighted' : ''}><span className="point-mark" aria-hidden="true"/><span className="point-text">{d.text}</span></li>)}</ul>;
 }
 export const ConceptNode = memo(({ data }: NodeProps<FollowNode>) => <NodeShell data={data}><Points data={data}/></NodeShell>);
 export const ProcessNode = memo(({ data }: NodeProps<FollowNode>) => {

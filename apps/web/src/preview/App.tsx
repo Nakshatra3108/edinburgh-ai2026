@@ -21,8 +21,8 @@ export function App() {
   const [held, setHeld] = useState(false); const [lastAction, setLastAction] = useState('Ready');
   const { reducedMotion, system, setExplicit } = useReducedMotion();
   useEffect(()=>()=>retainPdfAssets([]),[]);
-  const live = useLivePresentation(state.project, (scene, utterance) => {
-    setState(applyLiveScene(state, withRelevantFigure(state.project, scene, utterance))); setHeld(false); setLastAction('Live composition');
+  const live = useLivePresentation(state.project, (scene, utterance, phase) => {
+    setState(current => applyLiveScene(current, withRelevantFigure(current.project, scene, utterance), phase)); setHeld(false); setLastAction('Live composition');
   });
   const onAction = useCallback((action: CanvasAction) => {
     live.stop(); setState(s => action.type === 'HOLD' ? s : applyAction({ ...s, boardIds: undefined }, action)); setHeld(action.type === 'HOLD'); setLastAction(action.type);

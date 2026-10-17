@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { CanvasProject } from '../canvas/domain';
+import { instantScene } from './instantScene';
 import { localFigureScene } from './figures';
 import { composeLive } from '../preparation/client';
 import { MicrophoneCapture } from '../audio/capture';
@@ -7,7 +8,7 @@ import { LatestQueue } from '../audio/latest-queue';
 import { deduplicate } from '../audio/pcm';
 import { WorkerClient } from '../workers/rpc';
 
-export function useLivePresentation(project: CanvasProject, onScene: (scene: CanvasProject, utterance: string) => void) {
+export function useLivePresentation(project: CanvasProject, onScene: (scene: CanvasProject, utterance: string, phase?: 'instant' | 'refined') => void) {
   const [listening, setListening] = useState(false);
   const [opening, setOpening] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -26,6 +27,11 @@ export function useLivePresentation(project: CanvasProject, onScene: (scene: Can
   const request = useRef<AbortController | null>(null);
   const epoch = useRef(0);
   const pending = useRef('');
+  const sequence = useRef(0);
+  const currentTopic = useRef('');
+  const refinedTopic = useRef('');
+  const sourceIndex = useRef(project);
+  if (sourceIndex.current.id !== project.id || sourceIndex.current.source.sha256 !== project.source.sha256) sourceIndex.current = project;
   const active = useRef(false);
   const inFlight = useRef(false);
   const latest = useRef({ project, onScene });
@@ -35,6 +41,7 @@ export function useLivePresentation(project: CanvasProject, onScene: (scene: Can
     epoch.current++;
     active.current = false;
     pending.current = ''; previous.current = ''; context.current = '';
+    currentTopic.current = ''; refinedTopic.current = '';
     microphone.current?.stop(); microphone.current = null;
     audioQueue.current?.clear();
     request.current?.abort(); request.current = null;
@@ -48,27 +55,41 @@ export function useLivePresentation(project: CanvasProject, onScene: (scene: Can
     const utterance = text.trim().slice(-2000);
     if (utterance.length < 8 || !latest.current.project.knowledgeBase) return;
     setTranscript(utterance);
-    if (inFlight.current) { pending.current = `${pending.current} ${utterance}`.trim().slice(-2000); return; }
+    const version = ++sequence.current;
     const local = /\b(?:figure|diagram|chart|image|picture)\s*(?:\d+|one|two|three|four|five)\b/i.test(utterance) ? localFigureScene(latest.current.project, utterance) : undefined;
     if (local) {
+      pending.current = ''; currentTopic.current = '';
       try { latest.current.onScene(local, utterance); setError(''); setStatus(`Canvas updated · local source figure · page ${local.assets.find(a => a.id === local.concepts[0].assetIds[0])?.page ?? '—'}`); }
       catch (error) { setError(error instanceof Error ? error.message : 'Could not display the local figure.'); }
       return;
     }
+    let immediate = false;
+    const preview = instantScene(sourceIndex.current, utterance);
+    const topicKey = preview ? `${sourceIndex.current.source.sha256}:${preview.concepts.map(c => c.id).join('|')}` : '';
+    if (currentTopic.current !== topicKey) refinedTopic.current = '';
+    currentTopic.current = topicKey;
+    if (preview) {
+      try { if (refinedTopic.current !== topicKey) latest.current.onScene(preview, utterance, 'instant'); immediate = true; setError(''); setStatus('Canvas updated · source match · AI refining in background'); }
+      catch { /* A failed provenance check must leave the last valid canvas intact. */ }
+    }
+    // Run local retrieval even while Groq is busy. Pending speech is already a
+    // rolling context window: concatenating it duplicates old words and builds lag.
+    if (inFlight.current) { pending.current = utterance; return; }
     inFlight.current = true;
     const turn = epoch.current;
     const ctl = new AbortController(); request.current = ctl;
     const timeout = setTimeout(() => ctl.abort(), 50000);
-    setBusy(true); setError(''); setStatus('Composing a visual from your document…');
+    setBusy(true); setError(''); if (!immediate) setStatus('Composing a visual from your document…');
     try {
       const result = await composeLive(latest.current.project, utterance, ctl.signal);
-      if (epoch.current !== turn || ctl.signal.aborted) return;
+      if (epoch.current !== turn || ctl.signal.aborted || (sequence.current !== version && (!topicKey || currentTopic.current !== topicKey))) return;
       if (result.supported) {
-        latest.current.onScene(result.project, utterance);
+        latest.current.onScene(result.project, utterance, 'refined');
+        refinedTopic.current = topicKey;
         setStatus(`Canvas updated · source pages ${[...new Set(result.project.concepts.flatMap(c => c.sources.map(s => s.page)))].join(', ')}`);
-      } else setStatus('No supporting material found in this document. Keeping the current visual.');
+      } else setStatus(immediate ? 'Canvas updated · source match retained' : 'No supporting material found in this document. Keeping the current visual.');
     } catch (e) {
-      if (epoch.current === turn) {
+      if (epoch.current === turn && sequence.current === version) {
         setError(ctl.signal.aborted ? 'The visual took too long. Try a shorter explanation.' : e instanceof Error ? e.message : 'Could not compose a visual.');
         setStatus('Your last visual is preserved.'); pending.current = '';
       }
@@ -117,7 +138,7 @@ export function useLivePresentation(project: CanvasProject, onScene: (scene: Can
         setTranscribing(false);
         const fresh = deduplicate(previous.current, result.text); previous.current = result.text;
         if (!fresh.trim()) return;
-        context.current = `${context.current} ${fresh}`.trim().split(/\s+/).slice(-75).join(' ');
+        context.current = `${context.current} ${fresh}`.trim().split(/\s+/).slice(-35).join(' ');
         void compose(context.current);
       },
       e => { if (active.current) { stop(); setSpeechPhase('failed'); setError(e instanceof Error ? e.message : 'Transcription failed. Try typed input.'); } },

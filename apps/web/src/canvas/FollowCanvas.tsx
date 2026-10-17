@@ -47,7 +47,7 @@ function CanvasInner({ state, mode = 'studio', reducedMotion = false, onAction, 
   const edges = useMemo<Edge[]>(() => state.project.relationships.filter(r => r.approved && nodes.some(n => n.id === r.from) && nodes.some(n => n.id === r.to)).map(r => ({
     id: r.id, source: r.from, target: r.to, type: 'smoothstep', focusable: false, selectable: false,
     hidden: state.view !== 'overview' && !(state.live && state.boardIds?.includes(r.from) && state.boardIds.includes(r.to)) && r.id !== state.activeRelationshipId,
-    label: state.live && state.boardIds?.includes(r.from) && state.boardIds.includes(r.to) ? r.label : undefined,
+    label: undefined, ariaLabel: r.label,
     className: r.id === state.activeRelationshipId || state.connected.includes(r.id) ? 'edge-active' : 'edge-context',
     style: { strokeWidth: r.id === state.activeRelationshipId ? 4 : 3 },
     labelStyle: { fill: 'var(--text-secondary)', fontSize: 28 },

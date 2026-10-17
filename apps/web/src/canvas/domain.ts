@@ -42,6 +42,7 @@ export type CanvasState = {
   live?: boolean;
   /** Current spoken explanation plus nearby visual context; history remains on the canvas. */
   boardIds?: string[];
+  provisionalIds?: string[];
   view: 'overview' | 'focus' | 'connection' | 'comparison';
   focusId: string | null;
   pair: [string, string] | null;

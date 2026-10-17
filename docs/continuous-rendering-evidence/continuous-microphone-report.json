@@ -1,0 +1,15 @@
+{
+  "asr": "fixture, not real Whisper inference",
+  "audio": "Chromium synthetic microphone through real AudioWorklet",
+  "checks": [
+    "model load gates microphone",
+    "microphone PCM -> transcript -> composition -> canvas",
+    "two spoken topics render while microphone stays active",
+    "meter and transcript do not overlap typed input",
+    "pause releases tracks",
+    "restart reuses model and resumes composition",
+    "audience continues receiving live canvas",
+    "audience pause stops microphone",
+    "no browser runtime errors"
+  ]
+}

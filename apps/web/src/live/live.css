@@ -49,3 +49,12 @@
 .has-explanation .live-transcript { grid-column:1; max-height:42px; margin-top:4px; }
 .has-explanation .live-text-input { grid-column:2; grid-row:2/4; align-self:center; margin-top:8px; }
 .has-explanation .live-error,.has-explanation .live-model-progress,.has-explanation .live-audio-level { grid-column:1/-1; }
+/* Explicit rows prevent the microphone meter/progress text from sharing the
+   typed-input grid area when continuous listening is active. */
+.has-explanation .live-panel-heading { grid-row:1; }
+.has-explanation .live-audio-level { grid-column:1; grid-row:2; }
+.has-explanation .live-model-progress { grid-column:1; grid-row:3; }
+.has-explanation .live-status { grid-row:4; }
+.has-explanation .live-transcript { grid-row:5; }
+.has-explanation .live-text-input { grid-row:2/6; }
+.has-explanation .live-error { grid-row:6; }
