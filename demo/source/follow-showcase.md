@@ -20,7 +20,7 @@ The intended benefit is a presentation that can follow a conversation. The speak
 # From document to explanation
 ## Four stages, one evolving canvas.
 
-FOLLOW connects document preparation, speech recognition, source retrieval and visual composition. These four stages describe the presentation workflow in order.
+FOLLOW connects document preparation, speech recognition, source retrieval and visual composition. The four stages, in order, are: Build knowledge, Transcribe speech, Retrieve sources and Refine visuals.
 
 ### 1. Build the knowledge base
 The presenter uploads a text-based PDF. PDF.js extracts its text locally. The presenter can select pages and correct extraction errors. The complete selected text is retained, and Groq prepares a source-checked topic index. Manual review is optional.
@@ -78,6 +78,9 @@ The remote path uses Groq to interpret the explanation and choose a structured v
 ### Continuous speaking
 The local path remains available while Groq is busy. Only the newest pending explanation is retained, rather than appending duplicate speech windows. A superseded topic response cannot replace a newer matched topic. A relevant refinement replaces its provisional preview instead of adding a duplicate card.
 
+### Provider resilience
+New Groq requests rotate through available configured keys every 5 minutes. In-flight requests keep their selected key. A rate-limited key stays on cooldown; another available key can serve the next attempt. Rotation does not reset account quotas. Local source matching remains available when every remote key is limited.
+
 ### Timing
 The first display does not need to wait for Groq when a supported local match exists. Microphone capture and speech recognition still take time. Fresh AI composition depends on the network, provider latency and account quota.
 
@@ -120,7 +123,7 @@ PDF.js extracts selectable PDF text. Transformers.js runs the local Whisper Tiny
 The Fastify API service sends selected document text and the transcript to Groq. Zod validates structured data. Exact-quote grounding links accepted content to the source. The renderer consumes structured data rather than executing model-generated HTML.
 
 ### Privacy boundaries
-Microphone audio stays on the computer for transcription. Groq receives selected source text and the transcript. The API key stays in the server process. Original PDF figures, when used, are rendered locally rather than sent as image pixels to Groq.
+Microphone audio stays on the computer for transcription. Groq receives selected source text and the transcript. API keys stay in the server process. Original PDF figures, when used, are rendered locally rather than sent as image pixels to Groq.
 
 ### This showcase
 This document contains text only. Its processes, comparisons and quantities can become visuals inside FOLLOW; the PDF itself contains no screenshots, diagrams or embedded images.
@@ -142,7 +145,7 @@ The canvas retains up to 24 introduced concepts in its bounded visual history. O
 Microphone audio is processed in overlapping 3.5-second windows. Local transcription and source matching can proceed while a Groq request is pending. This does not imply zero-latency recognition or instantaneous new AI generation.
 
 ### Current boundaries
-The prototype targets desktop presentation. Text extraction does not perform OCR on scanned pages. Groq requires internet access and available quota. Project state is held in the browser session, so it is not durable project storage. Visuals use supported authored layouts rather than arbitrary AI drawing or generated photography.
+The prototype targets desktop presentation. Text extraction does not perform OCR on scanned pages. Groq requires internet access and available quota; keys in one organization share its overall limits. Project state is held in the browser session, so it is not durable project storage. Visuals use supported authored layouts rather than arbitrary AI drawing or generated photography.
 
 ### The takeaway
 Prepare the knowledge. Explain naturally. Let the canvas follow. FOLLOW makes the presentation itself a demonstration of the idea: the speaker leads, and the software brings the relevant evidence into view.

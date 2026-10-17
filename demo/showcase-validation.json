@@ -58,6 +58,44 @@
         "ms": 10167,
         "error": "PROVIDER_RATE_LIMIT"
       }
-    ]
-  }
+    ],
+    "sourceVersion": "Historical validation of the previous PDF, before the key-rotation amendment. Not rerun against the updated PDF."
+  },
+  "sha256": "c87bcaabdaf125e73a1bb010fe5ca058ed404dca69e63ab181a2c5f9fb3a02b3",
+  "currentRevisionValidation": {
+    "textOnly": true,
+    "pages": 7,
+    "renderInspected": true,
+    "browserImport": "passed",
+    "pdfJsExtraction": "passed",
+    "localSourceOnlyChecks": [
+      {
+        "utterance": "New Groq requests rotate through available configured keys every 5 minutes.",
+        "matchedPages": [
+          4,
+          7
+        ],
+        "validated": true
+      },
+      {
+        "utterance": "The workflow has four stages: build knowledge, transcribe speech, retrieve sources and refine visuals.",
+        "matchedPages": [
+          2,
+          2
+        ],
+        "validated": true
+      },
+      {
+        "utterance": "Fixed slides follow a prewritten order while FOLLOW follows the current explanation.",
+        "matchedPages": [
+          3,
+          3
+        ],
+        "validated": true
+      }
+    ],
+    "spokenScriptWords": 211,
+    "newRemoteInference": "not run; no provider quota consumed"
+  },
+  "localRetrievalSourceVersion": "Historical checks against the previous prepared index; see currentRevisionValidation for updated-PDF checks."
 }

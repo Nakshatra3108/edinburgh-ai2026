@@ -4,6 +4,8 @@ Upload [the text-only showcase PDF](../output/pdf/FOLLOW-Showcase.pdf) through *
 
 The document is ordinary selectable PDF text. It contains no screenshots, diagrams, embedded images, hidden prompts or invented adoption/performance statistics. The application should compose the visuals from the source material.
 
+Use [the timed presentation script](PRESENTATION-SCRIPT.md) for the two-minute pitch, demo cues, typed recovery inputs and judge Q&A.
+
 ## Suggested explanations
 
 Use your own words; these phrases identify the intended source topics clearly:
@@ -21,14 +23,14 @@ Switch back to the workflow after the comparison to demonstrate revisiting a top
 - Page 1: problem, assumption reversal and use cases.
 - Page 2: four-stage workflow and presenter controls.
 - Page 3: fixed slides versus FOLLOW.
-- Page 4: local source retrieval versus remote AI refinement; continuous speaking.
+- Page 4: local source retrieval versus remote AI refinement; continuous speaking and five-minute Groq key rotation.
 - Page 5: exact quotations, source provenance, unsupported speech and human judgment.
 - Page 6: React, TypeScript, Vite, React Flow, PDF.js, Whisper, Transformers.js, Fastify, Zod, Groq and privacy boundaries.
 - Page 7: the 3-element viewport, 24-concept history, 3.5-second speech windows and current prototype limits.
 
 ## Verification
 
-All seven pages were rendered and inspected; every page contains selectable text, no embedded images and no off-page characters. The actual PDF.js extractor retains all seven pages. Real Groq preparation returned source-checked topics. Live remote checks subsequently hit `PROVIDER_RATE_LIMIT`; those checks are not claimed as successful process/comparison/metric generation. Browser upload and immediate local retrieval were checked separately, without more provider calls. See [validation](showcase-validation.json).
+All seven pages were rendered and inspected; every page contains selectable text, no embedded images and no off-page characters. The actual PDF.js extractor retains all seven updated pages. The updated PDF passed browser upload and source-only retrieval checks for workflow, comparison and five-minute key rotation, without new remote inference. Historical real Groq preparation returned source-checked topics for the previous PDF version; its live checks hit `PROVIDER_RATE_LIMIT`. Those historical results are labelled separately and are not claimed as successful live generation against this revision. See [validation](showcase-validation.json).
 
 ## Edit and rebuild
 
