@@ -5,7 +5,7 @@ export function getComposition(state: CanvasState): CompositionItem[] {
   return state.project.concepts.filter(c => c.enabled).flatMap(c => {
     const paired = !!pair?.includes(c.id);
     const expanded = state.view !== 'overview' && (c.id === state.focusId || paired);
-    const home = { id: c.id, concept: c, x: c.position.x, y: c.position.y, width: 1000, height: expanded && c.visual.type !== 'process' ? 800 : 640, expanded };
+    const home = { id: c.id, concept: c, x: c.position.x, y: c.position.y, width: 1000, height: expanded ? 800 : 640, expanded };
     if (!paired) return [home];
     // Detail groups move; explicit ghost anchors preserve their home positions.
     return [{ ...home, id: `${c.id}--home`, expanded: false, home: true },

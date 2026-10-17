@@ -5,7 +5,10 @@ import { fileURLToPath } from "node:url";
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   worker: { format: "es" },
-  optimizeDeps: { exclude: ["@huggingface/transformers"] },
+  optimizeDeps: {
+    include: ["pdfjs-dist"],
+    exclude: ["@huggingface/transformers"],
+  },
   build: {
     target: "es2022",
     rollupOptions: {
@@ -21,5 +24,9 @@ export default defineConfig({
       },
     },
   },
-  server: { port: 5173, strictPort: true },
+  server: {
+    port: 5173,
+    strictPort: true,
+    proxy: { "/api": "http://127.0.0.1:8787" },
+  },
 });

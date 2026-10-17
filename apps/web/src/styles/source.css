@@ -1,0 +1,63 @@
+/* Screen B — Source and preparation. Uses the shared tokens in tokens.css. */
+.source-screen { height: 100dvh; overflow: hidden; display: flex; flex-direction: column; }
+.source-body { flex: 1; min-height: 0; display: grid; grid-template-columns: 252px minmax(0, 1fr) 340px; }
+
+.source-pages { border-right: 1px solid var(--line); background: var(--surface); display: flex; flex-direction: column; min-height: 0; }
+.source-pages-heading { padding: 24px 24px 16px; }
+.source-pages-heading h1 { font-size: 17px; display: flex; align-items: center; gap: 8px; }
+.source-pages-heading h1 span { font-family: var(--font-body); color: var(--text-muted); font-size: 12px; letter-spacing: 0; }
+.source-pages-heading p { color: var(--text-secondary); font-size: 12px; margin-top: 4px; }
+.source-pages ul { list-style: none; margin: 0; padding: 0 12px 16px; overflow-y: auto; display: grid; gap: 4px; }
+.source-page { display: flex; align-items: center; gap: 4px; border-radius: var(--radius-field); padding-left: 10px; }
+.source-page.is-active { background: var(--brand-deep); }
+.source-page input { width: 16px; height: 16px; min-height: 0; margin: 0; accent-color: var(--brand); flex-shrink: 0; }
+.source-page button { flex: 1; justify-content: flex-start; align-items: flex-start; text-align: left; padding: 10px 8px; min-width: 0; }
+.source-page button > svg { color: var(--brand); margin-top: 2px; flex-shrink: 0; }
+.source-page strong { display: block; font-size: 13px; font-weight: 500; }
+.source-page small { display: block; color: var(--text-muted); font-size: 11px; margin-top: 2px; }
+
+.source-preview { min-width: 0; display: flex; flex-direction: column; padding: 0 24px 24px; }
+.source-preview-topline { display: flex; align-items: center; justify-content: space-between; min-height: 64px; gap: 12px; }
+.source-preview-topline strong { font-size: 13px; font-weight: 500; }
+.source-text { flex: 1; overflow-y: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-dialog); padding: 32px; font-size: 15px; line-height: 1.8; color: var(--text-primary); max-width: 760px; white-space: pre-wrap; text-wrap: pretty; }
+.source-edit { flex: 1; display: flex; flex-direction: column; gap: 8px; max-width: 760px; }
+.source-edit textarea { flex: 1; min-height: 240px; margin-top: 0; background: var(--surface); font-size: 14px; }
+
+.source-panel { border-left: 1px solid var(--line); background: var(--surface); padding: 24px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; }
+.density { border: 0; padding: 0; margin: 0; display: grid; gap: 10px; }
+.density legend { color: var(--text-secondary); font-size: 12px; margin-bottom: 8px; padding: 0; }
+.selection-summary { display: grid; gap: 6px; font-size: 12px; color: var(--text-secondary); }
+.selection-summary strong { color: var(--text-primary); font-weight: 600; }
+.server-status { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-secondary); }
+.server-status.is-ready { color: var(--success); }
+.server-status.is-warning { color: var(--warning); }
+.server-status svg { flex-shrink: 0; }
+.prepare-button { min-height: 48px; }
+.privacy-note { font-size: 12px; line-height: 1.6; color: var(--text-secondary); padding: 12px 14px; background: var(--canvas); border-radius: var(--radius-field); margin-top: -8px; }
+
+.prep-progress { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; font-size: 13px; }
+.prep-progress li { display: flex; align-items: center; gap: 10px; color: var(--text-muted); }
+.prep-progress li.is-complete { color: var(--success); }
+.prep-progress li.is-active { color: var(--text-primary); font-weight: 500; }
+.prep-progress li.is-failed { color: var(--danger); }
+.prep-progress svg { flex-shrink: 0; }
+.spin { animation: source-spin 1s linear infinite; }
+@keyframes source-spin { to { transform: rotate(360deg); } }
+
+.prep-done, .prep-failure { display: grid; gap: 12px; font-size: 13px; }
+.prep-done strong { font-weight: 600; }
+.prep-done details { font-size: 12px; color: var(--text-secondary); }
+.prep-done summary { cursor: pointer; }
+.prep-done ul { margin: 8px 0 0; padding-left: 16px; display: grid; gap: 6px; line-height: 1.5; max-height: 220px; overflow-y: auto; }
+.prep-failure .error { display: flex; gap: 8px; align-items: flex-start; }
+.prep-failure .error svg { flex-shrink: 0; margin-top: 3px; }
+
+@media (max-width: 1023px) {
+  .source-screen { height: auto; min-height: 100dvh; overflow: visible; }
+  .source-body { grid-template-columns: 1fr; }
+  .source-pages { border-right: 0; border-bottom: 1px solid var(--line); }
+  .source-pages ul { grid-auto-flow: column; grid-auto-columns: minmax(150px, 1fr); overflow-x: auto; }
+  .source-preview { padding: 0 16px 16px; }
+  .source-text { max-height: 50dvh; padding: 20px; }
+  .source-panel { border-left: 0; border-top: 1px solid var(--line); }
+}

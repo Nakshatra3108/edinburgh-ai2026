@@ -1,27 +1,46 @@
-import { useRef, useState } from 'react';
-import { ArrowRight, FileUp, FolderOpen, Upload, Check, ArrowUpRight } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { ArrowRight, FileUp, FolderOpen, Upload, Check, Play, Focus, GitCompareArrows, Route, MousePointer2 } from 'lucide-react';
 import { Wordmark } from '../preview/Wordmark';
 import { FollowCanvas } from '../canvas/FollowCanvas';
-import { createCanvasState } from '../canvas/applyAction';
+import { applyAction, createCanvasState } from '../canvas/applyAction';
 import { exampleProject } from '../canvas/fixtures/project';
+import { demoProject } from '../preview/demoProject';
+import { matchCuratedSource } from '../pdf/curated';
+import type { ExtractedSource } from '../pdf/extract';
 import { parseCanvasProject } from '../canvas/manifest';
-import type { CanvasProject } from '../canvas/domain';
-const EXAMPLE_STATE = createCanvasState(exampleProject);
-export function StartScreen({ onOpen, reducedMotion }: { onOpen: (project: CanvasProject, illustrative: boolean) => void; reducedMotion: boolean }) {
+import type { CanvasAction, CanvasProject } from '../canvas/domain';
+const INITIAL_PREVIEW = ['capture', 'understand', 'match', 'compose'].reduce((state, detailId) => applyAction(state, { type: 'REVEAL', conceptId: 'pipeline', detailId }), createCanvasState(demoProject));
+const PREVIEW_OPTIONS: {label: string; icon: typeof Focus; action: CanvasAction}[] = [
+  { label: 'The problem', icon: Focus, action: { type: 'FOCUS', conceptId: 'problem' } },
+  { label: 'The process', icon: Route, action: { type: 'REVEAL', conceptId: 'pipeline', detailId: 'capture' } },
+  { label: 'The flip', icon: GitCompareArrows, action: { type: 'COMPARE', leftId: 'problem', rightId: 'reversal' } },
+];
+export function StartScreen({ onOpen, onSource, reducedMotion }: { onOpen: (project: CanvasProject, illustrative: boolean) => void; onSource?: (source: ExtractedSource) => void; reducedMotion: boolean }) {
   const pdfInput = useRef<HTMLInputElement>(null); const importInput = useRef<HTMLInputElement>(null);
+  const pdfJob = useRef<AbortController | null>(null);
+  useEffect(() => () => pdfJob.current?.abort(), []);
   const [dragging, setDragging] = useState(false); const [error, setError] = useState('');
   const [status, setStatus] = useState(''); const [reading, setReading] = useState(false);
+  const [preview, setPreview] = useState(INITIAL_PREVIEW); const [previewOption, setPreviewOption] = useState(1);
   const inspectPdf = async (file?: File) => {
-    if (!file) return; setError(''); setStatus('');
-    if (file.size > 25 * 1024 * 1024) { setError('This PDF is larger than 25 MB. Choose a smaller file.'); return; }
-    if (!file.name.toLowerCase().endsWith('.pdf')) { setError('Choose a PDF file, or use Import project for a JSON manifest.'); return; }
-    setReading(true);
+    if (!file) return;
+    pdfJob.current?.abort();
+    const job = new AbortController(); pdfJob.current = job;
+    setError(''); setStatus(''); setReading(true);
     try {
-      const header = new TextDecoder().decode(await file.slice(0, 5).arrayBuffer());
-      if (header !== '%PDF-') { setError('This file does not contain a PDF header. Choose a valid PDF.'); return; }
-      setStatus(`${file.name} selected. PDF preparation is not connected in Person A’s preview. Open the example or import a prepared project.`);
-    } catch { setError('This file could not be read. Choose it again from a local folder.'); }
-    finally { setReading(false); }
+      setStatus('Reading your PDF on this device…');
+      const { extractPdfFile } = await import('../pdf/extract');
+      const source = await extractPdfFile(file, { signal: job.signal, onProgress: (done, total) => { if (pdfJob.current === job) setStatus(`Reading PDF · ${done} of ${total} pages`); } });
+      if (job.signal.aborted || pdfJob.current !== job) return;
+      if (matchCuratedSource(source, demoProject).ok) {
+        onOpen(demoProject, false);
+      } else if (onSource) {
+        onSource(source);
+      } else {
+        setStatus(`${file.name}: ${source.pageCount} pages read locally${source.emptyPages.length ? ` (${source.emptyPages.length} without selectable text)` : ''}. Groq preparation is not connected yet. You can explore the ready-made demo or import an existing project.`);
+      }
+    } catch (e) { if (!job.signal.aborted && pdfJob.current === job) { setError(e instanceof Error ? e.message : 'This file could not be read. Choose a valid PDF.'); setStatus(''); } }
+    finally { if (pdfJob.current === job) setReading(false); }
   };
   const importProject = async (file?: File) => {
     if (!file) return; setError(''); setStatus(''); setReading(true);
@@ -33,18 +52,20 @@ export function StartScreen({ onOpen, reducedMotion }: { onOpen: (project: Canva
     finally { setReading(false); }
   };
   return <div className="start-screen">
-    <header className="app-header"><Wordmark/><span className="header-caption">Ideas, in your own order.</span><span className="badge">Canvas preview</span></header>
-    <main className="start-main"><div className="start-copy"><h1>Your ideas<br/>set the pace<span className="scarlet-period">.</span></h1><p className="start-intro">One canvas. A story that can go anywhere.<br/>Make room for the way you actually explain.</p>
+    <header className="app-header"><Wordmark/><span className="header-caption">A little less clicking. A lot more explaining.</span><span className="badge">Presentation studio</span></header>
+    <main className="start-main"><div className="start-copy"><h1>Big ideas.<br/>Room to <span className="headline-accent">follow.</span></h1><p className="start-intro">Turn an explanation into a visual conversation. Explore connected ideas, reveal the details, and present on one clear canvas.</p>
+      <div className="start-actions"><button className="primary" onClick={() => onOpen(demoProject, false)}><Play size={18}/>Open demo project<ArrowRight size={18}/></button><button onClick={() => importInput.current?.click()} disabled={reading}><FolderOpen size={18}/>Import project</button></div>
+      <p className="demo-explanation"><Check size={16}/>A ready-made project. No account or API key needed.</p>
+      <ol className="entry-workflow"><li><span>1</span><div><strong>Explore the ideas</strong><p>Start with the whole picture.</p></div></li><li><span>2</span><div><strong>Bring a point into focus</strong><p>Show just what you need.</p></div></li><li><span>3</span><div><strong>Present your way</strong><p>Take any route through the story.</p></div></li></ol>
       <div className={`pdf-drop ${dragging ? 'is-dragging' : ''}`} onDragOver={e => { e.preventDefault(); setDragging(true); }} onDragLeave={() => setDragging(false)} onDrop={e => { e.preventDefault(); setDragging(false); void inspectPdf(e.dataTransfer.files[0]); }}>
-        <FileUp size={28} strokeWidth={1.5}/><div><h2>{dragging ? 'Drop your PDF here' : 'Begin with your source.'}</h2><p>Drop a PDF here · up to 25 MB</p></div><button disabled={reading} onClick={() => pdfInput.current?.click()}><Upload size={16}/>{reading ? 'Reading…' : 'Choose PDF'}</button>
+        <FileUp size={24}/><div><h2>{dragging ? 'Drop your PDF here' : 'Have your own source?'}</h2><p>Read a PDF locally, up to 20 MB. The demo PDF opens directly.</p></div><button disabled={reading} onClick={() => pdfInput.current?.click()}><Upload size={16}/>{reading ? 'Reading…' : 'Choose PDF'}</button>
       </div>
       <input className="sr-only" tabIndex={-1} type="file" accept=".pdf,application/pdf" aria-label="Select source PDF" ref={pdfInput} onChange={e => { void inspectPdf(e.target.files?.[0]); e.target.value = ''; }}/>
       <input className="sr-only" tabIndex={-1} type="file" accept=".json,application/json" aria-label="Import prepared project manifest" ref={importInput} onChange={e => { void importProject(e.target.files?.[0]); e.target.value = ''; }}/>
       {error && <p className="entry-message error" role="alert">{error}</p>}{status && <p className="entry-message notice" role="status">{status}</p>}
-      <div className="start-actions"><button className="primary" onClick={() => onOpen(exampleProject, true)}>Open example canvas<ArrowRight size={18}/></button><button disabled={reading} className="ghost" onClick={() => importInput.current?.click()}><FolderOpen size={18}/>Import project</button></div>
-      <p className="start-footnote"><Check size={14}/>No account or API key needed to explore.</p>
+      <button className="ghost examples-link" onClick={() => onOpen(exampleProject, true)}>Open example canvas<ArrowRight size={14}/></button>
     </div>
-    <div className="start-art"><div className="example-caption"><span>Example canvas</span><ArrowUpRight size={18}/></div><div className="start-canvas"><FollowCanvas state={EXAMPLE_STATE} mode="preview" reducedMotion={reducedMotion}/></div><div className="example-footer"><span>Six ideas. One connected world.</span><span>Illustrative content</span></div></div></main>
-    <footer className="start-footer"><span>Let your explanation lead.</span><span>Person A · visual renderer preview</span></footer>
+    <section className="start-art" aria-label="Interactive canvas preview"><div className="example-caption"><span className="preview-heading"><span className="preview-dot"/>See the story take shape</span><span className="badge">Interactive preview</span></div><div className="start-canvas"><FollowCanvas state={preview} mode="preview" reducedMotion={reducedMotion}/></div><div className="preview-tabs" aria-label="Preview ideas">{PREVIEW_OPTIONS.map((option, i) => <button key={option.label} aria-pressed={previewOption === i} onClick={() => { setPreviewOption(i); setPreview(s => applyAction(s, option.action)); }}><option.icon size={16}/>{option.label}</button>)}</div><div className="example-footer"><span><MousePointer2 size={14}/>Try a different idea above</span><span>Curated content · manual preview</span></div></section></main>
+    <footer className="start-footer"><span>One canvas. More ways to tell your story.</span><span>Local preview · changes are session-only</span></footer>
   </div>;
 }

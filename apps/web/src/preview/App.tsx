@@ -4,10 +4,14 @@ import type { CanvasAction, CanvasProject, CanvasState, Concept } from '../canva
 import { exampleProject } from '../canvas/fixtures/project';
 import { AudienceScreen } from '../screens/AudienceScreen';
 import { StartScreen } from '../screens/StartScreen';
+import { SourceScreen } from '../screens/SourceScreen';
+import { demoProject } from './demoProject';
+import type { ExtractedSource } from '../pdf/extract';
 import { StudioScreen } from '../screens/StudioScreen';
 import { useReducedMotion } from './useReducedMotion';
 export function App() {
-  const [screen, setScreen] = useState<'start' | 'studio' | 'audience'>(() => new URLSearchParams(location.search).get('screen') === 'audience' ? 'audience' : 'start');
+  const [screen, setScreen] = useState<'start' | 'source' | 'studio' | 'audience'>(() => new URLSearchParams(location.search).get('screen') === 'audience' ? 'audience' : 'start');
+  const [source, setSource] = useState<ExtractedSource | null>(null);
   const [state, setState] = useState<CanvasState>(() => createCanvasState(exampleProject));
   const [illustrative, setIllustrative] = useState(true);
   const [held, setHeld] = useState(false); const [lastAction, setLastAction] = useState('Ready');
@@ -27,7 +31,8 @@ export function App() {
     setState(s => ({ ...s, project: { ...s.project, concepts: s.project.concepts.map(c => c.id === id ? { ...c, position } : c) } }));
   }, []);
   const open = (project: CanvasProject, example: boolean) => { setState(createCanvasState(project)); setIllustrative(example); setHeld(false); setScreen('studio'); };
-  if (screen === 'start') return <StartScreen onOpen={open} reducedMotion={reducedMotion}/>;
+  if (screen === 'start') return <StartScreen onOpen={open} onSource={s => { setSource(s); setScreen('source'); }} reducedMotion={reducedMotion}/>;
+  if (screen === 'source' && source) return <SourceScreen source={source} onBack={() => setScreen('start')} onOpenProject={p => open(p, false)} onOpenDemo={() => open(demoProject, false)}/>;
   if (screen === 'audience') return <AudienceScreen state={state} reducedMotion={reducedMotion} onExit={() => setScreen('studio')} contentLabel={illustrative ? 'Illustrative example · manually controlled' : undefined}/>;
   return <StudioScreen state={state} onAction={onAction} onConceptEdit={onConceptEdit} onPositionChange={onPositionChange}
     onReset={() => { setState(s => createCanvasState(s.project)); setHeld(false); setLastAction('Reset'); }}
