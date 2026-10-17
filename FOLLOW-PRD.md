@@ -1,7 +1,7 @@
 # FOLLOW
 ## Product requirements, visual design, and engineering specification
 
-**Version:** 1.0 — implementation proposal
+**Version:** 1.1 — Laya-assisted implementation proposal
 
 **Date:** 17 October 2026
 
@@ -13,7 +13,9 @@
 
 **Primary deliverable:** a polished, speech-directed presentation on one continuous canvas
 
-**AI provider:** Grok for preparation; local models for live speech and matching
+**AI providers:** Grok for preparation; local Whisper for speech; local sentence embeddings for retrieval; self-hosted Laya for typed live decisions, subject to the evaluation gate
+
+**Revision 1.1:** Adds Laya as a bounded decision layer alongside the existing AI stack. This is a documentation update; Laya has not been installed, benchmarked, or integrated into a running FOLLOW application.
 
 > Usually, speakers follow their slides. With FOLLOW, the presentation follows the speaker.
 
@@ -50,7 +52,9 @@ FOLLOW converts source material from a PDF into a reviewed collection of concept
 
 The audience sees **one continuous visual canvas**. There is no slide-page sequence that the speaker must follow. The same source can support different presentations and unexpected questions.
 
-Preparation and performance are separate. Grok proposes the source-grounded content before the talk. During the talk, local speech recognition and semantic matching select from approved content. A deterministic renderer composes the visuals. It does not execute model-generated HTML or invent factual material on stage.
+Preparation and performance are separate. Grok proposes the source-grounded content before the talk. During the talk, local Whisper transcribes speech, sentence embeddings retrieve candidate concepts, and self-hosted Laya proposes a typed topic/action decision over those candidates. A deterministic controller validates the decision and a shared renderer composes the visuals. Neither Laya nor Grok directly executes visual changes. No model-generated HTML or new factual material is invented on stage.
+
+Laya's intended role is a **decision model**, not PDF summarisation, speech recognition, text generation, a fact checker, or a replacement for Grok. Enable its live decisions only after the gate in section 9.5. The existing embeddings-only matcher remains an explicit fallback.
 
 ### 1.2 The reversal
 
@@ -67,12 +71,12 @@ Single-canvas appearance alone does not establish this reversal. The demo must s
 | Presentation form | One persistent canvas, not automatically changing PowerPoint pages |
 | Input | One PDF per project initially |
 | Preparation AI | Grok through a server-side API adapter |
-| Live AI | Local speech recognition and semantic embeddings |
+| Live AI | Local Whisper + semantic retrieval + self-hosted Laya topic/action decisions; deterministic stability and permission gates |
 | Visual quality | A first-class deliverable; polished even in curated mode |
 | Generality | Attempt the general PDF pipeline first; time-box unreliable automation |
 | Fallback | A manually curated manifest for one specific PDF, using the same renderer |
 | Honesty | Distinguish generated/curated content and microphone/typed/replay/manual input |
-| Budget | No paid speech or embedding APIs; Grok consumes the account's available credits and is not assumed universally free |
+| Budget | No paid speech, embedding, or hosted Laya APIs; self-host Laya on the demo laptop. Grok consumes the account's available credits and is not assumed universally free |
 | Platform | Desktop browser first; local demo deployment on one laptop |
 
 ### 1.4 What this release does not promise
@@ -102,6 +106,7 @@ No arbitrary live graphic generation, internet research, automatic fact verifica
 - Override an incorrect decision immediately and prevent stale audio from undoing that choice.
 - Keep presenter controls and transcripts out of the audience window.
 - Complete a rehearsed talk using cached content and local live models without Grok calls during the talk.
+- Compare Laya-assisted decisions against the embeddings-only baseline on the same held-out inputs. Enable Laya control only if its measured quality and latency meet section 9.5; report which engine actually drove the demo.
 
 These are acceptance goals. They are not statements of results already measured.
 
@@ -109,7 +114,7 @@ These are acceptance goals. They are not statements of results already measured.
 
 **P0 — demo release:** the reviewed manifest, polished canvas, concept/process/figure/comparison components, editing essentials, local speech, semantic focus, controlled reveal, one curated PDF package, manual controls, typed rehearsal, audience window, local save/export, and the key failure states.
 
-**P1 — general preparation target:** PDF extraction, Grok generation, validated source references, page crops, general deterministic layout, and regeneration. Start this immediately, but ship the curated content path if it misses the feasibility cutoff. P1 failure must not stop P0.
+**P1 — integration targets:** PDF extraction, Grok generation, validated source references, page crops, general deterministic layout, regeneration, and the local Laya decision adapter with its evaluation gate. Start these during feasibility, but ship curated content and/or embeddings-only control if an integration misses its cutoff. P1 failure must not stop P0. Laya is the intended enhanced engine, not a reason to make a previously working presentation unavailable.
 
 **P2 — later:** OCR for scanned PDFs, automatic figure boundary detection, numerical chart extraction, arbitrary scene generation, multiple documents, remote audience devices, recorded video export, live multi-speaker support, multilingual matching, full text editor undo history, custom themes, and imported PPTX.
 
@@ -125,7 +130,7 @@ Every feature below is assigned one of these priorities. P2 is explicitly outsid
 4. Explain that selected text will be sent to Grok. The action **Prepare canvas with Grok** initiates that transmission.
 5. Generate a bounded structured plan, validate it, and arrange its content on the canvas.
 6. Review source excerpts, correct or remove content, choose figure crops, and approve the project.
-7. Download/warm the local models if necessary. Perform a short microphone and matching check.
+7. Download/warm Whisper, the embedding model, and the selected Laya checkpoint if necessary. Perform microphone, matching, and decision-engine checks. Laya can first run in shadow mode while embeddings control the rehearsal.
 8. Rehearse in suggest mode, then select Auto or remain in Suggest.
 9. Open the audience window, enter fullscreen there, and start listening.
 10. Speak. The canvas selects and composes reviewed material. Manual controls remain available.
@@ -270,13 +275,13 @@ Show **Needs review**, **Reviewed**, **User-authored**, or **Curated** accuratel
 
 **Primary task:** verify audio, models, and matching before going on stage.
 
-Use a large stage preview with a restrained right-hand setup panel. Show actual model states (Not downloaded / Downloading / Ready / Failed), microphone device, input meter, audience-window connection, reduced-motion choice, and the control policy.
+Use a large stage preview with a restrained right-hand setup panel. Show actual model states (Not downloaded / Downloading / Ready / Failed), microphone device, input meter, audience-window connection, reduced-motion choice, and the control policy. Distinguish **Speech: Whisper**, **Retrieval: local embeddings**, and **Decisions: Laya-assisted / Embeddings only**. Laya adds **Service unavailable**, **Warming**, and **Shadow evaluation** states. A responding health endpoint is not enough to call its checkpoint ready: complete a real warm-up prediction.
 
 Controls: **Test microphone**, **Warm up models**, **Open audience window**, **Start rehearsal**, and **Start presentation**. Download buttons display known sizes from actual metadata, not hardcoded marketing estimates.
 
 Rehearsal defaults to **Suggest**. A typed phrase box is a first-class diagnostic control labelled **Typed rehearsal — not microphone input**. The same matching and rendering controller handles typed segments and recognised segments. Capture test observations locally: intended concept, predicted concept, delay, and whether the operator accepted it.
 
-Preflight distinguishes blockers from warnings. Missing Grok credentials do not block a cached approved project. Missing local embeddings blocks semantic Auto but allows manual mode. Missing microphone permission blocks microphone input but allows typed rehearsal and manual presentation.
+Preflight distinguishes blockers from warnings. Missing Grok credentials do not block a cached approved project. Missing local embeddings blocks semantic Auto but allows manual mode. Missing microphone permission blocks microphone input but allows typed rehearsal and manual presentation. Missing, slow, or unevaluated Laya offers an explicit **Use embeddings only** action and keeps Auto gated by that baseline's own rehearsal results. Do not show Laya as active when it is only configured or running in shadow mode.
 
 ### 5.5 Screen E — Live presenter console
 
@@ -289,11 +294,14 @@ Always visible:
 - Current focused concept and a compact topic navigator.
 - Listening / Muted / Recovering status with an actual level meter.
 - Input label: Microphone, Typed, Replay, or Manual.
+- Decision engine label: Laya-assisted, Embeddings only, or Laya shadow. Keep this separate from input and Auto/Suggest/Manual policy.
 - Control policy: Auto, Suggest, or Manual.
 - **Pause follow**, **Overview**, **Previous focus**, and **End**.
 - Last few transcript segments with provisional text visually distinguished from final text.
 
 The candidate panel shows **Likely topic: Architecture** and a non-probabilistic strength label (Strong / Uncertain), plus **Show** in Suggest mode. Numeric cosine scores belong in a collapsible diagnostic panel, not the primary product flow. Do not display them as confidence percentages.
+
+For Laya-assisted candidates, diagnostics may show the proposed topic/action, option distribution, checkpoint revision, decision duration, abstention status, and validator outcome. Label model probabilities as model scores whose local reliability is still being evaluated; do not call them the probability that a canvas change is correct. Laya failures produce a presenter-only **Using embeddings — Laya unavailable/late** notice. Keep these indicators out of the audience view; preserve the existing visual hierarchy and motion rules.
 
 Default transcript panel shows at most three recent utterances and can be collapsed. Automatic scrolling stops while the presenter inspects older text. Transcript corrections update diagnostics but do not retroactively replay old visual actions.
 
@@ -436,6 +444,9 @@ Shortcuts are disabled in text fields and while a modal consumes them. Controls 
 | F19 | OCR, automatic charts, arbitrary diagrams | P2 | Not required for hackathon release |
 | F20 | Cloud collaboration and mobile controller | P2 | Not required for hackathon release |
 | F21 | Video recording and PPTX export | P2 | Project JSON export is the P0 portable artifact |
+| F22 | Self-hosted Laya topic/action adapter | P1 | Accept a compact transcript and bounded approved candidates; return validated typed decisions without generating content or calling a paid service |
+| F23 | Laya shadow evaluation and activation gate | P1 | Compare the same inputs to baseline; log accuracy, holds, regressions, truncation, and latency before enabling Laya-assisted control |
+| F24 | Decision-engine degradation and disclosure | P0 | Missing/late/invalid Laya cannot freeze the stage; the console identifies the actual engine and old results cannot override fallback/manual decisions |
 
 ## 9. Speech, matching, and session behaviour
 
@@ -449,15 +460,17 @@ The single-speaker prototype cannot reliably distinguish the presenter from near
 
 Bound the inference queue to one executing chunk plus the newest pending chunk. Under load, show **Catching up**; do not replay a growing backlog of obsolete topic changes. Preserve a monotonically increasing sequence number and session epoch on every result. Discard results from an old session, prior model revision, muted epoch, or manual override.
 
-### 9.2 Semantic matching
+### 9.2 Semantic retrieval and embeddings-only baseline
 
 Precompute normalized embeddings for each enabled concept's title, summary, aliases, and curated example phrases. Compute embeddings for a rolling recent-speech window of roughly 12–24 words. Use cosine similarity; start with a prototype matcher that aggregates the best two example scores per concept. Compare against a keyword-only baseline in rehearsal.
 
-Select the top concept and inspect its margin over the runner-up. Starting calibration parameters can be top score 0.45, runner-up margin 0.08, and two consecutive eligible matches for a topic change. These values must be calibrated on the actual model, PDF, and paraphrase set. They are not universal confidence levels or probabilities.
+Keep the top three enabled concepts as the retrieval shortlist, plus the currently focused concept if absent. This bounds Laya's input and preserves context for HOLD decisions. If the intended concept is missing from this set, Laya cannot recover it: measure shortlist recall independently from decision accuracy. For the embeddings-only baseline, select the top concept and inspect its margin over the runner-up. Starting calibration parameters can be top score 0.45, runner-up margin 0.08, and two consecutive eligible matches for a topic change. These values must be calibrated on the actual model, PDF, and paraphrase set. They are not universal confidence levels or probabilities.
 
 Apply hysteresis: retaining the active topic needs less evidence than changing to another topic. A match to the active topic can reveal a detail without moving the camera. Silence, generic filler, and out-of-scope statements produce HOLD. Do not default to “next concept” when uncertain.
 
 Detail matching uses approved process-step and evidence labels. For a comparison, both endpoints must be resolved within the recent context. CONNECT only references an approved relationship. No new causal statements or factual text are created during live inference.
+
+In Laya-assisted mode, retrieval proposes candidates and Laya proposes which candidate/action fits the utterance. The controller still applies all of the ID validation, review, stability, manual-override, and motion rules. The embeddings-only baseline bypasses Laya and uses the preceding calibrated logic.
 
 ### 9.3 Independent states
 
@@ -469,6 +482,8 @@ Keep these separate rather than hiding everything in a single `isListening` bool
 - Capture state: `off | requesting | active | muted | unavailable`.
 - Model state per model: `absent | downloading | warming | ready | failed`.
 - Override: `none | manualHold`.
+- Decision engine: `embeddings-only | laya-shadow | laya-assisted`.
+- Laya health: `disabled | unavailable | warming | ready | degraded`.
 
 In Auto, a valid stable candidate commits an action. In Suggest, it updates a candidate preview until the presenter accepts it. In Manual, speech may be disabled; manual actions are authoritative. Pause follow stops automatic decisions while optionally leaving transcription active, with clear status. Mute stops capture and invalidates pending audio; unmute never executes previously buffered speech.
 
@@ -479,6 +494,54 @@ Manual focus invalidates pending decisions, clears candidate history, and enters
 Use `BroadcastChannel` between same-origin tabs/windows on the same browser. The presenter is authoritative. Messages carry project ID, session ID, manifest revision, sequence number, semantic composition, and motion policy. An audience window announces readiness and requests the latest snapshot; it ignores stale sequences and refuses mismatched project revisions.
 
 Send semantic state, not transcript, notes, tokens, or the Grok key. Both windows load approved assets from local storage. Audience refresh requests a fresh snapshot. The presenter shows connection status from heartbeats. A blocked popup yields an explicit **Open audience window** retry; single-window fullscreen is the fallback. Remote devices and cross-origin syncing are P2.
+
+### 9.5 Laya decision layer — intended integration, gated activation
+
+#### Suitability and limits
+
+The verified upstream project is [NandhaKishorM/laya](https://github.com/NandhaKishorM/laya), published by Convai Innovations. It exposes typed decisions rather than generated prose. This makes a bounded live topic/action selector a plausible use. It does not establish that the model understands FOLLOW's content reliably. Upstream documentation explicitly treats domain performance and adoption as things to evaluate. See [staged adoption](https://nandhakishorm.github.io/laya/staged-adoption/) and [benchmarks/limits](https://nandhakishorm.github.io/laya/benchmarks/).
+
+Use local self-hosting; do not confuse the upstream project with similarly named third-party hosted services. No hosted Laya subscription, API key purchase, or cloud transmission is required by this architecture. Downloading weights and running them still consumes storage, RAM, compute, and setup time.
+
+#### Responsibilities across the AI stack
+
+| Component | Owns | Does not own |
+| --- | --- | --- |
+| Grok | Prepares reviewed concepts, relationships, aliases, and visual content from PDF text | Live timing or unrestricted stage execution |
+| Whisper | Converts microphone audio into text | Topic or action selection |
+| Sentence embeddings | Retrieves a small set of relevant approved concepts/details | Definitive intent understanding |
+| Laya | Proposes a topic from supplied options and a bounded visual action from the recent speech | Content generation, truth verification, authorisation, or arbitrary node IDs |
+| Deterministic controller | Validates IDs/evidence, applies hysteresis/hold, respects the presenter, commits visual state | Generating factual claims |
+
+#### Decision procedure
+
+1. After a finalized, deduplicated, nonsilent segment, compute the retrieval shortlist.
+2. Construct a compact state containing the recent utterance, active topic, and short approved descriptions of shortlisted concepts and available details. Never send the whole PDF.
+3. Ask two typed `choice` questions: **topic** (candidate IDs plus `HOLD`) and **intent** (`focus`, `reveal`, `connect`, `compare`, `overview`, `hold`). This is FOLLOW's proposed question design, not a pre-trained FOLLOW skill.
+4. A returned action names only an intent. Resolve detail IDs, relationships, and comparison endpoints using existing approved retrieval and graph constraints. If those parameters are missing or ambiguous, HOLD or suggest; do not fabricate them.
+5. Validate the provider answer against the exact offered label sets and the active project/session revision. Verify all scores are finite and all required telemetry is present.
+6. Apply locally evaluated answer-distribution thresholds and the existing stability rules. A topic of HOLD, an intent of hold, invalid/missing parameters, or an abstention produces no automatic visual change.
+7. In Suggest policy, show the proposal and wait for acceptance. In Auto, commit only after both the Laya activation gate and controller gate have passed. Manual hold always wins.
+
+Use the selected checkpoint's tokenizer and inspected usage to ensure the utterance, instructions, question text, and options fit its actual budget. Start with the typed-decisions checkpoint and a 1024-token total budget; that is its documented default, not permission to send 1024 tokens of source plus additional unlimited options. Keep descriptions concise. Reject any response indicating source/question/option truncation. Do not assume that a valid JSON answer means the model saw the complete input. [Model card](https://huggingface.co/convaiinnovations/laya-typed-decisions)
+
+#### Confidence and rejection
+
+Keep raw `probabilities`, `answer_confidence`, entropy-style `confidence`, and the actual abstention report distinct. The adapter must not treat them as interchangeable. Fit a FOLLOW threshold using labelled rehearsal examples, the chosen checkpoint revision, and the actual candidate counts. A concentrated distribution can still be wrong; never turn a score into a success guarantee. Missing or non-finite confidence is a failed decision, not approval. Do not use `action.act_probability` as authorisation. For this release, prefer `choice` over adding extra ordinal `score` or generic yes/no questions. [Upstream agent reference](https://nandhakishorm.github.io/laya/reference/agent/)
+
+#### Deadline and fallback policy
+
+One inference request may be active; keep at most the newest pending request. The initial adapter deadline is 750 ms after submission, with a measured warm p95 target of 500 ms on the actual combined workload. These are proposed FOLLOW budgets, not published Laya performance claims. Include ASR contention in the measurement.
+
+On timeout, unavailability, invalid output, or truncation, use a decision from the already-validated embeddings baseline only if it independently passes that baseline's gates; otherwise HOLD. Do not ask Grok for an automatic live rescue. Commit at most one action for a segment. A Laya result arriving after a timeout/fallback/manual change is discarded, even when it looks confident. Three consecutive service failures mark Laya degraded and keep it out of the live path until an explicit successful preflight retry. Show the active engine in the console.
+
+#### Activation gate
+
+Start with Laya in shadow mode: it receives the same inputs and writes diagnostic proposals, but the baseline/presenter drives the stage. On the held-out phrase set, compare baseline and Laya-assisted final decisions, not only raw model labels. Include wrong high-confidence choices, distractors, negation, comparisons, option-order variation, missing-shortlist answers, and silence handling.
+
+Activate Laya-assisted Auto only when it meets the existing topic-accuracy target, makes no additional unsafe/wrong scene commits on the fixed acceptance set, demonstrates the supported action intents, and meets the combined latency budget. Prefer a measurable gain in ambiguous/action-intent cases. If it offers no useful gain or creates latency/regressions, keep shadow mode or embeddings-only and record why. Do not add fine-tuning to the six-hour critical path; label a curated acceptance set as curated and keep test phrases separate from cue examples.
+
+The documentation assessment establishes integration feasibility. No real Laya inference, task accuracy, or laptop memory/latency measurement has been performed in this planning update.
 
 ## 10. Technical stack and architecture
 
@@ -501,8 +564,11 @@ Send semantic state, not transcript, notes, tokens, or the Grok key. Both window
 | Local inference | `@huggingface/transformers` in Web Workers | Browser speech recognition and embeddings |
 | Speech candidate | `Xenova/whisper-tiny.en` | Small English model; measure actual device latency first |
 | Embedding candidate | `Xenova/all-MiniLM-L6-v2` | Compact sentence embeddings; use normalized mean pooling as specified by the model |
+| Live decision model | Laya, initial candidate `convaiinnovations/laya-typed-decisions` | Reranks approved topic candidates and selects bounded intents; evaluate on FOLLOW phrases before activation |
+| Laya runtime | Separate Python 3.11 virtual environment, `laya[serve]`, PyTorch | Reference local deployment; pin a tested release and checkpoint revision, choose CPU/MPS/CUDA only after hardware checks |
+| Laya transport | Fastify adapter → loopback `laya-serve` HTTP | Browser stays on the application origin; do not expose the inference server directly |
 | Inference backend | WebGPU when supported/tested; WASM fallback | Detect capability; do not silently promise equal performance |
-| Backend | Fastify + native `fetch` | One small server-side Grok adapter; no Python service required |
+| Backend | Fastify + native `fetch` | Grok preparation adapter plus Laya decision proxy; Python companion is required when using the reference self-hosted Laya path |
 | Validation | Zod + generated JSON Schema | Validate provider output, manifests, imports, requests, and events |
 | Grok endpoint | xAI Responses API | Current provider-recommended integration; see reference R1 |
 | Grok model | `XAI_MODEL` environment configuration; initial candidate `grok-4.7` | Smoke-test account access and structured output; record actual model used |
@@ -514,6 +580,8 @@ Send semantic state, not transcript, notes, tokens, or the Grok key. Both window
 | Deployment | Local Fastify serving Vite production assets | Same origin, no public deployment dependency |
 
 Package versions must be resolved together, checked for compatibility, and locked during implementation. Do not copy unverified “latest” versions into the repository or upgrade during demo freeze. Pin downloaded model revisions after the first working run, record their licenses, and bundle local WASM/model/font paths for the offline demo.
+
+Laya is not assumed to run through the existing Transformers.js worker. The upstream project also provides JavaScript/ONNX options, but converting/validating a browser deployment is outside this reference path. The Python sidecar is a deliberate additional process, with its own dependency lock and checkpoint cache. Preload only the chosen checkpoint, not every available model; measure total RAM and actual inference device with Whisper and embeddings active. If this exceeds the laptop budget, fall back explicitly instead of moving transcript text to a third-party hosted service.
 
 ### 10.2 Component architecture
 
@@ -530,7 +598,13 @@ flowchart LR
     MIC[Microphone] --> ASR[Local Whisper worker]
     ASR --> MATCH[Semantic matcher]
     EMB --> MATCH
-    MATCH --> CTRL[Session controller]
+    MATCH --> SHORT[Bounded approved shortlist]
+    SHORT --> DEC[Fastify decision adapter]
+    DEC --> LAYA[Local Laya service]
+    LAYA --> GATE[Validation and stability gate]
+    MATCH --> BASE[Embeddings-only baseline]
+    BASE --> GATE
+    GATE --> CTRL[Session controller]
     HUMAN[Presenter controls] --> CTRL
     CTRL --> RENDER[Shared canvas renderer]
     CTRL --> CHANNEL[BroadcastChannel]
@@ -554,8 +628,11 @@ apps/
     styles/               # tokens, typography, motion, responsive rules
   api/src/
     routes/               # health, prepare, cancel, status
-    providers/            # xAI adapter
+    providers/            # xAI preparation and Laya decision adapters
     generation/           # schema, prompts, source checks, limits
+    decisions/            # question construction, deadlines, normalization, gating
+services/
+  laya/                   # pinned Python environment, launcher, health/warm-up notes
 packages/
   shared/src/             # schemas, types, event contracts, reducers
 demo/
@@ -564,6 +641,7 @@ demo/
   assets/
   phrases.json            # paraphrases, distractors, expected matches
   replay.json             # disclosed event replay
+  decision-profile.json   # measured Laya/baseline settings; never invented results
 tests/
   unit/
   integration/
@@ -669,6 +747,50 @@ Implement `VisualPayload` as a discriminated runtime schema: process steps must 
 
 Embedding cache keys include project revision, model ID/revision, pooling configuration, and a hash of embedded text. Session state contains focused IDs, revealed IDs, comparison pair, action history of IDs, input/policy, sequence, epoch, and timestamps. Raw audio is not part of the persistent project.
 
+Add an optional `decisionProfile` to a project export: engine, Laya checkpoint/revision, question-template version, fitted threshold-profile ID, and the exact manifest revision it was evaluated against. A profile referencing another revision is not trusted after import or editing. Absence of the profile loads embeddings-only/Suggest, not a false “Laya verified” state. Exporting a profile does not bundle Laya weights or certify the new laptop.
+
+```ts
+type DecisionRequest = {
+  projectId: string;
+  manifestRevision: number;
+  sessionId: string;
+  epoch: number;
+  seq: number;
+  utterance: string;
+  activeConceptId: string | null;
+  candidateIds: string[];      // bounded, enabled IDs from the approved project
+};
+
+type DecisionResult = {
+  projectId: string;
+  manifestRevision: number;
+  sessionId: string;
+  epoch: number;
+  seq: number;
+  engine: 'laya' | 'embeddings';
+  topicId: string | null;      // null is HOLD
+  intent: 'focus' | 'reveal' | 'connect' | 'compare' | 'overview' | 'hold';
+  status: 'accepted' | 'abstained' | 'invalid';
+  evidence: {
+    topic: ChoiceEvidence | null;
+    intent: ChoiceEvidence | null;
+  };
+  similarityScores: Record<string, number> | null;
+  truncated: boolean;
+  checkpointRevision: string | null;
+  elapsedMs: number;
+};
+
+type ChoiceEvidence = {
+  probabilities: Record<string, number>;
+  answerConfidence: number | null;
+  entropyConfidence: number | null;
+  abstention: 'passed' | 'abstained' | 'unevaluated';
+};
+```
+
+This is FOLLOW's normalized response, not the raw Laya wire format and not an executable canvas action. Keep topic and intent evidence separate; accepting one answer does not accept the other. Embeddings-only results use `similarityScores` and null Laya evidence, never a fabricated probability distribution. The controller validates and resolves parameters before constructing `CanvasAction`. Application request IDs and elapsed time are supplied by FOLLOW, not invented by the model.
+
 ### 11.2 API endpoints
 
 | Endpoint | Request / response | Behaviour |
@@ -677,12 +799,16 @@ Embedding cache keys include project revision, model ID/revision, pooling config
 | `POST /api/prepare` | Validated page-text objects, source hash, density; returns `jobId` | Explicit user action; one active generation per local demo server |
 | `GET /api/prepare/:jobId` | Stage, completion/error, validated plan when ready | Poll at a bounded interval; actual stages only |
 | `DELETE /api/prepare/:jobId` | Cancellation result | Abort active upstream request where possible; suppress late results |
+| `PUT /api/decision-project` | Approved manifest subset and revision; returns registered revision/hash | Keep one bounded local live-project registry; no Grok call; invalidate old decision profiles on edit |
+| `POST /api/decide` | `DecisionRequest` → `DecisionResult` or typed failure | Build questions from registered approved content, proxy to local Laya, validate and enforce deadline; never accept arbitrary upstream URLs |
 
 Initial PDF limit: 20 MB and 20 selected pages, with a maximum 80,000 extracted characters in one preparation job. Treat these as prototype limits, not the Grok model's context limits. Explain truncation and page selection; never silently discard middle pages. Initial generated plan limit: eight concepts, five details each, twelve relationships.
 
 Use a 90-second provider deadline and a visible timeout recovery state. Retry transport/429/5xx failures at most once within the job deadline when instructed by the adapter policy; do not retry authentication or exhausted-credit errors. A schema/content repair may use one separate bounded repair request. Every retry/repair is recorded and can consume credits. Duplicate submissions reuse the active local job where safe. Cancellation cannot promise refund or termination of provider billing.
 
 Error envelope: `{ code, message, retryable, requestId }`. Codes include `INVALID_SOURCE`, `SOURCE_TOO_LARGE`, `PROVIDER_AUTH`, `PROVIDER_QUOTA`, `PROVIDER_RATE_LIMIT`, `PREP_TIMEOUT`, `INVALID_PLAN`, and `CANCELLED`. Never return provider stack traces or credentials to the browser.
+
+Decision errors additionally include `LAYA_UNAVAILABLE`, `LAYA_TIMEOUT`, `LAYA_INVALID_OUTPUT`, `LAYA_TRUNCATED`, `LAYA_NOT_EVALUATED`, and `STALE_REVISION`. The health response reports Laya reachability, warm-up completion, and engine availability without claiming task accuracy. Use no automatic per-segment retry: a retry can create stale actions and contention. The controller applies section 9.5's baseline-or-HOLD policy. The Python service is reached only through the configured loopback URL and is never the audience-window transport.
 
 ### 11.3 Grok adapter
 
@@ -723,9 +849,69 @@ WEB_ORIGIN=http://localhost:5173
 PREP_TIMEOUT_MS=90000
 MAX_SOURCE_CHARS=80000
 MAX_PREP_JOBS_PER_SESSION=3
+FOLLOW_DECISION_ENGINE=laya-shadow   # promote to laya-assisted only after the gate
+LAYA_BASE_URL=http://127.0.0.1:8000
+LAYA_MODEL=typed-decisions           # application adapter's explicit model field
+LAYA_DECISION_TIMEOUT_MS=750
+LAYA_THRESHOLD_PROFILE=             # fitted local profile; blank means not approved
+# Python sidecar environment (separate process):
+LAYA_HOST=127.0.0.1
+LAYA_PORT=8000
+LAYA_PRELOAD=1
+LAYA_MODELS=typed-decisions
+LAYA_DEFAULT_MODEL=typed-decisions
+LAYA_MAX_LOADED=1
+LAYA_JEV_STRICT=0
 ```
 
 Provide `.env.example` with blank credentials and ignore real environment files. Frontend configuration contains only nonsecret asset paths and feature flags. Do not ask anyone to paste API keys into the presentation or a chat transcript.
+
+### 11.5 Laya service setup and request contract
+
+Install `laya[serve]` into `services/laya/.venv` using Python 3.11, record the resolved release and dependencies, and start `laya-serve` with the sidecar environment above. Do not run an unpinned install during the pitch. The service's documented routes are `GET /health` and `POST /v1/systemone`. Verify a warm prediction in addition to health and check which checkpoint/device actually answered. The assessed upstream revision was `ca5045a3f1fac06fc6daa5cf3371110f322f5255`; it is a research reference, not a claim that those dependencies are installed. [Upstream HTTP API](https://nandhakishorm.github.io/laya/http-api/)
+
+Example FOLLOW-generated payload, using illustrative concepts rather than a supplied PDF:
+
+```json
+{
+  "model": "typed-decisions",
+  "max_len": 1024,
+  "head_max_len": 256,
+  "state": {
+    "utterance": "Unlike fixed slides, the visuals adapt to what I am explaining.",
+    "active_topic": "problem",
+    "context": "The presenter is explaining a reviewed document about FOLLOW."
+  },
+  "questions": {
+    "topic": {
+      "type": "choice",
+      "instructions": "Select the main topic expressed in the utterance, or HOLD if none fits.",
+      "criteria": {
+        "problem": "The constraints of fixed presentation sequences.",
+        "canvas": "A presentation canvas that follows the speaker.",
+        "architecture": "Components and data flow inside FOLLOW.",
+        "HOLD": "No supplied topic fits, or the utterance is too ambiguous."
+      }
+    },
+    "intent": {
+      "type": "choice",
+      "instructions": "Which approved visual interaction best supports this utterance?",
+      "criteria": {
+        "focus": "Explain one concept.",
+        "reveal": "Explain a supporting detail or process step.",
+        "connect": "Explain a relationship between approved concepts.",
+        "compare": "Contrast two approved concepts.",
+        "overview": "Explicitly request the overall map.",
+        "hold": "No supported visual change is warranted."
+      }
+    }
+  }
+}
+```
+
+Replace the illustrative criteria with the registered project's bounded candidates. The payload does not guarantee a correct prediction or define a pretrained presentation capability. Decode `answers.topic` and `answers.intent`, validate exact labels and telemetry, then attach FOLLOW's request/version metadata. The server's `max_len` and option budget are not interchangeable. Inspect truncation/option diagnostics rather than silently cutting instructions or dropping HOLD. Use only `choice` questions in this initial adapter. A fitted threshold can be applied in FOLLOW's gate; do not invent an arbitrary universal threshold to fill the configuration.
+
+Do not expose the service's default public bind address on the demo network. `laya-client` is an HTTP client and should not be confused with `laya-ts`, which is a different direct JavaScript inference path. The chosen design uses Fastify's `fetch` and a Python sidecar, so neither package is needed to bridge the two services.
 
 ## 12. Grok preparation and source grounding
 
@@ -765,6 +951,8 @@ Autosave valid edits locally after 500 ms idle, with explicit save errors. A gen
 
 PDF bytes, page text, crops, approved manifests, and revisions are stored in local IndexedDB. Grok preparation transmits only the selected page text and necessary project settings to the server/provider. Raw audio and live transcripts are not transmitted to Grok. API job bodies/results are held in memory, bounded, and discarded after completion/cancellation with a short expiration; no production database is required.
 
+With Laya enabled, the browser sends a bounded recent transcript and approved candidate identifiers to the local Fastify process; that process supplies compact candidate descriptions to the local Python service. This remains on the laptop in the reference deployment. Keep decision payloads in memory and disable body logging. No raw audio is sent to Laya. The offline claim therefore requires both localhost processes, cached Laya weights, and the browser assets—not just a downloaded frontend. Switching Laya to a remote host would change the privacy/network contract and requires an explicit product decision; do not make that switch automatically.
+
 Local transcripts and event logs default to session memory. Opt-in export can retain them, with clear deletion. **Delete project** removes its PDF, text, assets, manifest, embeddings, and session artifacts; shared model caches are a separate setting. Warn when browser storage fails or is unavailable; allow export without pretending a save succeeded.
 
 Portable export is one versioned `.follow.json` bundle containing the project manifest, normalized page text, each referenced asset's MIME type and base64 bytes, and optionally the source PDF bytes. Local IndexedDB keys alone are not portable. On import, validate the bundle and byte limits, rehydrate asset blobs to new local keys, verify the PDF hash when included, and regenerate embeddings if their model/text hashes differ. If the PDF is excluded, presentation still works from bundled content/crops, while full-page source viewing prompts for the matching original PDF. Never export the API key or raw audio. Initial imported/exported bundle limit is 50 MB to keep base64 processing bounded.
@@ -775,6 +963,8 @@ This is not a fully offline preparation system. **Offline presentation** means t
 
 Bind the demo backend to loopback. Use a Vite development proxy or serve built assets from Fastify for one origin. Restrict accepted origins, validate content type and request size, bound jobs, sanitize text, disallow generated executable markup, and allow only local asset references. Do not execute PDF embedded scripts or model-provided code. Logs contain IDs, timings, errors, and usage counts—not raw documents, audio, keys, or full prompts by default.
 
+Bind the Laya sidecar to loopback too. Only the application adapter may construct its questions and resolve its base URL. Validate label sets, numerical ranges, truncation, and revision metadata before control. A Laya-generated HOLD/OVERVIEW proposal does not grant permission to override a user, reveal disabled material, or execute provider-suggested text. Rate-limit local decision requests and bound the inference queue so a stale burst cannot stall the rest of the demo.
+
 Public deployment is a separate decision. An unauthenticated publicly accessible preparation endpoint would expose the team's API budget. Add authentication, quotas, transport security, and deployment-specific secret handling before any public release. This PRD does not authorise deploying the app.
 
 ### 13.3 Cost controls
@@ -783,13 +973,15 @@ The user selected Grok and may have promotional credits. Do not label the API fr
 
 Keep usage counters and model information in diagnostics. Estimate cost only from observed token usage and verified current rates; do not invent a dollar budget from absent account information. No hosted vector database, paid STT, or paid embedding API is required.
 
+The selected self-hosted Laya path has no metered hosted API call in this architecture; it does add installation time, model downloads, memory, and compute. Grok remains the only planned external inference service. No assumption is made that a similarly named hosted Laya website is the official service or offers unlimited free calls.
+
 ## 14. Curated-PDF fallback
 
 ### 14.1 What is authored
 
 The team may manually prepare concept text, source references, visual types, figure crops, positions, relationships, and varied speech examples for one actual PDF. Store this as the same versioned `Project` schema used by the general pipeline.
 
-The live core remains real: microphone capture, transcription, semantic matching, stability rules, action controller, composition, audience sync, and manual override. Preserve non-sequential behaviour; a curated manifest must not reduce the demo to a hidden timer or one exact script.
+The live core remains real: microphone capture, transcription, semantic matching, Laya-assisted decisions when activated, stability rules, action controller, composition, audience sync, and manual override. Laya can operate on a curated manifest because it receives approved candidates, not an assumed universal PDF interpretation. Preserve non-sequential behaviour; a curated manifest must not reduce the demo to a hidden timer or one exact script.
 
 ### 14.2 Fallback ladder
 
@@ -803,9 +995,11 @@ The live core remains real: microphone capture, transcription, semantic matching
 
 Do not silently move between these levels during a pitch. Keep source mode separate from input mode. The presenter console always shows both; introduce the demonstrated capability accurately.
 
+Decision engine is an additional independent axis. At any level, show whether Laya-assisted, Laya-shadow, or embeddings-only actually ran. A typed-rehearsal example cannot be described as a microphone test, and a configured or shadow-only Laya cannot be described as controlling the canvas.
+
 ### 14.3 Trigger for using it
 
-Attempt general extraction and one real Grok plan in the first feasibility phase. If generation/grounding is not dependable by the agreed cutoff, freeze the shared schema and curate the real demo PDF. If microphone latency is unacceptable on the laptop, try the smaller/local backend configuration within the next bounded check; otherwise use a disclosed input fallback. UI work continues against a validated fixture throughout.
+Attempt general extraction and one real Grok plan in the first feasibility phase. Start the Laya sidecar and a small decision smoke test in parallel with the existing live-AI feasibility work, then run shadow comparisons against the baseline. If generation/grounding is not dependable by the agreed cutoff, freeze the shared schema and curate the real demo PDF. If microphone latency is unacceptable on the laptop, try the smaller/local backend configuration within the next bounded check; otherwise use a disclosed input fallback. If Laya adds regressions or misses its budget, continue with the validated baseline and disclose the engine. UI work continues against a validated fixture throughout.
 
 ## 15. Performance and testing
 
@@ -818,13 +1012,14 @@ These are release targets to measure on the demo laptop, not guarantees:
 | Manual visual-control response | ≤100 ms before any intentional transition |
 | Automatic composition transition | 280 ms; no queued stale moves |
 | Local semantic matching after final transcript | ≤300 ms for the small project |
+| Laya-assisted decision overhead | Warm p95 target ≤500 ms; discard at the proposed 750 ms adapter deadline |
 | Speech-to-visual response | Aim ≤3 seconds after a meaningful phrase ends; if sustained >5 seconds, use Suggest and investigate |
 | Stage rendering | Aim 60 fps; degrade safely on the target machine without unreadable text |
 | Cached project opening | ≤2 seconds excluding model warm-up |
 | Grok preparation | Bounded by the 90-second job deadline; show actual stage |
 | Audience event delivery | Aim <250 ms locally; resync after refresh |
 
-Warm models before the pitch. Run inference in workers. Use quantized model weights where supported and verify accuracy against the phrase set. Keep one ASR instance and one embedding instance; do not create duplicates for the audience window. A browser's background-tab throttling must be tested in the actual two-window setup. Keep the presenter window active on the laptop while the audience window is projected.
+Warm models before the pitch. Run browser inference in workers and Laya in its own local process. Use quantized model weights where supported by each runtime and verify accuracy against the phrase set; do not assume the Python checkpoint shares the browser model's quantisation options. Keep one ASR instance, one embedding instance, and one selected resident Laya checkpoint; the audience window creates no model instances. Measure latency and peak memory while all three are active, since a standalone model benchmark does not establish the whole system's performance. A browser's background-tab throttling must be tested in the actual two-window setup. Keep the presenter window active on the laptop while the audience window is projected.
 
 ### 15.2 Meaningful automated tests
 
@@ -835,6 +1030,9 @@ Warm models before the pitch. Run inference in workers. Use quantized model weig
 - Renderer: focus/reveal/compare/overview preserve source content, stable anchors, and allowed visible-detail limits.
 - Window sync: late join, audience refresh, stale sequence, revision mismatch, and blocked popup.
 - Persistence: round-trip export/import, reload, quota failure, invalid file, and project deletion.
+- Laya adapter: missing service, warm-up failure, wrong checkpoint/revision, invalid/unoffered labels, unknown IDs, truncated state/options, missing/non-finite score, and an abstention that must not execute.
+- Laya controller: timeout then late success produces no second commit; manual override while inference is pending wins; repeated failures degrade the engine; recovery requires an explicit successful check.
+- Laya/baseline evaluation: identical held-out utterances and final action scoring, shortlist recall, label-order variation, option-count sensitivity, baseline regression, and combined ASR/decision resource use.
 
 Use recorded audio for deterministic pipeline tests and manual live mic checks for actual acoustic conditions. A mocked transcript is not evidence that microphone recognition works.
 
@@ -843,6 +1041,8 @@ Use recorded audio for deterministic pipeline tests and manual live mic checks f
 Prepare at least 24 varied paraphrases across six concepts, six distractor/off-topic statements, three silence intervals, two topic returns, two approved comparisons, and one interruption/manual override. Test a teammate who did not author the phrase examples. Record wrong matches and holds separately.
 
 Provisional gate: at least 85% correct topic selections on the small labelled paraphrase set and no automatic jump during the defined silence intervals. This is a fixture-specific target, not a population accuracy claim. If it fails, calibrate once on a separate rehearsal set and keep Suggest as default. Preserve a held-out set to avoid simply memorising the demonstration phrases.
+
+For Laya activation, add the section 9.5 action-intent and latency gates, plus explicit HOLD cases where the right topic is absent from the shortlist. Record false commits, missed useful changes, and abstention rate separately; a model that always holds is not useful despite never choosing the wrong topic. No inference benchmark or published speed is substituted for these measurements.
 
 ### 15.4 Visual acceptance
 
@@ -861,8 +1061,8 @@ Provisional gate: at least 85% correct topic selections on the small labelled pa
 | --- | --- | --- | --- |
 | A — visual/frontend | Shared canvas, components, camera, stage, motion | `canvas/`, `styles/`, audience screen | Consumes approved manifest + semantic composition |
 | B — preparation | PDF extraction, Grok adapter, grounding, curated source | `pdf/`, API, `generation/`, demo source | Produces validated plan; no canvas implementation |
-| C — live AI | Audio capture, workers, embeddings, semantic actions | `audio/`, `workers/`, `matching/` | Emits versioned transcript/candidate events |
-| D — integration/product | Console, controller, sync, persistence, QA and pitch | `state/`, `persistence/`, presenter/rehearsal, tests | Owns shared schemas with team review |
+| C — live AI | Audio capture, workers, embeddings, Laya setup and candidate decisions | `audio/`, `workers/`, `matching/`, `services/laya/`, API `decisions/` and Laya adapter | Emits versioned transcript/candidate events; owns shadow evaluation with D |
+| D — integration/product | Console, controller, sync, persistence, QA and pitch | `state/`, `persistence/`, presenter/rehearsal, tests | Owns shared schemas with team review; validates all Laya decisions before visual execution |
 
 Everyone works against the same minimal manifest early. Agree IDs, events, and action types before parallel edits. Do not let separate teammates build separate stage renderers. Resolve contract changes in the shared package before changing both sides.
 
@@ -871,8 +1071,8 @@ Everyone works against the same minimal manifest early. Agree IDs, events, and a
 | Window | Outcome |
 | --- | --- |
 | 0:00–0:25 | Freeze concept, stack, manifest/action contracts, actual PDF, and demo laptop. Start downloads. |
-| 0:25–1:15 | A builds the main stage from fixture; B attempts extraction and a real Grok plan; C measures real mic transcription and embeddings; D builds controller and sync skeleton. |
-| 1:15–1:30 | Feasibility gate: decide general vs curated content; record actual mic latency. Keep one working vertical slice. |
+| 0:25–1:15 | A builds the main stage from fixture; B attempts extraction and a real Grok plan; C measures real mic transcription/embeddings and smoke-tests one Laya checkpoint; D builds controller and sync skeleton. |
+| 1:15–1:30 | Feasibility gate: decide general vs curated content and Laya shadow vs assisted vs baseline; record actual mic and combined decision latency. Keep one working vertical slice. |
 | 1:30–3:00 | Integrate speech → matching → controller → stage. Complete visual types, manual hold, studio essentials, and source review. |
 | 3:00–4:00 | Finish audience window, comparison/reveal, persistence, error states, and preflight. Freeze optional features. |
 | 4:00–5:00 | Test held-out phrases, noisy room, projection, offline cached runtime, and recovery. Fix the highest-impact failures. |
@@ -882,7 +1082,7 @@ If less than six hours remain, preserve the live slice, visual quality, controls
 
 ### 16.3 Dependencies to settle immediately
 
-The chosen PDF and its usage rights; the actual laptop/browser and microphone; Grok API access and available credits; model download completion; projector/window arrangement; and the event's actual rubric, required technology, pitch duration, and submission deadline. These are not yet established by this document. Keep event-specific obligations unverified until an official brief is supplied.
+The chosen PDF and its usage rights; the actual laptop/browser and microphone; Grok API access and available credits; model download completion; Laya/PyTorch compatibility and combined memory/latency; projector/window arrangement; and the event's actual rubric, required technology, pitch duration, and submission deadline. These are not yet established by this document. Keep event-specific obligations unverified until an official brief is supplied.
 
 ## 17. Demo, risks, and release checklist
 
@@ -900,6 +1100,8 @@ For a three-minute reference pitch, allow 20 seconds for the problem, 90 seconds
 | Incorrect PDF summaries | Source excerpts, validation, review, and bounded content | Curated manifest |
 | Noisy room / slow ASR | Close mic, warm models, bounded queue, held-out rehearsal | Suggest, typed, manual, then replay as disclosed |
 | Similar topics cause flicker | Margin, hysteresis, cooldown, limited action vocabulary | Manual hold |
+| Laya zero-shot decisions are inaccurate or confidently wrong | Shadow evaluation, bounded labels with HOLD, held-out calibration, deterministic validation | Embeddings-only or Suggest; record the actual engine |
+| Laya setup or resource contention threatens the build | One checkpoint, loopback service, combined-workload feasibility cutoff | Keep the working baseline; do not add fine-tuning or a new hosted service |
 | Runtime cannot handle two models | Worker scheduling, small quantized models, actual laptop test | Local companion speech adapter only if time permits; otherwise disclose input fallback |
 | API quota/network fails | Prepare/cache before pitch, bounded retries | Existing approved/curated content |
 | Overdesigned unreadable stage | Projector-sized typography, short content budgets, restrained motion | Reduced motion and simpler visual composition |
@@ -912,6 +1114,8 @@ For a three-minute reference pitch, allow 20 seconds for the problem, 90 seconds
 - [ ] Actual PDF supplied; generated or curated preparation mode recorded.
 - [ ] All audience claims can be traced to source or labelled user-authored content.
 - [ ] Local models warmed; microphone path tested rather than only mocked.
+- [ ] Laya is either warmed and acceptance-tested on the combined workload or explicitly marked shadow/disabled with the baseline active.
+- [ ] Laya timeout, late result, truncation, confidence rejection, and manual-override behaviour verified.
 - [ ] Two different topic orders work on the same project.
 - [ ] One relationship/process reveal and one comparison work.
 - [ ] Silence holds; manual override survives late AI results.
@@ -937,6 +1141,9 @@ These primary sources were consulted on 17 October 2026. They support implementa
 - **R5:** [Transformers.js](https://huggingface.co/docs/transformers.js/en/index), [WebGPU](https://huggingface.co/docs/transformers.js/guides/webgpu), and [local asset configuration](https://huggingface.co/docs/transformers.js/custom_usage) — local model execution and asset hosting.
 - **R6:** [React Flow](https://reactflow.dev/learn) — node/edge canvas foundation.
 - **R7:** [BroadcastChannel](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API) — same-origin window communication.
+- **R8:** [Laya upstream repository](https://github.com/NandhaKishorM/laya/tree/ca5045a3f1fac06fc6daa5cf3371110f322f5255) and [official project documentation](https://nandhakishorm.github.io/laya/) — project identity, open implementation, and typed-decision capability. Assessed on 17 October 2026; no model runtime was executed during this documentation update.
+- **R9:** [Laya HTTP API](https://nandhakishorm.github.io/laya/http-api/) — self-hosted service contract and telemetry. [Agent reference](https://nandhakishorm.github.io/laya/reference/agent/) — distinguish choice probabilities, confidence, and caller-side gates.
+- **R10:** [Laya staged adoption](https://nandhakishorm.github.io/laya/staged-adoption/), [benchmarks and limits](https://nandhakishorm.github.io/laya/benchmarks/), and [typed-decisions model card](https://huggingface.co/convaiinnovations/laya-typed-decisions) — basis for the shadow mode, local evaluation gate, and constrained context. Upstream task scores are not FOLLOW's measured accuracy.
 
 ### 18.2 User-requested design skills
 
