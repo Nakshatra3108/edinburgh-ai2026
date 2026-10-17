@@ -92,3 +92,25 @@ test('the real HTTP adapter and pool preserve schema, switch headers, and honour
  assert.equal((await provider(request())).usage.totalTokens,2);
  time=300000;await provider(request());assert.deepEqual(headers,['Bearer A','Bearer B','Bearer B']);
 });
+
+test('an unused third credential remains available and is tried before reporting exhaustion',async()=>{
+ const provider=createRotatingGroqProvider({apiKeys:['gsk-secret-A','gsk-secret-B','gsk-secret-C'],model:'fixture',createProvider:key=>async()=>{
+  if(key!=='gsk-secret-C')throw limited(600000);return result('ok');
+ }});
+ assert.equal(provider.getStatus().availableKeys,3);
+ assert.equal((await provider(request())).content,'ok');
+ const status=provider.getStatus();
+ assert.equal(status.coolingKeys,2);assert.equal(status.availableKeys,1);
+ assert.deepEqual(status.keys.map(k=>k.attempts),[1,1,1]);
+ assert.deepEqual(status.keys.map(k=>k.successes),[0,0,1]);
+ assert.ok(!JSON.stringify(status).includes('gsk-secret'));
+});
+test('health reports exactly the startup credential count without touching or revealing keys',async()=>{
+ const config=loadConfig({GROQ_API_KEY:'secret-primary',GROQ_API_KEY_2:'secret-second',GROQ_API_KEY_3:'secret-third',GROQ_API_KEY_4:'secret-fourth'},'/nonexistent');
+ const app=buildServer({config,logger:false});
+ const health=(await app.inject({url:'/api/health'})).json();
+ assert.equal(health.credentialPool.configuredKeys,4);assert.equal(health.credentialPool.availableKeys,4);
+ assert.equal(health.credentialPool.rotationSeconds,300);
+ assert.ok(health.credentialPool.keys.every((k:{attempts:number})=>k.attempts===0));
+ assert.ok(!JSON.stringify(health).includes('secret-'));await app.close();
+});

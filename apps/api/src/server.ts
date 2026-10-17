@@ -36,7 +36,8 @@ export type ServerDeps = { config: Config; provider?: CompletionProvider; logger
 export function buildServer({ config, provider, logger = true }: ServerDeps): FastifyInstance {
   const app = Fastify({ logger, bodyLimit: BODY_LIMIT, genReqId: () => randomUUID() });
   const configured = Boolean(provider || config.groqApiKeys.length);
-  const completion = provider ?? (config.groqApiKeys.length ? createRotatingGroqProvider({ apiKeys: config.groqApiKeys, model: config.groqModel }) : null);
+  const pool = !provider && config.groqApiKeys.length ? createRotatingGroqProvider({ apiKeys: config.groqApiKeys, model: config.groqModel }) : null;
+  const completion = provider ?? pool;
   let liveBusy = false;
   const liveCache = new Map<string, unknown>();
   const jobs = configured
@@ -77,6 +78,7 @@ export function buildServer({ config, provider, logger = true }: ServerDeps): Fa
     provider: 'groq',
     model: config.groqModel,
     configured,
+    credentialPool: pool?.getStatus() ?? null,
     promptVersion: PROMPT_VERSION,
     schemaVersion: PLAN_SCHEMA_VERSION,
     limits: { maxSelectedPages: MAX_SELECTED_PAGES, maxSourceChars: config.maxSourceChars, timeoutMs: config.prepTimeoutMs, maxJobsPerSession: config.maxPrepJobsPerSession, plan: PLAN_LIMITS },
