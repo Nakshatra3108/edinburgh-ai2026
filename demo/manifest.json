@@ -1,0 +1,748 @@
+{
+  "schemaVersion": 1,
+  "id": "follow-demo",
+  "revision": 1,
+  "title": "FOLLOW: a presentation that listens",
+  "source": {
+    "name": "follow-demo.pdf",
+    "sha256": "58306471b6858e348259fadf43b1c95c9976cfdabfbd0d899ec28b3db16d4a47",
+    "pages": 4
+  },
+  "preparation": {
+    "mode": "curated",
+    "model": null,
+    "promptVersion": "curated-follow-demo-v1",
+    "preparedAt": "2026-10-17T12:30:00Z"
+  },
+  "concepts": [
+    {
+      "assetIds": [],
+      "enabled": true,
+      "review": "reviewed",
+      "id": "problem",
+      "title": "Slides lock speakers into a fixed order",
+      "summary": "A slide deck is a sequence decided before the talk begins, so the speaker follows it even when the room wants to go somewhere else.",
+      "position": {
+        "x": 80,
+        "y": 120
+      },
+      "visual": {
+        "type": "concept"
+      },
+      "aliases": [
+        "the problem",
+        "fixed order",
+        "slide deck",
+        "the clicker",
+        "searching back through the deck"
+      ],
+      "speechExamples": [
+        "So here's the problem with slides: the order is locked in before you even start talking.",
+        "Someone asks about an earlier point and you end up clicking backwards through the whole deck.",
+        "The moment your explanation wanders off in a different direction, the slides are out of step with what you are saying.",
+        "Every time you stop to fiddle with the clicker, the audience loses the thread.",
+        "It ends up looking like the speaker is serving the slides instead of the other way round.",
+        "Think about how awkward it is when the conversation wants to go somewhere your deck doesn't."
+      ],
+      "sources": [
+        {
+          "page": 1,
+          "quote": "Slides lock speakers into a fixed order",
+          "start": 245,
+          "end": 284
+        },
+        {
+          "page": 1,
+          "quote": "A slide deck is a sequence decided before the talk begins.",
+          "start": 285,
+          "end": 343
+        },
+        {
+          "page": 1,
+          "quote": "The audience sees the speaker serving the slides, instead of the slides serving the speaker.",
+          "start": 830,
+          "end": 922
+        }
+      ],
+      "details": [
+        {
+          "id": "order",
+          "text": "The order is decided before the talk begins.",
+          "sources": [
+            {
+              "page": 1,
+              "quote": "A slide deck is a sequence decided before the talk begins.",
+              "start": 285,
+              "end": 343
+            },
+            {
+              "page": 3,
+              "quote": "Decided before the talk",
+              "start": 607,
+              "end": 630
+            }
+          ],
+          "origin": "source"
+        },
+        {
+          "id": "questions",
+          "text": "A question about an earlier point means searching back through the deck.",
+          "sources": [
+            {
+              "page": 1,
+              "quote": "When someone asks a question about an earlier point, the speaker has to search backwards through the deck.",
+              "start": 521,
+              "end": 627
+            },
+            {
+              "page": 3,
+              "quote": "Search back through the deck",
+              "start": 777,
+              "end": 805
+            }
+          ],
+          "origin": "source"
+        },
+        {
+          "id": "clicker",
+          "text": "Stopping to operate the clicker loses the audience.",
+          "sources": [
+            {
+              "page": 1,
+              "quote": "When the speaker stops to operate the clicker, the audience loses the thread of the argument.",
+              "start": 736,
+              "end": 829
+            },
+            {
+              "page": 3,
+              "quote": "Clicker or keyboard",
+              "start": 705,
+              "end": 724
+            }
+          ],
+          "origin": "source"
+        },
+        {
+          "id": "direction",
+          "text": "When the explanation changes direction, the slides fall out of step.",
+          "sources": [
+            {
+              "page": 1,
+              "quote": "When the explanation naturally takes a different direction, the slides fall out of step with the words.",
+              "start": 630,
+              "end": 733
+            }
+          ],
+          "origin": "source"
+        }
+      ]
+    },
+    {
+      "assetIds": [],
+      "enabled": true,
+      "review": "reviewed",
+      "id": "reversal",
+      "title": "The speech decides what the audience sees",
+      "summary": "FOLLOW removes the slide sequence. The speaker prepares material once, explains it in any order, and the canvas follows the speech.",
+      "position": {
+        "x": 1250,
+        "y": 120
+      },
+      "visual": {
+        "type": "concept"
+      },
+      "aliases": [
+        "the reversal",
+        "flip the script",
+        "speech decides",
+        "no slide sequence",
+        "the presentation follows the speaker"
+      ],
+      "speechExamples": [
+        "What FOLLOW does is flip that around, so the presentation follows me instead of me following it.",
+        "There is no slide order any more; I just explain things in whatever order makes sense.",
+        "You prepare your material once and then you simply talk, and the visuals form around what you say.",
+        "The speech itself decides what the audience gets to see.",
+        "I can answer a question, go back to an earlier idea, or change direction, and the visuals keep up.",
+        "The speaker leads, and the presentation follows."
+      ],
+      "sources": [
+        {
+          "page": 2,
+          "quote": "The speech decides what the audience sees",
+          "start": 56,
+          "end": 97
+        },
+        {
+          "page": 2,
+          "quote": "FOLLOW removes the slide sequence entirely. The speaker prepares source material once, then explains it naturally in any order.",
+          "start": 98,
+          "end": 225
+        },
+        {
+          "page": 1,
+          "quote": "Usually, speakers follow their slides. With FOLLOW, the presentation follows the speaker.",
+          "start": 143,
+          "end": 232
+        },
+        {
+          "page": 4,
+          "quote": "The speaker leads. The presentation follows.",
+          "start": 712,
+          "end": 756
+        }
+      ],
+      "details": [
+        {
+          "id": "order",
+          "text": "The order is decided by the speech, not a slide sequence.",
+          "sources": [
+            {
+              "page": 2,
+              "quote": "FOLLOW removes the slide sequence entirely.",
+              "start": 98,
+              "end": 141
+            },
+            {
+              "page": 3,
+              "quote": "Decided by the speech",
+              "start": 631,
+              "end": 652
+            }
+          ],
+          "origin": "source"
+        },
+        {
+          "id": "questions",
+          "text": "A question returns to the earlier idea with its context.",
+          "sources": [
+            {
+              "page": 3,
+              "quote": "Return to the earlier idea with its context",
+              "start": 806,
+              "end": 849
+            }
+          ],
+          "origin": "source"
+        },
+        {
+          "id": "control",
+          "text": "The speaker's voice is the control, with manual override.",
+          "sources": [
+            {
+              "page": 3,
+              "quote": "The speaker's voice, with manual override",
+              "start": 725,
+              "end": 766
+            }
+          ],
+          "origin": "source"
+        },
+        {
+          "id": "canvas",
+          "text": "Concepts arrive on one continuous canvas.",
+          "sources": [
+            {
+              "page": 2,
+              "quote": "The presentation listens and brings the right concept onto one continuous canvas.",
+              "start": 226,
+              "end": 307
+            }
+          ],
+          "origin": "source"
+        },
+        {
+          "id": "freedom",
+          "text": "Answer questions, revisit ideas and change direction while the visuals keep up.",
+          "sources": [
+            {
+              "page": 4,
+              "quote": "FOLLOW lets the speaker answer questions, revisit ideas and change direction, while the visuals keep up.",
+              "start": 607,
+              "end": 711
+            }
+          ],
+          "origin": "source"
+        }
+      ]
+    },
+    {
+      "assetIds": [],
+      "enabled": true,
+      "review": "reviewed",
+      "id": "pipeline",
+      "title": "Four steps: capture, understand, match, compose",
+      "summary": "Speech is captured, turned into text, matched to a prepared concept and composed on the canvas, continuously while the speaker talks.",
+      "position": {
+        "x": 2420,
+        "y": 120
+      },
+      "visual": {
+        "type": "process",
+        "stepDetailIds": [
+          "capture",
+          "understand",
+          "match",
+          "compose"
+        ]
+      },
+      "aliases": [
+        "how it works",
+        "the pipeline",
+        "four steps",
+        "capture understand match compose"
+      ],
+      "speechExamples": [
+        "Let me walk you through how it actually works, it's four steps.",
+        "First it listens to me through the laptop microphone.",
+        "Then the speech gets turned into text, right here on the device.",
+        "Next it compares the meaning of what I just said with the concepts we prepared from the document.",
+        "And finally it lays out the matching idea, its details and its connections on the canvas.",
+        "All four of those steps keep running the whole time I am talking."
+      ],
+      "sources": [
+        {
+          "page": 2,
+          "quote": "Four steps: capture, understand, match, compose",
+          "start": 525,
+          "end": 572
+        },
+        {
+          "page": 2,
+          "quote": "Figure 1. The FOLLOW pipeline. Steps 1 to 4 run continuously while the speaker talks.",
+          "start": 1007,
+          "end": 1092
+        }
+      ],
+      "details": [
+        {
+          "id": "capture",
+          "text": "Capture: listen to the speaker",
+          "sources": [
+            {
+              "page": 2,
+              "quote": "1. Capture Listen to the speaker",
+              "start": 867,
+              "end": 899
+            },
+            {
+              "page": 2,
+              "quote": "Capture listens to the speaker through the laptop microphone.",
+              "start": 573,
+              "end": 634
+            }
+          ],
+          "origin": "source"
+        },
+        {
+          "id": "understand",
+          "text": "Understand: turn speech into text",
+          "sources": [
+            {
+              "page": 2,
+              "quote": "2. Understand Turn speech into text",
+              "start": 900,
+              "end": 935
+            },
+            {
+              "page": 2,
+              "quote": "Understand turns the speech into text on the device.",
+              "start": 635,
+              "end": 687
+            }
+          ],
+          "origin": "source"
+        },
+        {
+          "id": "match",
+          "text": "Match: find the prepared concept",
+          "sources": [
+            {
+              "page": 2,
+              "quote": "3. Match Find the prepared concept",
+              "start": 936,
+              "end": 970
+            },
+            {
+              "page": 2,
+              "quote": "Match compares the meaning of the latest words with the concepts prepared from the document.",
+              "start": 688,
+              "end": 780
+            }
+          ],
+          "origin": "source"
+        },
+        {
+          "id": "compose",
+          "text": "Compose: arrange it on the canvas",
+          "sources": [
+            {
+              "page": 2,
+              "quote": "4. Compose Arrange it on the canvas",
+              "start": 971,
+              "end": 1006
+            },
+            {
+              "page": 2,
+              "quote": "Compose arranges the matching concept, its details and its connections on the canvas.",
+              "start": 781,
+              "end": 866
+            }
+          ],
+          "origin": "source"
+        }
+      ]
+    },
+    {
+      "assetIds": [],
+      "enabled": true,
+      "review": "reviewed",
+      "id": "matching",
+      "title": "Matching by meaning, and holding when unsure",
+      "summary": "FOLLOW matches meaning rather than exact keywords. When it is not confident it holds the current view, and the speaker can always override it.",
+      "position": {
+        "x": 1250,
+        "y": 1040
+      },
+      "visual": {
+        "type": "concept"
+      },
+      "aliases": [
+        "matching by meaning",
+        "not keywords",
+        "holding when unsure",
+        "manual override",
+        "paraphrase freely"
+      ],
+      "speechExamples": [
+        "It isn't looking for keywords, it's matching on what I actually mean.",
+        "I don't have to recite a script; I can say things in my own words.",
+        "If it is not sure what I am talking about, it just stays where it is rather than guessing.",
+        "Umms, pauses and random asides like this one shouldn't move anything on screen.",
+        "And I'm always in control: one key press and my manual choice wins.",
+        "A late automatic decision can never override something I chose by hand."
+      ],
+      "sources": [
+        {
+          "page": 3,
+          "quote": "Matching by meaning, and holding when unsure",
+          "start": 52,
+          "end": 96
+        },
+        {
+          "page": 3,
+          "quote": "FOLLOW matches meaning rather than exact keywords, so the speaker can paraphrase freely instead of reciting a script.",
+          "start": 97,
+          "end": 214
+        },
+        {
+          "page": 3,
+          "quote": "When the system is not confident, it holds the current view instead of guessing.",
+          "start": 215,
+          "end": 295
+        }
+      ],
+      "details": [
+        {
+          "id": "paraphrase",
+          "text": "Paraphrase freely instead of reciting a script.",
+          "sources": [
+            {
+              "page": 3,
+              "quote": "so the speaker can paraphrase freely instead of reciting a script.",
+              "start": 148,
+              "end": 214
+            }
+          ],
+          "origin": "source"
+        },
+        {
+          "id": "hold",
+          "text": "When not confident, it holds the current view instead of guessing.",
+          "sources": [
+            {
+              "page": 3,
+              "quote": "When the system is not confident, it holds the current view instead of guessing.",
+              "start": 215,
+              "end": 295
+            }
+          ],
+          "origin": "source"
+        },
+        {
+          "id": "silence",
+          "text": "Silence, filler words and off-topic remarks never move the canvas.",
+          "sources": [
+            {
+              "page": 3,
+              "quote": "Silence, filler words and off-topic remarks never move the canvas.",
+              "start": 296,
+              "end": 362
+            }
+          ],
+          "origin": "source"
+        },
+        {
+          "id": "override",
+          "text": "A single key press overrides; a manual choice beats a late automatic one.",
+          "sources": [
+            {
+              "page": 3,
+              "quote": "A single key press overrides the system, and a manual choice always beats a late automatic decision.",
+              "start": 400,
+              "end": 500
+            }
+          ],
+          "origin": "source"
+        }
+      ]
+    },
+    {
+      "assetIds": [],
+      "enabled": true,
+      "review": "reviewed",
+      "id": "comparison",
+      "title": "Fixed slides compared with a speech-directed canvas",
+      "summary": "Order, format, control and questions: decided in advance with fixed slides, decided by the speech with the FOLLOW canvas.",
+      "position": {
+        "x": 80,
+        "y": 1040
+      },
+      "visual": {
+        "type": "comparison",
+        "leftId": "problem",
+        "rightId": "reversal",
+        "relationshipId": "slides-vs-follow"
+      },
+      "aliases": [
+        "slides versus FOLLOW",
+        "side by side",
+        "fixed slides compared with the canvas"
+      ],
+      "speechExamples": [
+        "If you put fixed slides side by side with what we're doing, the difference is pretty stark.",
+        "With slides the order is fixed before the talk, whereas here the speech decides it.",
+        "Compared with a deck of separate pages, this is one continuous canvas.",
+        "A clicker versus your own voice, with a manual override if you need it.",
+        "Slides make you search back for an earlier point, whereas FOLLOW just returns to it with its context."
+      ],
+      "sources": [
+        {
+          "page": 3,
+          "quote": "Fixed slides compared with a speech-directed canvas",
+          "start": 522,
+          "end": 573
+        },
+        {
+          "page": 3,
+          "quote": "Table 1. Fixed slides compared with the FOLLOW canvas.",
+          "start": 850,
+          "end": 904
+        }
+      ],
+      "details": []
+    },
+    {
+      "assetIds": [],
+      "enabled": true,
+      "review": "reviewed",
+      "id": "architecture",
+      "title": "Prepared once with AI, presented live on the device",
+      "summary": "Before the talk an AI model proposes concepts linked to their pages, and the speaker approves them. During the talk, speech and matching run locally.",
+      "position": {
+        "x": 2420,
+        "y": 1040
+      },
+      "visual": {
+        "type": "concept"
+      },
+      "aliases": [
+        "the architecture",
+        "prepared once",
+        "runs locally",
+        "on the device",
+        "offline",
+        "no audio sent to a server"
+      ],
+      "speechExamples": [
+        "So what happens before the talk? An AI model reads the document once and proposes the concepts.",
+        "Every concept and fact it suggests is linked back to the page it came from.",
+        "I review all of that and approve it before I ever present.",
+        "During the talk, the speech recognition and the matching run locally on this laptop.",
+        "To answer the privacy question: my live audio never gets sent to a server.",
+        "It only ever shows material I approved, it never makes up new facts on stage."
+      ],
+      "sources": [
+        {
+          "page": 4,
+          "quote": "Prepared once with AI, presented live on the device",
+          "start": 56,
+          "end": 107
+        },
+        {
+          "page": 4,
+          "quote": "Before the talk, an AI model reads the document once and proposes concepts, supporting facts and relationships, each linked to the page it came from.",
+          "start": 108,
+          "end": 257
+        },
+        {
+          "page": 4,
+          "quote": "During the talk, speech recognition and meaning matching run locally on the laptop.",
+          "start": 306,
+          "end": 389
+        }
+      ],
+      "details": [
+        {
+          "id": "prepared",
+          "text": "An AI model reads the document once; each item links to its page.",
+          "sources": [
+            {
+              "page": 4,
+              "quote": "Before the talk, an AI model reads the document once and proposes concepts, supporting facts and relationships, each linked to the page it came from.",
+              "start": 108,
+              "end": 257
+            }
+          ],
+          "origin": "source"
+        },
+        {
+          "id": "review",
+          "text": "The speaker reviews and approves the material.",
+          "sources": [
+            {
+              "page": 4,
+              "quote": "The speaker reviews and approves this material.",
+              "start": 258,
+              "end": 305
+            }
+          ],
+          "origin": "source"
+        },
+        {
+          "id": "local",
+          "text": "Speech recognition and matching run locally on the laptop.",
+          "sources": [
+            {
+              "page": 4,
+              "quote": "During the talk, speech recognition and meaning matching run locally on the laptop.",
+              "start": 306,
+              "end": 389
+            }
+          ],
+          "origin": "source"
+        },
+        {
+          "id": "audio",
+          "text": "Live audio is never sent to a server.",
+          "sources": [
+            {
+              "page": 4,
+              "quote": "Live audio is never sent to a server.",
+              "start": 390,
+              "end": 427
+            }
+          ],
+          "origin": "source"
+        },
+        {
+          "id": "approved",
+          "text": "Only approved material is shown; no new facts on stage.",
+          "sources": [
+            {
+              "page": 4,
+              "quote": "FOLLOW only shows approved material. It never invents new facts on stage.",
+              "start": 428,
+              "end": 501
+            }
+          ],
+          "origin": "source"
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "id": "slides-vs-follow",
+      "from": "problem",
+      "to": "reversal",
+      "label": "fixed slides vs the FOLLOW canvas",
+      "kind": "comparison",
+      "sources": [
+        {
+          "page": 3,
+          "quote": "Table 1. Fixed slides compared with the FOLLOW canvas.",
+          "start": 850,
+          "end": 904
+        }
+      ],
+      "approved": true
+    },
+    {
+      "id": "reversal-pipeline",
+      "from": "reversal",
+      "to": "pipeline",
+      "label": "how the canvas follows the speech",
+      "kind": "association",
+      "sources": [
+        {
+          "page": 2,
+          "quote": "The presentation listens and brings the right concept onto one continuous canvas.",
+          "start": 226,
+          "end": 307
+        }
+      ],
+      "approved": true
+    },
+    {
+      "id": "pipeline-matching",
+      "from": "pipeline",
+      "to": "matching",
+      "label": "the match step, by meaning",
+      "kind": "association",
+      "sources": [
+        {
+          "page": 2,
+          "quote": "Match compares the meaning of the latest words with the concepts prepared from the document.",
+          "start": 688,
+          "end": 780
+        }
+      ],
+      "approved": true
+    },
+    {
+      "id": "matching-architecture",
+      "from": "matching",
+      "to": "architecture",
+      "label": "runs locally on the laptop",
+      "kind": "association",
+      "sources": [
+        {
+          "page": 4,
+          "quote": "During the talk, speech recognition and meaning matching run locally on the laptop.",
+          "start": 306,
+          "end": 389
+        }
+      ],
+      "approved": true
+    },
+    {
+      "id": "architecture-reversal",
+      "from": "architecture",
+      "to": "reversal",
+      "label": "prepare once, then speak freely",
+      "kind": "association",
+      "sources": [
+        {
+          "page": 2,
+          "quote": "The speaker prepares source material once, then explains it naturally in any order.",
+          "start": 142,
+          "end": 225
+        }
+      ],
+      "approved": true
+    }
+  ],
+  "assets": [],
+  "approvedRevision": 1
+}
