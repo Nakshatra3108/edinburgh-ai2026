@@ -109,3 +109,17 @@ describe('speech-driven canvas', () => {
     expect(() => parseCanvasProject(s.project)).not.toThrow();
   });
 });
+
+it('reflows measured card heights without overlapping context nodes or changing compact roles',()=>{
+  const p=prepared();const concepts=p.concepts.filter(c=>['problem','pipeline','reversal'].includes(c.id));
+  const state:CanvasState={...createCanvasState({...p,concepts}),live:true,view:'focus',focusId:'problem',boardIds:['problem','pipeline','reversal'],introduced:['problem','pipeline','reversal']};
+  const initial=getComposition(state);
+  const heights={[initial[0].measureKey!]:1200,[initial[1].measureKey!]:600};
+  const grown=getComposition(state,heights);
+  expect(grown[0].height).toBeGreaterThanOrEqual(1200);
+  expect(grown[1].height).toBeGreaterThanOrEqual(600);
+  expect(grown[1].compact).toBe(true);
+  expect(grown[2].compact).toBe(true);
+  expect(grown[1].y+grown[1].height).toBeLessThan(grown[2].y);
+  expect(grown[2].y+grown[2].height).toBe(grown[0].height);
+});

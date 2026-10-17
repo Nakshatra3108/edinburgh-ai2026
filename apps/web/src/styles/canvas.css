@@ -189,3 +189,12 @@
 
 .canvas-board .visual-metric:not(.is-compact) .metric-value-long { font-size:64px; }
 .canvas-board .visual-metric:not(.is-compact) .metric-unit-long { display:block; margin:12px 0 0; font-size:26px; line-height:1.2; }
+
+/* The live layout measures actual body overflow and expands/reflows nodes. Never
+   use the body as a clipping mask for source-backed supporting points. */
+.canvas-board .node-detail-group:not([hidden]) { overflow:visible; }
+.canvas-board .visual-process.is-compact .process-path { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px 12px; margin:8px 0 0; }
+.canvas-board .visual-process.is-compact .process-path li { display:flex; align-items:flex-start; gap:8px; padding:8px 0; min-width:0; }
+.canvas-board .visual-process.is-compact .step-index { width:24px; height:24px; font-size:16px; margin:0; flex-shrink:0; }
+.canvas-board .visual-process.is-compact .step-label { min-width:0; font-size:20px; line-height:1.25; }
+.canvas-board .visual-process.is-compact .process-path li::before,.canvas-board .visual-process.is-compact .process-path li::after { display:none; }

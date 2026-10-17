@@ -1,9 +1,10 @@
-import { memo, type ReactNode } from 'react';
+import { memo, useLayoutEffect, useRef, type ReactNode } from 'react';
 import { Handle, Position, type Node, type NodeProps } from '@xyflow/react';
 import { ArrowRight, Layers2, GitCompareArrows, Image as ImageIcon, Route, Hash, AudioLines, BrainCircuit, Database, FileText, Workflow, ShieldCheck, Users, Zap, Network } from 'lucide-react';
 import { metricDisplay } from './metric';
 import type { Asset, Concept } from './domain';
 export type CanvasNodeData = {
+  measureKey?: string; onHeightNeeded?: (key:string,height:number)=>void;
   board?: boolean; compact?: boolean; concept: Concept; expanded: boolean; paired: boolean; home: boolean; introduced: boolean;
   revealed: string[]; highlightedDetailId: string | null; asset?: Asset; assetUrl?: string;
 };
@@ -23,13 +24,32 @@ function TopicGlyph({ concept }: { concept: Concept }) {
   return <Icon className="topic-glyph" size={72} strokeWidth={1.5} aria-hidden="true"/>;
 }
 function NodeShell({ data, children }: { data: CanvasNodeData; children?: ReactNode }) {
+  const ref=useRef<HTMLElement>(null);
+  useLayoutEffect(()=>{
+    const article=ref.current;
+    if(!article || !data.board || !data.expanded || !data.measureKey || !data.onHeightNeeded)return;
+    const body=article.querySelector<HTMLElement>('.node-detail-group');
+    if(!body || body.hidden)return;
+    let disposed=false;
+    const measure=()=>{
+      if(disposed)return;
+      const overflow=body.scrollHeight-body.clientHeight;
+      if(overflow>1)data.onHeightNeeded!(data.measureKey!,article.offsetHeight+overflow+8);
+    };
+    measure();
+    const observer=new ResizeObserver(measure);
+    observer.observe(body);
+    article.querySelectorAll('h2,.node-summary,.node-points,.process-path,.metric-composition,.source-figure').forEach(el=>observer.observe(el));
+    void document.fonts.ready.then(measure);
+    return ()=>{disposed=true;observer.disconnect();};
+  },[data.board,data.expanded,data.measureKey,data.onHeightNeeded,data.concept,data.revealed]);
   const Icon = visualIcons[data.concept.visual.type];
-  return <article className={`canvas-node visual-${data.concept.visual.type} ${data.expanded ? 'is-focused' : 'is-anchor'} ${data.introduced ? 'is-introduced' : ''} ${data.home ? 'is-home' : ''} ${data.paired ? 'is-paired' : ''} ${data.board ? 'is-board-element' : ''} ${data.compact ? 'is-compact' : ''}`}  aria-label={data.concept.title}>
+  return <article ref={ref} className={`canvas-node visual-${data.concept.visual.type} ${data.expanded ? 'is-focused' : 'is-anchor'} ${data.introduced ? 'is-introduced' : ''} ${data.home ? 'is-home' : ''} ${data.paired ? 'is-paired' : ''} ${data.board ? 'is-board-element' : ''} ${data.compact ? 'is-compact' : ''}`}  aria-label={data.concept.title}>
     <Handle type="target" position={Position.Left} isConnectable={false} />
     <div className="node-type"><Icon size={24}/><span>{visualNames[data.concept.visual.type]}</span>{data.home && <span>Home anchor</span>}</div>
     {data.board && data.concept.visual.type !== 'figure' && data.concept.visual.type !== 'metric' && <TopicGlyph concept={data.concept}/>}
     <h2>{data.concept.title}</h2>
-    <div className="node-detail-group" hidden={!data.expanded}><p className="node-summary" hidden={data.concept.visual.type === 'figure' || (data.paired && !data.compact && data.revealed.length > 0 && data.concept.visual.type === 'concept')}>{data.concept.summary}</p>{children}</div>
+    <div className="node-detail-group" hidden={!data.expanded}><p className="node-summary" hidden={data.concept.visual.type === 'figure' || (data.board && data.compact && data.concept.visual.type === 'process') || (data.paired && !data.compact && data.revealed.length > 0 && data.concept.visual.type === 'concept')}>{data.concept.summary}</p>{children}</div>
     {!data.expanded && !data.home && <div className="anchor-rule" aria-hidden="true"><span/><ArrowRight size={32}/></div>}
     {data.board && <span className="board-provenance">{data.concept.sources.length ? `Source · p. ${[...new Set(data.concept.sources.map(s => s.page))].join(', ')}` : 'Original PDF figure'}</span>}
     <Handle type="source" position={Position.Right} isConnectable={false}/>

@@ -26,8 +26,12 @@ function CanvasInner({ state, mode = 'studio', reducedMotion = false, onAction, 
   const [zoom, setZoom] = useState(1);
   const [dragPositions, setDragPositions] = useState<Record<string, { x: number; y: number }>>({});
   const [cameraRequest, setCameraRequest] = useState(0);
+  const [measuredHeights,setMeasuredHeights] = useState<Record<string,number>>({});
+  const onHeightNeeded = useCallback((key:string,height:number) => {
+    setMeasuredHeights(previous => (previous[key] ?? 0) >= height ? previous : {...previous,[key]:Math.ceil(height)});
+  },[]);
   const renderState = useMemo(() => mode === 'audience' ? { ...state, project: { ...state.project, concepts: state.project.concepts.filter(c => c.review !== 'needs-review') } } : state, [mode, state]);
-  const scene = useMemo(() => getComposition(renderState), [renderState]);
+  const scene = useMemo(() => getComposition(renderState,measuredHeights), [renderState,measuredHeights]);
   const lastCamera = useRef({ key: '', at: -Infinity });
   const nodes = useMemo<FollowNode[]>(() => scene.map(item => ({
     id: item.id, type: item.concept.visual.type, hidden: state.view !== 'overview' && !item.expanded, position: dragPositions[item.id] ?? { x: item.x, y: item.y },
@@ -36,14 +40,14 @@ function CanvasInner({ state, mode = 'studio', reducedMotion = false, onAction, 
     selectable: false, focusable: mode === 'studio' && !item.home,
     ariaLabel: `${item.concept.title}, ${item.concept.visual.type}. Press Enter to focus.`,
     data: { concept: item.concept, expanded: item.expanded, paired: !!state.pair?.includes(item.concept.id), home: !!item.home,
-      board: !!(state.live && state.boardIds?.length && state.view !== 'overview'), compact: item.height < 500,
+      board: !!(state.live && state.boardIds?.length && state.view !== 'overview'), compact: !!item.compact, measureKey:item.measureKey, onHeightNeeded,
       introduced: state.introduced.includes(item.concept.id), revealed: state.revealed[item.concept.id] ?? EMPTY,
       highlightedDetailId: state.highlightedDetailId,
       ...(item.concept.visual.type === 'figure' ? (() => {
         const id = item.concept.visual.assetId; const asset = state.project.assets.find(a => a.id === id);
         return { asset, assetUrl: asset ? resolveAsset(asset) : undefined };
       })() : {}) },
-  })), [scene, state, locked, mode, resolveAsset, dragPositions]);
+  })), [scene, state, locked, mode, resolveAsset, dragPositions, onHeightNeeded]);
   const edges = useMemo<Edge[]>(() => state.project.relationships.filter(r => r.approved && nodes.some(n => n.id === r.from) && nodes.some(n => n.id === r.to)).map(r => ({
     id: r.id, source: r.from, target: r.to, type: 'smoothstep', focusable: false, selectable: false,
     hidden: state.view !== 'overview' && !(state.live && state.boardIds?.includes(r.from) && state.boardIds.includes(r.to)) && r.id !== state.activeRelationshipId,
@@ -66,7 +70,7 @@ function CanvasInner({ state, mode = 'studio', reducedMotion = false, onAction, 
   // Semantic framing, computed independently for each viewport. New destinations interrupt old ones.
   useEffect(() => {
     if (!ready || !size.width || !size.height) return;
-    const bounds = getCompositionBounds(renderState);
+    const bounds = getCompositionBounds(renderState,measuredHeights);
     const key = JSON.stringify([bounds, size, cameraRequest]);
     if (lastCamera.current.key === key) return;
     // Keep the composition label and studio toolbar outside the fitted content.
@@ -79,7 +83,7 @@ function CanvasInner({ state, mode = 'studio', reducedMotion = false, onAction, 
       void flow.setViewport(viewport, { duration: reducedMotion || cameraOrigin === 'manual' ? 0 : 280, ease: cameraEase });
     };
     commit();
-  }, [ready, size, renderState, flow, reducedMotion, cameraOrigin, cameraRequest, mode, state.pair]);
+  }, [ready, size, renderState, flow, reducedMotion, cameraOrigin, cameraRequest, mode, state.pair, measuredHeights]);
   const positionChange = useCallback((changes: NodeChange<FollowNode>[]) => {
     changes.forEach(c => {
       if (c.type !== 'position' || !c.position) return;
