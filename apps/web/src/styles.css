@@ -323,6 +323,28 @@ select {
 .mic-row button {
   flex: 1;
 }
+.mic-transcript {
+  margin-top: 12px;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--canvas);
+}
+.mic-transcript span {
+  display: block;
+  color: var(--muted);
+  font-size: 8px;
+  letter-spacing: 1px;
+  margin-bottom: 7px;
+}
+.mic-transcript strong {
+  display: block;
+  color: var(--secondary);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
 meter {
   width: 70px;
   height: 10px;

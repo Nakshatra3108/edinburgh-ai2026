@@ -9,7 +9,7 @@ import { WorkerClient } from "../workers/rpc";
 import type { Backend, SpeechModel } from "../workers/protocol";
 import { Matcher, isFiller, type Score } from "./matcher";
 import { LatestQueue } from "../audio/latest-queue";
-import { Chunker, deduplicate, rms } from "../audio/pcm";
+import { Chunker, deduplicate, speechEnergy } from "../audio/pcm";
 import { decodeRecording, MicrophoneCapture } from "../audio/capture";
 
 type ModelState = "absent" | "loading" | "ready" | "failed";
@@ -413,7 +413,7 @@ export class SpeechMatchingSession {
       }
       for (const chunk of chunks) {
         if (epoch !== this.state.epoch) return;
-        if (rms(chunk) < 0.008) continue;
+        if (!speechEnergy(chunk).voiced) continue;
         const start = performance.now();
         const reply = await this.speechClient!.request(
           { type: "transcribe", pcm: chunk },

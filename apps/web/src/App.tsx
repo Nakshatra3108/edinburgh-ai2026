@@ -54,6 +54,7 @@ export function App() {
   const busy = state.capture !== "off" || state.recording || evaluating;
   const active = manifest.concepts.find((c) => c.id === state.activeId);
   const candidate = state.candidate;
+  const latestDecision = candidate ?? state.events.at(-1) ?? null;
   async function evaluate() {
     session.stop();
     setEvaluating(true);
@@ -297,6 +298,12 @@ export function App() {
                   aria-label="Microphone input level"
                 />
               </div>
+              <div className="mic-transcript" aria-live="polite">
+                <span>LIVE MICROPHONE TRANSCRIPT</span>
+                <strong>
+                  {state.latestSpeech || "Waiting for a complete speech chunk…"}
+                </strong>
+              </div>
               <label className="file-label" htmlFor="recording">
                 Or test a recorded clip{" "}
                 <span className="muted">≤60 sec / 25 MB</span>
@@ -351,7 +358,7 @@ export function App() {
                 <p>
                   {candidate?.stable && !automaticPreview
                     ? "A suggestion is ready. Click Accept candidate below, or enable automatic preview."
-                    : (candidate?.reason ??
+                    : (latestDecision?.reason ??
                       (state.capture === "active" &&
                       !state.audioChunks &&
                       state.silences
@@ -410,21 +417,21 @@ export function App() {
                 <span className="step">02</span>
                 <h2 id="decision-heading">Matching decision</h2>
                 <span
-                  className={`decision-badge ${candidate?.stable ? "candidate" : ""}`}
+                  className={`decision-badge ${latestDecision?.stable ? "candidate" : ""}`}
                 >
-                  {candidate?.action.type ?? "HOLD"}
+                  {latestDecision?.action.type ?? "HOLD"}
                 </span>
               </div>
               <div className="decision-summary" aria-live="polite">
                 <strong>
-                  {candidate
+                  {latestDecision
                     ? (manifest.concepts.find(
-                        (c) => c.id === candidate.conceptId,
+                        (c) => c.id === latestDecision.conceptId,
                       )?.title ?? "No topic selected")
                     : "Waiting for an observation"}
                 </strong>
                 <p>
-                  {candidate?.reason ??
+                  {latestDecision?.reason ??
                     "Uncertain input keeps the current visual in place."}
                 </p>
               </div>
@@ -432,13 +439,13 @@ export function App() {
                 <div>
                   <span>TOP SCORE</span>
                   <strong>
-                    {candidate ? candidate.strength.toFixed(3) : "—"}
+                    {latestDecision ? latestDecision.strength.toFixed(3) : "—"}
                   </strong>
                 </div>
                 <div>
                   <span>RUNNER-UP MARGIN</span>
                   <strong>
-                    {candidate ? candidate.margin.toFixed(3) : "—"}
+                    {latestDecision ? latestDecision.margin.toFixed(3) : "—"}
                   </strong>
                 </div>
                 <div>

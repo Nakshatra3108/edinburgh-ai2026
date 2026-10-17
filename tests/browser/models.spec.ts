@@ -71,6 +71,15 @@ test("real browser embeddings and Whisper recording path", async () => {
       }),
     ).toBeVisible();
     await expect(
+      page.locator(".stats > div").nth(0).locator("strong"),
+    ).not.toHaveText("—");
+    await expect(
+      page.locator(".stats > div").nth(1).locator("strong"),
+    ).not.toHaveText("—");
+    await expect(page.locator(".mic-transcript")).toContainText(
+      "LIVE MICROPHONE TRANSCRIPT",
+    );
+    await expect(
       page.getByRole("button", { name: "Accept candidate" }),
     ).toHaveCount(0);
     await page

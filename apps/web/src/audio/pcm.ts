@@ -3,6 +3,37 @@ export function rms(samples: Float32Array): number {
     ? Math.sqrt(samples.reduce((sum, x) => sum + x * x, 0) / samples.length)
     : 0;
 }
+
+export interface SpeechEnergy {
+  rms: number;
+  peakFrameRms: number;
+  voicedFrameRatio: number;
+  voiced: boolean;
+}
+
+/** Detect speech in short frames so pauses do not hide a quiet voice. */
+export function speechEnergy(
+  samples: Float32Array,
+  sampleRate = 16_000,
+): SpeechEnergy {
+  const frameSize = Math.max(1, Math.round(sampleRate * 0.02));
+  let peakFrameRms = 0;
+  let voicedFrames = 0;
+  let frames = 0;
+  for (let offset = 0; offset < samples.length; offset += frameSize) {
+    const frameRms = rms(samples.subarray(offset, offset + frameSize));
+    peakFrameRms = Math.max(peakFrameRms, frameRms);
+    if (frameRms >= 0.0025) voicedFrames++;
+    frames++;
+  }
+  const voicedFrameRatio = frames ? voicedFrames / frames : 0;
+  return {
+    rms: rms(samples),
+    peakFrameRms,
+    voicedFrameRatio,
+    voiced: peakFrameRms >= 0.004 && voicedFrameRatio >= 0.03,
+  };
+}
 export function resample(
   input: Float32Array,
   from: number,

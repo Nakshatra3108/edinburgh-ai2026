@@ -42,7 +42,7 @@ Silence, filler, duplicated final text, negation, stale sequences and uncertain 
 
 ## Audio and timing
 
-AudioWorklet mixes channels to mono, batches 4096 samples, resamples actual input-rate PCM to 16 kHz with area averaging, and emits 3.5-second windows with 0.5-second overlap. RMS <0.008 skips a window without cancelling speech already being transcribed or dismissing a valid suggestion. Stop/reset/mute still invalidate pending inference. This is a cheap tuning gate, not diarisation or a production VAD. Test quiet voices and room noise before adjusting it. The resampler is a prototype, not a studio-quality resampling filter.
+AudioWorklet mixes channels to mono, batches 4096 samples, resamples actual input-rate PCM to 16 kHz with area averaging, and emits 3.5-second windows with 0.5-second overlap. A frame-aware energy gate retains short or quiet speech bursts that would disappear in a whole-window RMS average, while very low background noise skips the window without cancelling speech already being transcribed or dismissing a valid suggestion. Stop/reset/mute still invalidate pending inference. This is a lightweight tuning gate, not diarisation or a production VAD. Test quiet voices and room noise before adjusting it. The resampler is a prototype, not a studio-quality resampling filter.
 
 Live queue: one executing ASR chunk plus newest pending. New pending audio replaces old pending audio; reset invalidates both pending work and late results. Word overlap uses case/punctuation-normalized suffix/prefix alignment; it does not claim forced alignment or perfect deduplication of inconsistent ASR hypotheses. Only complete chunk transcripts enter matching; there is no provisional-token UI.
 

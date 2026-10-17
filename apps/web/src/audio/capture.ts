@@ -1,5 +1,5 @@
 import workletUrl from "./pcm-worklet.js?url";
-import { Chunker, resample, rms } from "./pcm";
+import { Chunker, resample, rms, speechEnergy } from "./pcm";
 
 export class MicrophoneCapture {
   private stream?: MediaStream;
@@ -39,7 +39,7 @@ export class MicrophoneCapture {
         if (this.cancelled) return;
         onLevel(rms(data));
         for (const pcm of chunker.push(resample(data, context.sampleRate))) {
-          if (rms(pcm) < 0.008) onSilence();
+          if (!speechEnergy(pcm).voiced) onSilence();
           else onChunk(pcm, performance.now());
         }
       };
