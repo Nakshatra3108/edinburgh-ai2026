@@ -1,7 +1,7 @@
 # FOLLOW
 ## Product requirements, visual design, and engineering specification
 
-**Version:** 1.3 — Groq preparation and local live control
+**Version:** 1.4 — Groq preparation and local live control
 
 **Date:** 17 October 2026
 
@@ -157,32 +157,32 @@ If no confident topic is available, hold the current visual. If the microphone f
 
 ## 4. Visual identity and design tokens
 
-### 4.1 Design direction: an editorial presentation studio
+### 4.1 Design direction: a clear, light presentation studio
 
-The audience should remember the explanation and the way it formed. The application should feel deliberate, quiet, and technically precise. The visual signature is a **scarlet focus trace** that connects speech to the active concept. It is an instrument indicator, not a decorative light show.
+The user explicitly replaced the original dark direction with a brighter, more legible interface. Use a light lavender-white workspace, white content surfaces, deep ink typography, violet focus/action accents, and restrained semantic tints. The same one-canvas mechanism, Sora/Inter typography and local-first behavior remain.
 
-Use a near-black stage, graphite controls, warm-white typography, thin connective lines, generous negative space, and one strong accent. Avoid a generic dashboard grid, rainbow nodes, gradient blobs, oversized empty cards, decorative 3D, and repeated floating panels. The canvas is the dominant surface.
-
-Editor chrome is restrained. Audience content has editorial variety: a large statement, a process, a diagram, a figure, or a comparison. Do not render every type as an identical rounded rectangle.
+Make the next action visible. Start with the real curated demo, explain topic selection in the workspace, and provide a prominent Reveal next point control. Supporting-point buttons come before editing fields. Rare diagnostic controls live behind Tools. A focused concept and its revealed details must be distinguishable through text, position and borders, not color alone.
 
 ### 4.2 Colour tokens
 
 | Token | Value | Role |
 | --- | --- | --- |
-| `canvas` | `#0A0A0B` | Main stage and application background |
-| `surface` | `#15171B` | Sidebars and input surfaces |
-| `surface-raised` | `#1F2328` | Menus, selected inspector sections, dialogs |
-| `text-primary` | `#F5F5F2` | Titles and essential copy |
-| `text-secondary` | `#B7BDC6` | Body text, context, labels |
-| `text-muted` | `#929AA5` | Nonessential metadata; still contrast-tested |
-| `line` | `#343940` | Dividers and idle connectors |
-| `brand` | `#FF102A` | Primary action, active focus, focus ring |
-| `brand-deep` | `#89001E` | Selected background tint and restrained shadow |
-| `success` | `#91D7AD` | Approved/ready status, paired with text |
-| `warning` | `#E7BB72` | Review required or degraded operation |
-| `danger` | `#FF8F9C` | Errors, paired with explicit copy |
+| `canvas` | `#F5F6FB` | Main workspace and stage |
+| `surface` | `#FFFFFF` | Content and tool surfaces |
+| `surface-raised` | `#ECEEF7` | Subtle tool and waiting-state backgrounds |
+| `text-primary` | `#20253D` | Titles and essential copy |
+| `text-secondary` | `#4F5972` | Body and control labels |
+| `text-muted` | `#687189` | Contrast-checked metadata |
+| `line` | `#D4D9E6` | Surface dividers |
+| `connector` | `#9DA8C0` | Inactive canvas relationships |
+| `brand` | `#5945CC` | Primary actions and focus |
+| `brand-deep` | `#EEEAFB` | Selected backgrounds |
+| `brand-ink` | `#FFFFFF` | Labels on primary actions |
+| `success` | `#226C4D` | Reviewed/ready states |
+| `warning` | `#875309` | Pending capabilities and review warnings |
+| `danger` | `#B42B45` | Errors with recovery text |
 
-Use tokens in component specifications and code. Token definitions are the only source of raw palette values. Do not use the brand colour as small body text or assume white text on scarlet passes contrast: use dark label ink or a tested lighter/outlined alternative where required. Validate actual rendered contrast before shipping. Status never depends on colour alone.
+See `apps/web/src/styles/tokens.css` for semantic type tints and motion/spacing tokens. This light theme supersedes the earlier dark palette. Do not hardcode dark styling into newly integrated screens.
 
 ### 4.3 Typography
 
@@ -947,7 +947,7 @@ Read from [DivyomSharma/myskills](https://github.com/DivyomSharma/myskills), pin
 
 | Skill | Application in this PRD |
 | --- | --- |
-| [UI/UX Pro Max](https://github.com/DivyomSharma/myskills/blob/59bb372f3eff115dfb4564461822abe6adeca28d/ui-ux-pro-max/SKILL.md) | Sora/Inter, near-black and graphite surfaces, scarlet emphasis, equal comparison panels, touch targets |
+| [UI/UX Pro Max](https://github.com/DivyomSharma/myskills/blob/59bb372f3eff115dfb4564461822abe6adeca28d/ui-ux-pro-max/SKILL.md) | Sora/Inter, light surfaces and ink typography, violet emphasis, equal comparison panels, touch targets |
 | [Design engineering](https://github.com/DivyomSharma/myskills/blob/59bb372f3eff115dfb4564461822abe6adeca28d/emilkowalski-skills/skills/emil-design-eng/SKILL.md) | Purposeful motion, immediate control feedback, interruption, reduced motion |
 | [Handoff specification](https://github.com/DivyomSharma/myskills/blob/59bb372f3eff115dfb4564461822abe6adeca28d/designer-skills-main/design-ops/skills/handoff-spec/SKILL.md) | Measurements, component states, responsive rules, content limits, edge cases, and acceptance |
 | [Motion system](https://github.com/DivyomSharma/myskills/blob/59bb372f3eff115dfb4564461822abe6adeca28d/designer-skills-main/design-systems/skills/motion-system/SKILL.md) | Shared duration/easing tokens, choreography, system-level reduced motion |

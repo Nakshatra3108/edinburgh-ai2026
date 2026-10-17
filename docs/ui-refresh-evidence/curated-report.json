@@ -1,0 +1,230 @@
+{
+  "page_errors": [],
+  "concepts": [
+    {
+      "id": "problem",
+      "viewport": [
+        1280,
+        720
+      ],
+      "measurements": [
+        {
+          "title": "Slides lock speakers into a fixed order",
+          "height": 794,
+          "scroll": 794,
+          "zoom": 0.709531,
+          "points": 1
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "id": "problem",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "measurements": [
+        {
+          "title": "Slides lock speakers into a fixed order",
+          "height": 794,
+          "scroll": 794,
+          "zoom": 1.06301,
+          "points": 1
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "id": "reversal",
+      "viewport": [
+        1280,
+        720
+      ],
+      "measurements": [
+        {
+          "title": "The speech decides what the audience sees",
+          "height": 794,
+          "scroll": 794,
+          "zoom": 0.709531,
+          "points": 3
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "id": "reversal",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "measurements": [
+        {
+          "title": "The speech decides what the audience sees",
+          "height": 794,
+          "scroll": 794,
+          "zoom": 1.06301,
+          "points": 3
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "id": "pipeline",
+      "viewport": [
+        1280,
+        720
+      ],
+      "measurements": [
+        {
+          "title": "Four steps: capture, understand, match, compose",
+          "height": 794,
+          "scroll": 794,
+          "zoom": 0.709531,
+          "points": 0
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "id": "pipeline",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "measurements": [
+        {
+          "title": "Four steps: capture, understand, match, compose",
+          "height": 794,
+          "scroll": 794,
+          "zoom": 1.06301,
+          "points": 0
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "id": "matching",
+      "viewport": [
+        1280,
+        720
+      ],
+      "measurements": [
+        {
+          "title": "Matching by meaning, and holding when unsure",
+          "height": 794,
+          "scroll": 794,
+          "zoom": 0.709531,
+          "points": 1
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "id": "matching",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "measurements": [
+        {
+          "title": "Matching by meaning, and holding when unsure",
+          "height": 794,
+          "scroll": 794,
+          "zoom": 1.06301,
+          "points": 1
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "id": "comparison",
+      "viewport": [
+        1280,
+        720
+      ],
+      "measurements": [
+        {
+          "title": "Slides lock speakers into a fixed order",
+          "height": 754,
+          "scroll": 754,
+          "zoom": 0.682119,
+          "points": 1
+        },
+        {
+          "title": "The speech decides what the audience sees",
+          "height": 754,
+          "scroll": 754,
+          "zoom": 0.682119,
+          "points": 3
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "id": "comparison",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "measurements": [
+        {
+          "title": "Slides lock speakers into a fixed order",
+          "height": 754,
+          "scroll": 754,
+          "zoom": 1.02252,
+          "points": 1
+        },
+        {
+          "title": "The speech decides what the audience sees",
+          "height": 754,
+          "scroll": 754,
+          "zoom": 1.02252,
+          "points": 3
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "id": "architecture",
+      "viewport": [
+        1280,
+        720
+      ],
+      "measurements": [
+        {
+          "title": "Prepared once with AI, presented live on the device",
+          "height": 794,
+          "scroll": 794,
+          "zoom": 0.709531,
+          "points": 3
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "id": "architecture",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "measurements": [
+        {
+          "title": "Prepared once with AI, presented live on the device",
+          "height": 794,
+          "scroll": 794,
+          "zoom": 1.06301,
+          "points": 3
+        }
+      ],
+      "overflow": false
+    }
+  ],
+  "requests": [],
+  "manifest_import": "passed",
+  "audience_window_count": 1,
+  "matching_pdf_opens_demo": "passed",
+  "different_hash_does_not_open_curated_project": "passed",
+  "primary_demo_action": "passed",
+  "reload_restores_project": false
+}
