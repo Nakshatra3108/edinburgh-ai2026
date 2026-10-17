@@ -26,10 +26,29 @@ export function pageTextFromItems(items: readonly TextItemLike[]): string {
   return normalizeText(raw);
 }
 
-/** Locates an exact quote (after the same normalization) in normalized page text. */
+// One-for-one typographic look-alikes, so folding never changes string length.
+const FOLD: Record<string, string> = {
+  '‐': '-', '‑': '-', '‒': '-', '–': '-', '—': '-', '−': '-',
+  '‘': "'", '’': "'", '“': '"', '”': '"',
+};
+const fold = (s: string) => s.replace(/[‐-—−‘’“”]/g, (c) => FOLD[c]);
+
+/**
+ * Locates a quote in normalized page text. Exact matches win. Otherwise it
+ * tolerates dash/quote look-alikes and one added trailing punctuation mark
+ * (common in model output). The returned quote is always the page's own text,
+ * so provenance stays exact.
+ */
 export function locateQuote(pageText: string, quote: string): { quote: string; start: number; end: number } | null {
   const q = normalizeText(quote);
   if (!q) return null;
-  const start = pageText.indexOf(q);
-  return start === -1 ? null : { quote: q, start, end: start + q.length };
+  const exact = pageText.indexOf(q);
+  if (exact !== -1) return { quote: q, start: exact, end: exact + q.length };
+  const page = fold(pageText);
+  const folded = fold(q);
+  for (const candidate of [folded, folded.replace(/[.,;:!?]$/, '')]) {
+    const start = candidate ? page.indexOf(candidate) : -1;
+    if (start !== -1) return { quote: pageText.slice(start, start + candidate.length), start, end: start + candidate.length };
+  }
+  return null;
 }
