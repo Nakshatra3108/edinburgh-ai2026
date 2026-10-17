@@ -26,7 +26,7 @@ export type Asset = {
 export type CanvasProject = {
   schemaVersion: 1; id: string; revision: number; title: string;
   source: { name: string; sha256: string; pages: number };
-  preparation: { mode: 'grok' | 'curated'; model: string | null; promptVersion: string; preparedAt: string };
+  preparation: { mode: 'groq' | 'curated'; model: string | null; promptVersion: string; preparedAt: string };
   concepts: Concept[]; relationships: Relationship[]; assets: Asset[]; approvedRevision: number | null;
 };
 export type CanvasAction =
