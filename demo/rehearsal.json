@@ -1,0 +1,59 @@
+[
+  {
+    "text": "The problem is having to operate a slide deck while explaining something.",
+    "expected": "problem"
+  },
+  {
+    "text": "A presenter is distracted by searching for the next page in a rigid slide sequence.",
+    "expected": "problem"
+  },
+  {
+    "text": "We move through capture, understanding, matching, and visual composition.",
+    "expected": "pipeline"
+  },
+  {
+    "text": "These four stages connect sound from the microphone to the final explanation.",
+    "expected": "pipeline"
+  },
+  {
+    "text": "The matcher checks similarity and the gap between the top two topics.",
+    "expected": "matching"
+  },
+  {
+    "text": "When the system is unsure which concept was meant it holds its current focus.",
+    "expected": "matching"
+  },
+  {
+    "text": "A fixed slide deck and a flexible canvas organize a presentation differently.",
+    "expected": "comparison"
+  },
+  {
+    "text": "With slides the order is fixed; with this canvas you can revisit ideas in any order.",
+    "expected": "comparison"
+  },
+  {
+    "text": "We separate cloud preparation before the talk from local browser inference during it.",
+    "expected": "architecture"
+  },
+  {
+    "text": "Whisper and the embedding model run on the device rather than sending live speech to a server.",
+    "expected": "architecture"
+  },
+  {
+    "text": "My final takeaway is that ideas should set the pace of the presentation.",
+    "expected": "closing"
+  },
+  {
+    "text": "To conclude, the speaker can focus on explaining naturally with manual control available.",
+    "expected": "closing"
+  },
+  { "text": "I ordered a sandwich for lunch.", "expected": null },
+  { "text": "Has the football match started yet?", "expected": null },
+  {
+    "text": "The hotel receptionist called about our booking.",
+    "expected": null
+  },
+  { "text": "My phone battery needs charging.", "expected": null },
+  { "text": "We should take the bus to the station.", "expected": null },
+  { "text": "The blue jacket is hanging behind the door.", "expected": null }
+]

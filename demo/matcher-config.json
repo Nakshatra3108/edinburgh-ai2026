@@ -1,0 +1,9 @@
+{
+  "threshold": 0.35,
+  "margin": 0.02,
+  "hits": 2,
+  "retainThreshold": 0.3,
+  "retainMargin": 0.01,
+  "detailThreshold": 0.6,
+  "detailMargin": 0.08
+}

@@ -1,0 +1,27 @@
+{
+  "name": "follow",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/web",
+    "packages/shared"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace @follow/web --",
+    "build": "npm run typecheck && npm run build --workspace @follow/web",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:browser": "playwright test",
+    "test:models": "node scripts/model-smoke.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "@types/node": "22.19.7",
+    "typescript": "5.9.3",
+    "vitest": "4.1.11",
+    "vite": "7.3.7"
+  },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  }
+}

@@ -1,0 +1,110 @@
+[
+  {
+    "text": "A presenter loses their train of thought while hunting through a slide deck.",
+    "expected": "problem"
+  },
+  {
+    "text": "We force people to fit their explanation into a prearranged sequence of pages.",
+    "expected": "problem"
+  },
+  {
+    "text": "The speaker keeps clicking forward and backward instead of concentrating on the audience.",
+    "expected": "problem"
+  },
+  {
+    "text": "Searching for the correct slide creates an awkward interruption.",
+    "expected": "problem"
+  },
+  {
+    "text": "Audio passes through four processing stages before becoming a visual explanation.",
+    "expected": "pipeline"
+  },
+  {
+    "text": "First capture the sound, then transcribe it, select the topic, and display its visual.",
+    "expected": "pipeline"
+  },
+  {
+    "text": "Our processing chain turns microphone input into composed presentation content.",
+    "expected": "pipeline"
+  },
+  {
+    "text": "Let me explain the four steps linking the speaker's voice to the display.",
+    "expected": "pipeline"
+  },
+  {
+    "text": "We use sentence vectors to find concepts with similar meaning.",
+    "expected": "matching"
+  },
+  {
+    "text": "If two topics receive almost identical similarity scores we keep the current view.",
+    "expected": "matching"
+  },
+  {
+    "text": "A topic must win twice before the system changes its focus.",
+    "expected": "matching"
+  },
+  {
+    "text": "Paraphrasing a heading should still resolve to the same prepared concept.",
+    "expected": "matching"
+  },
+  {
+    "text": "A predetermined sequence and a flexible explanation offer different ways to present.",
+    "expected": "comparison"
+  },
+  {
+    "text": "Slides prescribe an order while a responsive canvas supports jumping between ideas.",
+    "expected": "comparison"
+  },
+  {
+    "text": "The same prepared material can be explained in multiple different orders.",
+    "expected": "comparison"
+  },
+  {
+    "text": "We replace a rigid deck with a visual map that responds to the explanation.",
+    "expected": "comparison"
+  },
+  {
+    "text": "All live speech processing happens inside the browser on this laptop.",
+    "expected": "architecture"
+  },
+  {
+    "text": "The cloud model prepares content beforehand and local models handle the actual talk.",
+    "expected": "architecture"
+  },
+  {
+    "text": "Audio remains on the device while the renderer selects reviewed material.",
+    "expected": "architecture"
+  },
+  {
+    "text": "The runtime keeps working without making requests to Grok during a presentation.",
+    "expected": "architecture"
+  },
+  {
+    "text": "What matters is letting the speaker concentrate on sharing their ideas naturally.",
+    "expected": "closing"
+  },
+  {
+    "text": "Our final message is to let the explanation determine the pace.",
+    "expected": "closing"
+  },
+  {
+    "text": "To wrap up, the presentation should follow the person speaking.",
+    "expected": "closing"
+  },
+  {
+    "text": "We finish with the idea that your thoughts lead the presentation.",
+    "expected": "closing"
+  },
+  {
+    "text": "What time does the cafeteria close this evening?",
+    "expected": null
+  },
+  { "text": "I left my umbrella on the train yesterday.", "expected": null },
+  {
+    "text": "The weather forecast says it will rain on Sunday.",
+    "expected": null
+  },
+  { "text": "Would anyone like a cup of coffee?", "expected": null },
+  { "text": "My bicycle needs a replacement front tyre.", "expected": null },
+  { "text": "Okay um well right", "expected": null }
+]
